@@ -1,6 +1,6 @@
 import "server-only";
 
-import { prisma } from "@/lib/prisma";
+import { ensureCrmDatabase, prisma } from "@/lib/prisma";
 import { listActiveClients } from "@/services/clientService";
 import { findMatchingClients } from "@/services/matchingService";
 import type { Property } from "@/types/property";
@@ -31,6 +31,7 @@ export async function checkForNewPropertiesAndNotify(
 ): Promise<AdminNotification[]> {
   if (liveProperties.length === 0) return [];
 
+  await ensureCrmDatabase();
   const seenIds = new Set(
     (await prisma.seenProperty.findMany({ select: { id: true } })).map((row) => row.id)
   );
@@ -70,6 +71,7 @@ export async function checkForNewPropertiesAndNotify(
 }
 
 export async function listNotifications(limit = 30): Promise<AdminNotification[]> {
+  await ensureCrmDatabase();
   const rows = await prisma.notification.findMany({
     orderBy: { createdAt: "desc" },
     take: limit,
@@ -85,13 +87,16 @@ export async function listNotifications(limit = 30): Promise<AdminNotification[]
 }
 
 export async function getUnreadNotificationCount(): Promise<number> {
+  await ensureCrmDatabase();
   return prisma.notification.count({ where: { isRead: false } });
 }
 
 export async function markNotificationRead(id: string): Promise<void> {
+  await ensureCrmDatabase();
   await prisma.notification.update({ where: { id }, data: { isRead: true } }).catch(() => {});
 }
 
 export async function markAllNotificationsRead(): Promise<void> {
+  await ensureCrmDatabase();
   await prisma.notification.updateMany({ where: { isRead: false }, data: { isRead: true } });
 }

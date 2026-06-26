@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { Client as PrismaClientRow } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { ensureCrmDatabase, prisma } from "@/lib/prisma";
 import type { Client, ClientFilters, ClientInput } from "@/types/client";
 
 function toClient(row: PrismaClientRow): Client {
@@ -61,6 +61,7 @@ function toRowData(input: ClientInput) {
 }
 
 export async function listClients(filters: ClientFilters = {}): Promise<Client[]> {
+  await ensureCrmDatabase();
   const rows = await prisma.client.findMany({
     where: {
       archived: filters.includeArchived ? undefined : false,
@@ -84,6 +85,7 @@ export async function listClients(filters: ClientFilters = {}): Promise<Client[]
 
 /** Active, non-archived clients — the set matching should run against on new-property import. */
 export async function listActiveClients(): Promise<Client[]> {
+  await ensureCrmDatabase();
   const rows = await prisma.client.findMany({
     where: { archived: false, status: "active" },
   });
@@ -91,16 +93,19 @@ export async function listActiveClients(): Promise<Client[]> {
 }
 
 export async function getClientById(id: string): Promise<Client | null> {
+  await ensureCrmDatabase();
   const row = await prisma.client.findUnique({ where: { id } });
   return row ? toClient(row) : null;
 }
 
 export async function createClient(input: ClientInput): Promise<Client> {
+  await ensureCrmDatabase();
   const row = await prisma.client.create({ data: toRowData(input) });
   return toClient(row);
 }
 
 export async function updateClient(id: string, input: ClientInput): Promise<Client | null> {
+  await ensureCrmDatabase();
   try {
     const row = await prisma.client.update({ where: { id }, data: toRowData(input) });
     return toClient(row);
@@ -110,6 +115,7 @@ export async function updateClient(id: string, input: ClientInput): Promise<Clie
 }
 
 export async function archiveClient(id: string, archived: boolean): Promise<Client | null> {
+  await ensureCrmDatabase();
   try {
     const row = await prisma.client.update({ where: { id }, data: { archived } });
     return toClient(row);
@@ -119,6 +125,7 @@ export async function archiveClient(id: string, archived: boolean): Promise<Clie
 }
 
 export async function deleteClient(id: string): Promise<boolean> {
+  await ensureCrmDatabase();
   try {
     await prisma.client.delete({ where: { id } });
     return true;
