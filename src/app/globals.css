@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-playfair: "Playfair Display", Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-surface text-primary-900 antialiased;
+}
+
+.dark body {
+  @apply bg-primary-900 text-surface;
+}
+
+.glass {
+  @apply backdrop-blur-md bg-white/70 dark:bg-primary-900/60 border border-white/40 dark:border-white/10;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary-800 px-6 py-3 text-sm font-medium text-white shadow-soft transition hover:bg-primary-700 active:scale-[0.98];
+}
+
+.btn-gold {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3 text-sm font-medium text-primary-900 shadow-soft transition hover:bg-gold-400 active:scale-[0.98];
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-primary-200 px-6 py-3 text-sm font-medium text-primary-800 transition hover:bg-primary-50 dark:border-white/20 dark:text-white dark:hover:bg-white/10;
+}
+
+.card {
+  @apply rounded-xl2 bg-white shadow-soft dark:bg-primary-800/60;
+}
