@@ -19,26 +19,84 @@ body {
   @apply bg-primary-900 text-surface;
 }
 
+/* ── Glass nav ─────────────────────────────────────────── */
 .glass {
-  @apply backdrop-blur-md bg-white/70 dark:bg-primary-900/60 border border-white/40 dark:border-white/10;
+  @apply backdrop-blur-md bg-white/80 dark:bg-primary-900/70 border-b border-white/60 dark:border-white/10;
 }
 
+/* ── Layout ────────────────────────────────────────────── */
 .container-page {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 
+/* ── Buttons ───────────────────────────────────────────── */
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary-800 px-6 py-3 text-sm font-medium text-white shadow-soft transition hover:bg-primary-700 active:scale-[0.98];
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary-800 px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary-700 active:scale-[0.98];
 }
 
 .btn-gold {
-  @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3 text-sm font-medium text-primary-900 shadow-soft transition hover:bg-gold-400 active:scale-[0.98];
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-primary-900 shadow-soft transition hover:bg-gold-400 active:scale-[0.98];
 }
 
 .btn-outline {
-  @apply inline-flex items-center justify-center gap-2 rounded-full border border-primary-200 px-6 py-3 text-sm font-medium text-primary-800 transition hover:bg-primary-50 dark:border-white/20 dark:text-white dark:hover:bg-white/10;
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-primary-200 px-6 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50 hover:border-primary-300 dark:border-white/20 dark:text-white dark:hover:bg-white/10;
 }
 
+/* ── Cards ─────────────────────────────────────────────── */
 .card {
-  @apply rounded-xl2 bg-white shadow-soft dark:bg-primary-800/60;
+  @apply rounded-2xl bg-white shadow-soft ring-1 ring-primary-900/5 dark:bg-primary-800/60 dark:ring-white/5;
+}
+
+/* ── Animations ────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.45s ease both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease both;
+}
+
+/* staggered delay helpers */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
+/* ── Skeleton loader ───────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    theme("colors.primary.100") 25%,
+    theme("colors.primary.50")  50%,
+    theme("colors.primary.100") 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* ── Scale utility not in default Tailwind ─────────────── */
+.group:hover .group-hover\:scale-108 {
+  --tw-scale-x: 1.08;
+  --tw-scale-y: 1.08;
+  transform: var(--tw-transform);
 }

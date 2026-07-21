@@ -8,7 +8,7 @@ const config: Config = {
       colors: {
         primary: {
           DEFAULT: "#0F2A4A",
-          50: "#EEF3F8",
+          50:  "#EEF3F8",
           100: "#D7E3EF",
           200: "#AFC7DF",
           300: "#87ABCF",
@@ -21,7 +21,7 @@ const config: Config = {
         },
         gold: {
           DEFAULT: "#C9A24B",
-          50: "#FBF6EA",
+          50:  "#FBF6EA",
           100: "#F3E6C2",
           200: "#E8D29A",
           300: "#DDBE72",
@@ -35,18 +35,30 @@ const config: Config = {
         surface: "#F7F8FA",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans:  ["var(--font-inter)", "system-ui", "sans-serif"],
         serif: ["var(--font-playfair)", "Georgia", "serif"],
       },
       borderRadius: {
         xl2: "1.25rem",
+        "2xl": "1rem",
       },
       boxShadow: {
-        soft: "0 10px 40px -10px rgba(15, 42, 74, 0.15)",
-        glass: "0 8px 32px 0 rgba(15, 42, 74, 0.1)",
+        soft:    "0 10px 40px -10px rgba(15, 42, 74, 0.15)",
+        glass:   "0 8px 32px 0 rgba(15, 42, 74, 0.08)",
+        card:    "0 4px 20px -4px rgba(15, 42, 74, 0.12)",
+        premium: "0 20px 60px -15px rgba(15, 42, 74, 0.25)",
       },
       backdropBlur: {
         xs: "2px",
+      },
+      scale: {
+        "108": "1.08",
+      },
+      transitionDuration: {
+        "400": "400ms",
+      },
+      spacing: {
+        "18": "4.5rem",
       },
     },
   },

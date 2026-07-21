@@ -25,8 +25,19 @@ export default async function ContactPage() {
             </h2>
             <ul className="mt-4 space-y-3 text-sm text-primary-700 dark:text-white/70">
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-gold-500" /> {t("address")}</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-gold-500" /> +374 10 000 000</li>
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-gold-500" /> info@yerevanrealestate.am</li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 shrink-0 text-gold-500" />
+                <a href="tel:+37477757762" className="transition hover:text-gold-600">+374 77 757 762</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 shrink-0 text-gold-500" />
+                <a href="tel:+37444222310" className="transition hover:text-gold-600">+374 44 222 310</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 shrink-0 text-gold-500" />
+                <a href="tel:+37493524419" className="transition hover:text-gold-600">+374 93 524 419</a>
+              </li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0 text-gold-500" /> info@yerevanrealestate.am</li>
             </ul>
           </div>
           <div className="mt-6 overflow-hidden rounded-xl2 shadow-soft">

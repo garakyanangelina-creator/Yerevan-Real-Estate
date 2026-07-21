@@ -8,22 +8,39 @@ export default function Hero() {
   const t = useTranslations("hero");
 
   return (
-    <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[680px] items-center justify-center overflow-hidden">
       <Image
-        src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80"
+        src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=85"
         alt="Yerevan skyline"
         fill
         priority
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 via-primary-900/60 to-primary-900/30" />
+      {/* Multi-stop gradient for depth */}
+      <div className="absolute inset-0 bg-gradient-to-t from-primary-900/95 via-primary-900/55 to-primary-900/20" />
+      {/* Subtle left vignette */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary-900/40 to-transparent" />
 
-      <div className="container-page relative z-10 flex flex-col items-center gap-6 py-24 text-center text-white">
-        <h1 className="max-w-3xl font-serif text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+      <div className="container-page relative z-10 flex flex-col items-center gap-7 py-28 text-center text-white">
+        {/* Eyebrow badge */}
+        <span className="animate-fade-in rounded-full border border-gold-400/40 bg-gold-500/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-gold-300 backdrop-blur-sm">
+          Premium Real Estate · Yerevan, Armenia
+        </span>
+
+        <h1 className="animate-fade-in delay-100 max-w-3xl font-serif text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
           {t("title")}
         </h1>
-        <p className="max-w-xl text-base text-white/85 sm:text-lg">{t("subtitle")}</p>
-        <QuickSearchBar />
+
+        {/* Gold accent line */}
+        <div className="animate-fade-in delay-200 flex items-center gap-3">
+          <div className="h-px w-12 bg-gold-400/60" />
+          <p className="max-w-xl text-base text-white/80 sm:text-lg">{t("subtitle")}</p>
+          <div className="h-px w-12 bg-gold-400/60" />
+        </div>
+
+        <div className="animate-fade-in delay-300 w-full max-w-2xl">
+          <QuickSearchBar />
+        </div>
       </div>
     </section>
   );
