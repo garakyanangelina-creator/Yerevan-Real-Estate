@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
-import { Bell, LogOut, Users, LayoutDashboard } from "lucide-react";
+import { Bell, LogOut, Users, LayoutDashboard, ShieldAlert, UserCog } from "lucide-react";
 import { Link, useRouter } from "@/i18n/routing";
 
 interface AdminNotification {
@@ -14,9 +13,15 @@ interface AdminNotification {
   createdAt: string;
 }
 
-export default function AdminNav({ active }: { active: "dashboard" | "clients" }) {
-  const t = useTranslations("admin");
-  const tNotif = useTranslations("notifications");
+type ActiveTab = "dashboard" | "clients" | "users";
+
+export default function AdminNav({
+  active,
+  role,
+}: {
+  active: ActiveTab;
+  role: "super_admin" | "admin" | string;
+}) {
   const router = useRouter();
 
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
@@ -49,44 +54,53 @@ export default function AdminNav({ active }: { active: "dashboard" | "clients" }
     setNotifications((list) => list.map((n) => ({ ...n, isRead: true })));
   }
 
-  async function viewMatches(notification: AdminNotification) {
-    await fetch(`/api/admin/notifications/${notification.id}/read`, { method: "POST" });
+  async function viewMatches(n: AdminNotification) {
+    await fetch(`/api/admin/notifications/${n.id}/read`, { method: "POST" });
     setOpen(false);
-    router.push(`/admin/dashboard?matchesFor=${notification.propertyId}`);
+    router.push(`/admin/dashboard?matchesFor=${n.propertyId}`);
   }
 
   async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin");
   }
 
+  const navLink = (href: string, tab: ActiveTab, icon: React.ElementType, label: string) => {
+    const Icon = icon;
+    const isActive = active === tab;
+    return (
+      <Link
+        href={href as "/admin/dashboard"}
+        className={`flex items-center gap-1.5 text-sm font-medium transition ${
+          isActive ? "text-gold-600" : "text-primary-600 hover:text-primary-900 dark:text-white/70 dark:hover:text-white"
+        }`}
+      >
+        <Icon className="h-4 w-4" /> {label}
+      </Link>
+    );
+  };
+
   return (
     <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
-      <nav className="flex items-center gap-4">
-        <Link
-          href="/admin/dashboard"
-          className={`flex items-center gap-1.5 text-sm font-medium ${
-            active === "dashboard" ? "text-gold-600" : "text-primary-600 dark:text-white/70"
-          }`}
-        >
-          <LayoutDashboard className="h-4 w-4" /> {t("dashboard")}
-        </Link>
-        <Link
-          href="/admin/clients"
-          className={`flex items-center gap-1.5 text-sm font-medium ${
-            active === "clients" ? "text-gold-600" : "text-primary-600 dark:text-white/70"
-          }`}
-        >
-          <Users className="h-4 w-4" /> {t("clients")}
-        </Link>
+      <nav className="flex items-center gap-5">
+        {navLink("/admin/dashboard", "dashboard", LayoutDashboard, "Dashboard")}
+        {navLink("/admin/clients", "clients", Users, "Clients")}
+        {role === "super_admin" &&
+          navLink("/admin/users", "users", ShieldAlert, "Users")}
       </nav>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        {/* Role badge */}
+        <span className="hidden rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-500 dark:bg-white/10 dark:text-white/60 sm:block">
+          {role === "super_admin" ? "Super Admin" : "Admin"}
+        </span>
+
+        {/* Notification bell */}
         <div className="relative" ref={panelRef}>
           <button
             onClick={() => setOpen((v) => !v)}
-            aria-label={tNotif("title")}
-            className="relative rounded-full border border-primary-200 p-2 text-primary-700 dark:border-white/20 dark:text-white"
+            aria-label="Notifications"
+            className="relative rounded-full border border-primary-200 p-2 text-primary-700 transition hover:bg-primary-50 dark:border-white/20 dark:text-white dark:hover:bg-white/10"
           >
             <Bell className="h-4 w-4" />
             {unreadCount > 0 && (
@@ -99,16 +113,16 @@ export default function AdminNav({ active }: { active: "dashboard" | "clients" }
           {open && (
             <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-primary-100 bg-white shadow-soft dark:border-white/10 dark:bg-primary-800">
               <div className="flex items-center justify-between border-b border-primary-100 px-4 py-2 dark:border-white/10">
-                <span className="text-sm font-semibold text-primary-900 dark:text-white">{tNotif("title")}</span>
+                <span className="text-sm font-semibold text-primary-900 dark:text-white">Notifications</span>
                 {unreadCount > 0 && (
                   <button onClick={markAllRead} className="text-xs text-gold-600 hover:underline">
-                    {tNotif("markAllRead")}
+                    Mark all read
                   </button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <p className="p-4 text-center text-sm text-primary-500 dark:text-white/60">{tNotif("empty")}</p>
+                  <p className="p-4 text-center text-sm text-primary-500 dark:text-white/60">No notifications</p>
                 ) : (
                   notifications.map((n) => (
                     <button
@@ -119,7 +133,7 @@ export default function AdminNav({ active }: { active: "dashboard" | "clients" }
                       }`}
                     >
                       <p className="line-clamp-1">{n.propertyTitle}</p>
-                      <p className="mt-0.5 text-xs text-gold-600">{tNotif("newPropertyMatches", { count: n.matchCount })}</p>
+                      <p className="mt-0.5 text-xs text-gold-600">{n.matchCount} matching clients</p>
                     </button>
                   ))
                 )}
@@ -128,8 +142,8 @@ export default function AdminNav({ active }: { active: "dashboard" | "clients" }
           )}
         </div>
 
-        <button onClick={logout} className="btn-outline">
-          <LogOut className="h-4 w-4" /> {t("logout")}
+        <button onClick={logout} className="btn-outline gap-2 text-sm">
+          <LogOut className="h-4 w-4" /> Sign Out
         </button>
       </div>
     </div>

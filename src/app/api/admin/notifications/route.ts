@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { hasValidAdminSession } from "@/lib/adminAuth";
+import { getSession } from "@/lib/auth";
 import {
   checkForNewPropertiesAndNotify,
   getUnreadNotificationCount,
@@ -14,7 +14,7 @@ import { getAdminProperties } from "@/services/propertyService";
  * this can't be a true push/webhook trigger yet.
  */
 export async function GET() {
-  if (!(await hasValidAdminSession())) {
+  const _authSession = await getSession(); if (!_authSession || !["super_admin","admin"].includes(_authSession.role)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

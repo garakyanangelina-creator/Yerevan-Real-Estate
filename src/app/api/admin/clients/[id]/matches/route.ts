@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { hasValidAdminSession } from "@/lib/adminAuth";
+import { getSession } from "@/lib/auth";
 import { getClientById } from "@/services/clientService";
 import { findMatchingProperties } from "@/services/matchingService";
 import { getAdminProperties } from "@/services/propertyService";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await hasValidAdminSession())) {
+  const _authSession = await getSession(); if (!_authSession || !["super_admin","admin"].includes(_authSession.role)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

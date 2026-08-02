@@ -59,7 +59,7 @@ export default function AdminClientsPage() {
 
   return (
     <div className="container-page py-10">
-      <AdminNav active="clients" />
+      <AdminNav active="clients" role="admin" />
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <div>

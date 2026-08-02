@@ -1,6 +1,3 @@
-// Phase 2 CRM storage. Uses SQLite so the project runs with zero external
-// database setup; swap the datasource to postgresql + a real DATABASE_URL
-// when a managed Postgres instance is provisioned (see README).
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,41 +7,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Property listings themselves are NOT stored here — they're fetched live
-// from Apify on every request (see src/services/propertyService.ts). This
-// model only tracks which property IDs we've already processed, so we can
-// detect "newly imported" properties for matching/notifications.
+// ── CRM ──────────────────────────────────────────────────────────────────────
+
 model SeenProperty {
-  id        String   @id // Apify/property id
+  id          String   @id
   firstSeenAt DateTime @default(now())
 }
 
 model Client {
-  id                 String    @id @default(cuid())
+  id                 String   @id @default(cuid())
   fullName           String
   phone              String
   whatsapp           String?
   email              String?
-  preferredLanguage  String // "en" | "ru" | "hy"
-  propertyType       String // PropertyType
-  purpose            String // "rent" | "sale"
-  preferredDistricts String // JSON-encoded string[] of District
+  preferredLanguage  String
+  propertyType       String
+  purpose            String
+  preferredDistricts String
   minBudget          Float?
   maxBudget          Float?
   minArea            Float?
   maxArea            Float?
   bedrooms           Int?
   bathrooms          Int?
-  furnished          String // "any" | "furnished" | "unfurnished"
-  petsAllowed        Boolean   @default(false)
-  parkingRequired    Boolean   @default(false)
-  elevatorRequired   Boolean   @default(false)
-  balconyRequired    Boolean   @default(false)
+  furnished          String
+  petsAllowed        Boolean  @default(false)
+  parkingRequired    Boolean  @default(false)
+  elevatorRequired   Boolean  @default(false)
+  balconyRequired    Boolean  @default(false)
   notes              String?
-  status             String    @default("active") // "active" | "paused" | "closed"
-  archived           Boolean   @default(false)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  status             String   @default("active")
+  archived           Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model Notification {
@@ -54,4 +49,49 @@ model Notification {
   matchCount    Int
   isRead        Boolean  @default(false)
   createdAt     DateTime @default(now())
+}
+
+// ── Users & Access Control ────────────────────────────────────────────────────
+
+model User {
+  id           String       @id @default(cuid())
+  username     String       @unique
+  email        String?
+  passwordHash String
+  role         String       @default("employee") // super_admin | admin | employee
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  createdById  String?
+
+  listings     DbProperty[]
+}
+
+// ── Employee Property Listings ────────────────────────────────────────────────
+
+model DbProperty {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        String   @default("apartment")
+  purpose     String   @default("sale")
+  district    String   @default("other")
+  address     String?
+  price       Float    @default(0)
+  currency    String   @default("AMD")
+  bedrooms    Int      @default(0)
+  bathrooms   Int      @default(0)
+  area        Float    @default(0)
+  floor       Int      @default(0)
+  totalFloors Int      @default(0)
+  images      String   @default("[]") // JSON array of URL strings
+  amenities   String   @default("{}") // JSON object
+  status      String   @default("available") // available | sold | rented
+  isPublished Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
 }

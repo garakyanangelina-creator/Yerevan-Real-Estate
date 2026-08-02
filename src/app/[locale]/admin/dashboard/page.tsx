@@ -2,26 +2,65 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { Eye, EyeOff, Trash2, Pencil, Users } from "lucide-react";
+import {
+  Eye, EyeOff, Users, LayoutDashboard, Building2,
+  TrendingUp, UserCheck, UserCog, ShieldCheck,
+} from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import AdminNav from "@/components/admin/AdminNav";
 import MatchingClientsModal from "@/components/admin/MatchingClientsModal";
-import type { Property, PropertyFetchErrorCode } from "@/types/property";
+import type { Property } from "@/types/property";
 
-function AdminDashboardContent() {
-  const t = useTranslations("admin");
-  const tCommon = useTranslations("common");
-  const tMatching = useTranslations("matching");
+interface DbListing {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  purpose: string;
+  district: string;
+  status: string;
+  isPublished: boolean;
+  createdAt: string;
+  createdBy: { username: string };
+}
+
+interface UserRow {
+  id: string;
+  username: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+function StatCard({ icon: Icon, label, value, sub }: {
+  icon: React.ElementType; label: string; value: string | number; sub?: string;
+}) {
+  return (
+    <div className="card flex items-center gap-4 p-5">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-50 dark:bg-primary-700/50">
+        <Icon className="h-5 w-5 text-gold-500" />
+      </div>
+      <div>
+        <p className="text-2xl font-bold text-primary-900 dark:text-white">{value}</p>
+        <p className="text-sm text-primary-500 dark:text-white/60">{label}</p>
+        {sub && <p className="text-xs text-primary-400 dark:text-white/40">{sub}</p>}
+      </div>
+    </div>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [status, setStatus] = useState<"loading" | "ready" | "unauthorized">("loading");
+  const [role, setRole] = useState<string | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
-  const [error, setError] = useState<PropertyFetchErrorCode>(null);
+  const [dbListings, setDbListings] = useState<DbListing[]>([]);
+  const [users, setUsers] = useState<UserRow[]>([]);
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [matchesFor, setMatchesFor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fromQuery = searchParams.get("matchesFor");
@@ -30,131 +69,186 @@ function AdminDashboardContent() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/admin/properties")
-      .then(async (res) => {
-        if (res.status === 401) {
-          if (active) setStatus("unauthorized");
+
+    async function load() {
+      try {
+        const [propRes, listingsRes] = await Promise.all([
+          fetch("/api/admin/properties"),
+          fetch("/api/employee/listings"),
+        ]);
+
+        if (propRes.status === 401) {
           router.replace("/admin");
           return;
         }
-        const data = await res.json();
+
+        const propData = propRes.ok ? await propRes.json() : { properties: [] };
+        const listingsData = listingsRes.ok ? await listingsRes.json() : { listings: [] };
+
         if (!active) return;
-        setProperties(data.properties ?? []);
-        setError(data.error ?? null);
-        setStatus("ready");
-      })
-      .catch(() => {
-        if (active) {
-          setError("network");
-          setStatus("ready");
+        setProperties(propData.properties ?? []);
+        setDbListings(listingsData.listings ?? []);
+
+        // Detect role from session (super_admin gets users list)
+        const usersRes = await fetch("/api/super-admin/users");
+        if (usersRes.ok) {
+          const usersData = await usersRes.json();
+          setUsers(usersData.users ?? []);
+          setRole("super_admin");
+        } else {
+          setRole("admin");
         }
-      });
-    return () => {
-      active = false;
-    };
+      } catch {
+        if (active) router.replace("/admin");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { active = false; };
   }, [router]);
 
-  if (status !== "ready") return null;
+  if (loading) {
+    return (
+      <div className="container-page py-10">
+        <div className="h-8 w-48 skeleton rounded-lg" />
+        <div className="mt-6 grid gap-4 sm:grid-cols-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-24 skeleton rounded-2xl" />)}
+        </div>
+      </div>
+    );
+  }
 
-  const stats = [
-    { label: t("properties"), value: properties.length },
-    { label: t("messages"), value: 0 },
-    { label: t("contactRequests"), value: 0 },
-    { label: t("owners"), value: properties.length },
-  ];
+  const adminCount = users.filter(u => u.role === "admin" && u.isActive).length;
+  const employeeCount = users.filter(u => u.role === "employee" && u.isActive).length;
 
   return (
     <div className="container-page py-10">
-      <AdminNav active="dashboard" />
+      <AdminNav active="dashboard" role={role ?? "admin"} />
 
-      <h1 className="mt-6 font-serif text-3xl font-semibold text-primary-900 dark:text-white">
-        {t("dashboard")}
-      </h1>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-4">
-        {stats.map((s) => (
-          <div key={s.label} className="card p-5">
-            <p className="text-2xl font-semibold text-primary-900 dark:text-white">{s.value}</p>
-            <p className="text-sm text-primary-500 dark:text-white/60">{s.label}</p>
-          </div>
-        ))}
+      <div className="mt-6 flex items-center gap-3">
+        <h1 className="font-serif text-3xl font-semibold text-primary-900 dark:text-white">
+          Dashboard
+        </h1>
+        <span className="rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gold-700 dark:bg-gold-900/30 dark:text-gold-300">
+          {role === "super_admin" ? "Super Admin" : "Admin"}
+        </span>
       </div>
 
-      {error && (
-        <div className="mt-6 rounded-xl2 border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200">
-          {tCommon("fetchErrorTitle")}:{" "}
-          {error === "config" ? tCommon("fetchErrorConfig") : tCommon("fetchErrorNetwork")}
-        </div>
+      {/* Stats */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard icon={Building2} label="Apify Listings" value={properties.length} />
+        <StatCard icon={TrendingUp} label="Employee Listings" value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} published`} />
+        {role === "super_admin" && (
+          <>
+            <StatCard icon={UserCog} label="Admins" value={adminCount} />
+            <StatCard icon={UserCheck} label="Employees" value={employeeCount} />
+          </>
+        )}
+      </div>
+
+      {/* Employee-created listings */}
+      {dbListings.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 font-serif text-xl font-semibold text-primary-900 dark:text-white">
+            Employee Listings
+          </h2>
+          <div className="card overflow-x-auto p-0">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-primary-100 dark:border-white/10">
+                <tr className="text-primary-500 dark:text-white/60">
+                  <th className="px-4 py-3">Title</th>
+                  <th className="px-4 py-3">Price</th>
+                  <th className="px-4 py-3">District</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">By</th>
+                  <th className="px-4 py-3">Published</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dbListings.map((l) => (
+                  <tr key={l.id} className="border-b border-primary-50 dark:border-white/5">
+                    <td className="px-4 py-3 font-medium text-primary-800 dark:text-white">{l.title}</td>
+                    <td className="px-4 py-3">
+                      {formatPrice(l.price, l.purpose as "sale" | "rent", l.currency)}
+                    </td>
+                    <td className="px-4 py-3 capitalize">{l.district}</td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        l.status === "available"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : l.status === "sold"
+                          ? "bg-primary-100 text-primary-700 dark:bg-primary-700/30 dark:text-white/60"
+                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                      }`}>
+                        {l.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-primary-500 dark:text-white/60">{l.createdBy.username}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs ${l.isPublished ? "text-green-600" : "text-primary-400"}`}>
+                        {l.isPublished ? "Yes" : "Draft"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       )}
 
-      {!error && properties.length === 0 && (
-        <p className="mt-10 text-center text-primary-500 dark:text-white/60">
-          {tCommon("noProperties")}
-        </p>
-      )}
-
+      {/* Apify listings */}
       {properties.length > 0 && (
-        <div className="mt-10 card overflow-x-auto p-0">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-primary-100 text-primary-500 dark:border-white/10 dark:text-white/60">
-              <tr>
-                <th className="px-4 py-3">{t("properties")}</th>
-                <th className="px-4 py-3">Price</th>
-                <th className="px-4 py-3">Owner</th>
-                <th className="px-4 py-3">Phone</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {properties.map((p) => (
-                <tr key={p.id} className="border-b border-primary-50 dark:border-white/5">
-                  <td className="px-4 py-3 font-medium text-primary-800 dark:text-white">{p.title}</td>
-                  <td className="px-4 py-3">{formatPrice(p.price, p.purpose, p.currency)}</td>
-                  <td className="px-4 py-3">{p.ownerName || "—"}</td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => setRevealed((r) => ({ ...r, [p.id]: !r[p.id] }))}
-                      className="flex items-center gap-1.5 text-primary-600 hover:text-gold-600 dark:text-white/70"
-                    >
-                      {revealed[p.id] ? (
-                        <>
-                          <EyeOff className="h-3.5 w-3.5" /> {p.ownerPhone || "—"}
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="h-3.5 w-3.5" /> {t("viewPhone")}
-                        </>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
+        <section className="mt-10">
+          <h2 className="mb-4 font-serif text-xl font-semibold text-primary-900 dark:text-white">
+            Apify Listings
+          </h2>
+          <div className="card overflow-x-auto p-0">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-primary-100 dark:border-white/10">
+                <tr className="text-primary-500 dark:text-white/60">
+                  <th className="px-4 py-3">Title</th>
+                  <th className="px-4 py-3">Price</th>
+                  <th className="px-4 py-3">Owner</th>
+                  <th className="px-4 py-3">Phone</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {properties.map((p) => (
+                  <tr key={p.id} className="border-b border-primary-50 dark:border-white/5">
+                    <td className="px-4 py-3 font-medium text-primary-800 dark:text-white">{p.title}</td>
+                    <td className="px-4 py-3">{formatPrice(p.price, p.purpose, p.currency)}</td>
+                    <td className="px-4 py-3">{p.ownerName || "—"}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => setRevealed((r) => ({ ...r, [p.id]: !r[p.id] }))}
+                        className="flex items-center gap-1.5 text-primary-600 hover:text-gold-600 dark:text-white/70"
+                      >
+                        {revealed[p.id] ? (
+                          <><EyeOff className="h-3.5 w-3.5" /> {p.ownerPhone || "—"}</>
+                        ) : (
+                          <><Eye className="h-3.5 w-3.5" /> View</>
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => setMatchesFor(p.id)}
-                        title={tMatching("matchingClients")}
                         className="flex items-center gap-1 rounded px-2 py-1.5 text-xs text-primary-600 hover:bg-primary-50 dark:text-white/70 dark:hover:bg-white/10"
                       >
-                        <Users className="h-3.5 w-3.5" /> {tMatching("matchingClients")}
+                        <Users className="h-3.5 w-3.5" /> Matches
                       </button>
-                      <button className="rounded p-1.5 hover:bg-primary-50 dark:hover:bg-white/10">
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button className="rounded p-1.5 text-red-600 hover:bg-red-50">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       )}
-
-      <p className="mt-4 text-xs text-primary-400">
-        Listings are fetched live from Apify on each load. Edit / Delete actions here are UI-only
-        until a write-back endpoint exists (Phase 2).
-      </p>
 
       {matchesFor && (
         <MatchingClientsModal propertyId={matchesFor} onClose={() => setMatchesFor(null)} />
@@ -166,7 +260,7 @@ function AdminDashboardContent() {
 export default function AdminDashboardPage() {
   return (
     <Suspense fallback={null}>
-      <AdminDashboardContent />
+      <DashboardContent />
     </Suspense>
   );
 }

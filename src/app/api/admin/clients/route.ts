@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
-import { hasValidAdminSession } from "@/lib/adminAuth";
+import { getSession } from "@/lib/auth";
 import { createClient, listClients } from "@/services/clientService";
 import type { ClientFilters, ClientInput } from "@/types/client";
 
+async function checkAuth() {
+  const session = await getSession();
+  return session && ["super_admin", "admin"].includes(session.role) ? session : null;
+}
+
 export async function GET(request: Request) {
-  if (!(await hasValidAdminSession())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!(await checkAuth())) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const params = new URL(request.url).searchParams;
   const filters: ClientFilters = {
@@ -22,14 +25,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!(await hasValidAdminSession())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!(await checkAuth())) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = (await request.json().catch(() => null)) as ClientInput | null;
-  if (!body?.fullName?.trim() || !body?.phone?.trim()) {
+  if (!body?.fullName?.trim() || !body?.phone?.trim())
     return NextResponse.json({ error: "fullName and phone are required" }, { status: 400 });
-  }
 
   const client = await createClient(body);
   return NextResponse.json({ client }, { status: 201 });

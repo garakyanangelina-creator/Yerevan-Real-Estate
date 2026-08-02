@@ -58,7 +58,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
   if (notFound) {
     return (
       <div className="container-page py-10">
-        <AdminNav active="clients" />
+        <AdminNav active="clients" role="admin" />
         <p className="mt-10 text-center text-primary-500 dark:text-white/60">{t("noClients")}</p>
       </div>
     );
@@ -68,7 +68,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="container-page py-10">
-      <AdminNav active="clients" />
+      <AdminNav active="clients" role="admin" />
 
       <Link href="/admin/clients" className="mt-6 flex items-center gap-1.5 text-sm text-primary-600 hover:text-gold-600 dark:text-white/70">
         <ArrowLeft className="h-4 w-4" /> {t("backToClients")}
