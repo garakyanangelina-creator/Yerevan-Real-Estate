@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bell, LogOut, Users, LayoutDashboard, ShieldAlert, UserCog } from "lucide-react";
+import { Bell, LogOut, Users, LayoutDashboard, ShieldAlert, KeyRound, X } from "lucide-react";
 import { Link, useRouter } from "@/i18n/routing";
 
 interface AdminNotification {
@@ -28,6 +28,31 @@ export default function AdminNav({
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  const [showChangePw, setShowChangePw] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [pwError, setPwError] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+
+  async function changePassword() {
+    setPwError("");
+    if (pwForm.next !== pwForm.confirm) { setPwError("Passwords don't match"); return; }
+    if (pwForm.next.length < 6) { setPwError("Min 6 characters"); return; }
+    setPwLoading(true);
+    const res = await fetch("/api/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+    });
+    setPwLoading(false);
+    if (res.ok) {
+      setShowChangePw(false);
+      setPwForm({ current: "", next: "", confirm: "" });
+    } else {
+      const d = await res.json();
+      setPwError(d.error ?? "Error");
+    }
+  }
 
   useEffect(() => {
     fetch("/api/admin/notifications")
@@ -142,10 +167,48 @@ export default function AdminNav({
           )}
         </div>
 
+        <button onClick={() => setShowChangePw(true)} className="btn-outline gap-2 text-sm">
+          <KeyRound className="h-4 w-4" /> Password
+        </button>
+
         <button onClick={logout} className="btn-outline gap-2 text-sm">
           <LogOut className="h-4 w-4" /> Sign Out
         </button>
       </div>
+
+      {showChangePw && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-primary-800">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-serif text-lg font-semibold text-primary-900 dark:text-white">Change Password</h2>
+              <button onClick={() => setShowChangePw(false)} className="text-primary-400 hover:text-primary-700 dark:text-white/50 dark:hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <input
+                type="password" placeholder="Current password" value={pwForm.current}
+                onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))}
+                className="input w-full"
+              />
+              <input
+                type="password" placeholder="New password" value={pwForm.next}
+                onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))}
+                className="input w-full"
+              />
+              <input
+                type="password" placeholder="Confirm new password" value={pwForm.confirm}
+                onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
+                className="input w-full"
+              />
+              {pwError && <p className="text-sm text-red-500">{pwError}</p>}
+              <button onClick={changePassword} disabled={pwLoading} className="btn-primary w-full">
+                {pwLoading ? "Saving…" : "Save Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

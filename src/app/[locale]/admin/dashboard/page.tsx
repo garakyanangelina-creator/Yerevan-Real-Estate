@@ -4,13 +4,12 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import {
-  Eye, EyeOff, Users, LayoutDashboard, Building2,
-  TrendingUp, UserCheck, UserCog, ShieldCheck,
+  Users, LayoutDashboard, Building2,
+  UserCheck, UserCog,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import AdminNav from "@/components/admin/AdminNav";
 import MatchingClientsModal from "@/components/admin/MatchingClientsModal";
-import type { Property } from "@/types/property";
 
 interface DbListing {
   id: string;
@@ -55,10 +54,8 @@ function DashboardContent() {
   const searchParams = useSearchParams();
 
   const [role, setRole] = useState<string | null>(null);
-  const [properties, setProperties] = useState<Property[]>([]);
   const [dbListings, setDbListings] = useState<DbListing[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [matchesFor, setMatchesFor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -72,21 +69,16 @@ function DashboardContent() {
 
     async function load() {
       try {
-        const [propRes, listingsRes] = await Promise.all([
-          fetch("/api/admin/properties"),
-          fetch("/api/employee/listings"),
-        ]);
+        const listingsRes = await fetch("/api/employee/listings");
 
-        if (propRes.status === 401) {
+        if (listingsRes.status === 401) {
           router.replace("/admin");
           return;
         }
 
-        const propData = propRes.ok ? await propRes.json() : { properties: [] };
         const listingsData = listingsRes.ok ? await listingsRes.json() : { listings: [] };
 
         if (!active) return;
-        setProperties(propData.properties ?? []);
         setDbListings(listingsData.listings ?? []);
 
         // Detect role from session (super_admin gets users list)
@@ -138,8 +130,7 @@ function DashboardContent() {
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Building2} label="Apify Listings" value={properties.length} />
-        <StatCard icon={TrendingUp} label="Employee Listings" value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} published`} />
+        <StatCard icon={Building2} label="Total Listings" value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} published`} />
         {role === "super_admin" && (
           <>
             <StatCard icon={UserCog} label="Admins" value={adminCount} />
@@ -190,57 +181,6 @@ function DashboardContent() {
                       <span className={`text-xs ${l.isPublished ? "text-green-600" : "text-primary-400"}`}>
                         {l.isPublished ? "Yes" : "Draft"}
                       </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      {/* Apify listings */}
-      {properties.length > 0 && (
-        <section className="mt-10">
-          <h2 className="mb-4 font-serif text-xl font-semibold text-primary-900 dark:text-white">
-            Apify Listings
-          </h2>
-          <div className="card overflow-x-auto p-0">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-primary-100 dark:border-white/10">
-                <tr className="text-primary-500 dark:text-white/60">
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Price</th>
-                  <th className="px-4 py-3">Owner</th>
-                  <th className="px-4 py-3">Phone</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {properties.map((p) => (
-                  <tr key={p.id} className="border-b border-primary-50 dark:border-white/5">
-                    <td className="px-4 py-3 font-medium text-primary-800 dark:text-white">{p.title}</td>
-                    <td className="px-4 py-3">{formatPrice(p.price, p.purpose, p.currency)}</td>
-                    <td className="px-4 py-3">{p.ownerName || "—"}</td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setRevealed((r) => ({ ...r, [p.id]: !r[p.id] }))}
-                        className="flex items-center gap-1.5 text-primary-600 hover:text-gold-600 dark:text-white/70"
-                      >
-                        {revealed[p.id] ? (
-                          <><EyeOff className="h-3.5 w-3.5" /> {p.ownerPhone || "—"}</>
-                        ) : (
-                          <><Eye className="h-3.5 w-3.5" /> View</>
-                        )}
-                      </button>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => setMatchesFor(p.id)}
-                        className="flex items-center gap-1 rounded px-2 py-1.5 text-xs text-primary-600 hover:bg-primary-50 dark:text-white/70 dark:hover:bg-white/10"
-                      >
-                        <Users className="h-3.5 w-3.5" /> Matches
-                      </button>
                     </td>
                   </tr>
                 ))}
