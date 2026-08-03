@@ -10,8 +10,8 @@ export default function Hero() {
   return (
     <section className="relative flex min-h-[680px] items-center justify-center overflow-hidden">
       <Image
-        src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=85"
-        alt="Yerevan skyline"
+        src="/yerevan-ararat.jpg"
+        alt="Yerevan city with Mount Ararat"
         fill
         priority
         className="object-cover"
