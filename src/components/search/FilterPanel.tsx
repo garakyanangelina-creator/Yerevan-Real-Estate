@@ -123,23 +123,53 @@ export default function FilterPanel({
         </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs font-medium uppercase text-primary-500">{t("priceMin")}</label>
+      <div>
+        <label className="text-xs font-medium uppercase text-primary-500">{t("priceMin")} – {t("priceMax")}</label>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {[
+            { label: "< $50K",        min: "",       max: "50000" },
+            { label: "$50K–$100K",    min: "50000",  max: "100000" },
+            { label: "$100K–$200K",   min: "100000", max: "200000" },
+            { label: "$200K–$500K",   min: "200000", max: "500000" },
+            { label: "$500K+",        min: "500000", max: "" },
+          ].map((range) => {
+            const active = filters.priceMin === range.min && filters.priceMax === range.max;
+            return (
+              <button
+                key={range.label}
+                type="button"
+                onClick={() => {
+                  if (active) {
+                    onChange({ ...filters, priceMin: "", priceMax: "" });
+                  } else {
+                    onChange({ ...filters, priceMin: range.min, priceMax: range.max });
+                  }
+                }}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  active
+                    ? "border-gold-500 bg-gold-500 text-white"
+                    : "border-primary-200 text-primary-600 hover:border-gold-400 hover:text-gold-600 dark:border-white/20 dark:text-white/70"
+                }`}
+              >
+                {range.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-3">
           <input
             type="number"
+            placeholder={t("priceMin")}
             value={filters.priceMin}
             onChange={(e) => set("priceMin", e.target.value)}
-            className="mt-1 w-full rounded-lg border border-primary-100 px-3 py-2 text-sm dark:border-white/10 dark:bg-primary-800"
+            className="w-full rounded-lg border border-primary-100 px-3 py-2 text-sm dark:border-white/10 dark:bg-primary-800"
           />
-        </div>
-        <div>
-          <label className="text-xs font-medium uppercase text-primary-500">{t("priceMax")}</label>
           <input
             type="number"
+            placeholder={t("priceMax")}
             value={filters.priceMax}
             onChange={(e) => set("priceMax", e.target.value)}
-            className="mt-1 w-full rounded-lg border border-primary-100 px-3 py-2 text-sm dark:border-white/10 dark:bg-primary-800"
+            className="w-full rounded-lg border border-primary-100 px-3 py-2 text-sm dark:border-white/10 dark:bg-primary-800"
           />
         </div>
       </div>
