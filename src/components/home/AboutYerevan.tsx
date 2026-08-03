@@ -70,8 +70,8 @@ export default function AboutYerevan() {
 
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1589810635657-232948472d98?auto=format&fit=crop&w=900&q=80"
-              alt="Yerevan city view with Mount Ararat"
+              src="/ararat.jpg"
+              alt="Mount Ararat view from Yerevan"
               className="rounded-2xl shadow-premium object-cover w-full h-72 lg:h-96"
             />
             <div className="absolute -bottom-4 -left-4 rounded-xl bg-white p-4 shadow-soft dark:bg-primary-800">
