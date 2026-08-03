@@ -10,8 +10,8 @@ export default function Hero() {
   return (
     <section className="relative flex min-h-[680px] items-center justify-center overflow-hidden">
       <Image
-        src="/yerevan-ararat.jpg"
-        alt="Yerevan city with Mount Ararat"
+        src="/hero-bg.jpg"
+        alt="Yerevan city aerial view at sunset"
         fill
         priority
         className="object-cover"
