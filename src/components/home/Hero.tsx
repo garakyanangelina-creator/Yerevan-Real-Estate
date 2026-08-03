@@ -27,14 +27,14 @@ export default function Hero() {
           Premium Real Estate · Yerevan, Armenia
         </span>
 
-        <h1 className="animate-fade-in delay-100 max-w-3xl font-serif text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+        <h1 className="animate-fade-in delay-100 max-w-3xl font-serif text-5xl font-bold leading-tight text-gold-300 sm:text-6xl lg:text-7xl">
           {t("title")}
         </h1>
 
         {/* Gold accent line */}
         <div className="animate-fade-in delay-200 flex items-center gap-3">
           <div className="h-px w-12 bg-gold-400/60" />
-          <p className="max-w-xl text-base text-white/80 sm:text-lg">{t("subtitle")}</p>
+          <p className="max-w-xl text-lg text-gold-100/90 sm:text-xl">{t("subtitle")}</p>
           <div className="h-px w-12 bg-gold-400/60" />
         </div>
 
