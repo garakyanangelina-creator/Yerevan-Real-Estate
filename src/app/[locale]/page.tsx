@@ -86,9 +86,9 @@ export default async function HomePage() {
             <p className="mt-4 text-primary-600 dark:text-white/70">{t("aboutText")}</p>
           </div>
           <img
-            src="https://images.unsplash.com/photo-1560448075-bb485b067938?auto=format&fit=crop&w=900&q=80"
-            alt="Yerevan Real Estate office"
-            className="rounded-xl2 shadow-soft"
+            src="/yerevan-city.jpg"
+            alt="Yerevan city at sunset"
+            className="rounded-2xl shadow-soft object-cover w-full h-80"
           />
         </div>
       </section>
