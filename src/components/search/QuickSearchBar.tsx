@@ -28,47 +28,55 @@ export default function QuickSearchBar() {
   }
 
   return (
-    <div className="glass mt-4 flex w-full max-w-3xl flex-col gap-3 rounded-2xl p-4 shadow-glass sm:flex-row sm:items-center">
+    <div className="glass mt-4 w-full rounded-2xl p-3 shadow-glass sm:p-4">
+      {/* Search input full width on top */}
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("placeholder")}
-        className="flex-1 rounded-xl border border-white/30 bg-white/90 px-4 py-3 text-sm text-primary-900 outline-none placeholder:text-primary-400"
+        className="w-full rounded-xl border border-white/30 bg-white/90 px-4 py-3 text-sm text-primary-900 outline-none placeholder:text-primary-400"
       />
-      <select
-        value={type}
-        onChange={(e) => setType(e.target.value)}
-        className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none"
+
+      {/* Selects in 2-col grid on mobile, row on sm+ */}
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-3 sm:grid-cols-3 sm:gap-3">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none"
+        >
+          <option value="">{t("type")}</option>
+          {["apartment", "house", "commercial", "office", "land"].map((v) => (
+            <option key={v} value={v}>{tTypes(v)}</option>
+          ))}
+        </select>
+
+        <select
+          value={purpose}
+          onChange={(e) => setPurpose(e.target.value)}
+          className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none"
+        >
+          <option value="">{t("purpose")}</option>
+          <option value="rent">{tPurpose("rent")}</option>
+          <option value="sale">{tPurpose("sale")}</option>
+        </select>
+
+        <select
+          value={district}
+          onChange={(e) => setDistrict(e.target.value)}
+          className="col-span-2 rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none sm:col-span-1"
+        >
+          <option value="">{t("district")}</option>
+          {districts.map((d) => (
+            <option key={d} value={d}>{tDistricts(d)}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Search button full width on mobile */}
+      <button
+        onClick={handleSearch}
+        className="btn-gold mt-2 w-full sm:mt-3"
       >
-        <option value="">{t("type")}</option>
-        {["apartment", "house", "commercial", "office", "land"].map((v) => (
-          <option key={v} value={v}>
-            {tTypes(v)}
-          </option>
-        ))}
-      </select>
-      <select
-        value={purpose}
-        onChange={(e) => setPurpose(e.target.value)}
-        className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none"
-      >
-        <option value="">{t("purpose")}</option>
-        <option value="rent">{tPurpose("rent")}</option>
-        <option value="sale">{tPurpose("sale")}</option>
-      </select>
-      <select
-        value={district}
-        onChange={(e) => setDistrict(e.target.value)}
-        className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none"
-      >
-        <option value="">{t("district")}</option>
-        {districts.map((d) => (
-          <option key={d} value={d}>
-            {tDistricts(d)}
-          </option>
-        ))}
-      </select>
-      <button onClick={handleSearch} className="btn-gold whitespace-nowrap">
         <Search className="h-4 w-4" />
         {t("title")}
       </button>

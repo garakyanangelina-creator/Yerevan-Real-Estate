@@ -35,65 +35,69 @@ const facts = [
 
 export default function AboutYerevan() {
   return (
-    <section className="py-20">
+    <section className="py-12 sm:py-20">
       <div className="container-page">
-        {/* Header */}
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        {/* Header — stacks on mobile, side-by-side on lg */}
+        <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-2">
           <div>
             <span className="inline-block rounded-full bg-gold-100 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-gold-700 dark:bg-gold-900/30 dark:text-gold-300">
               Why Yerevan?
             </span>
-            <h2 className="mt-4 font-serif text-3xl font-semibold leading-snug text-primary-900 dark:text-white sm:text-4xl">
+            <h2 className="mt-4 font-serif text-2xl font-semibold leading-snug text-primary-900 dark:text-white sm:text-3xl sm:text-4xl">
               Discover the City<br />Behind Every Listing
             </h2>
-            <p className="mt-4 text-primary-600 dark:text-white/70 leading-relaxed">
+            <p className="mt-4 text-sm leading-relaxed text-primary-600 dark:text-white/70 sm:text-base">
               Yerevan is more than just an address — it&apos;s a lifestyle. From its
               stunning views of Mount Ararat to its thriving café culture and
               fast-growing property market, Yerevan offers something truly special
               for residents and investors alike.
             </p>
-            <div className="mt-6 flex gap-8">
+
+            {/* Stats */}
+            <div className="mt-6 flex flex-wrap gap-6 sm:gap-8">
               <div>
-                <p className="text-3xl font-bold text-gold-500">782 BC</p>
-                <p className="mt-1 text-sm text-primary-500 dark:text-white/60">Year founded</p>
+                <p className="text-2xl font-bold text-gold-500 sm:text-3xl">782 BC</p>
+                <p className="mt-1 text-xs text-primary-500 dark:text-white/60 sm:text-sm">Year founded</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gold-500">1.1M+</p>
-                <p className="mt-1 text-sm text-primary-500 dark:text-white/60">Population</p>
+                <p className="text-2xl font-bold text-gold-500 sm:text-3xl">1.1M+</p>
+                <p className="mt-1 text-xs text-primary-500 dark:text-white/60 sm:text-sm">Population</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gold-500">300+</p>
-                <p className="mt-1 text-sm text-primary-500 dark:text-white/60">Sunny days/year</p>
+                <p className="text-2xl font-bold text-gold-500 sm:text-3xl">300+</p>
+                <p className="mt-1 text-xs text-primary-500 dark:text-white/60 sm:text-sm">Sunny days/year</p>
               </div>
             </div>
           </div>
 
-          <div className="relative">
+          {/* Image */}
+          <div className="relative pb-6 pl-0 sm:pb-8">
             <img
               src="/ararat.jpg"
               alt="Mount Ararat view from Yerevan"
-              className="rounded-2xl shadow-premium object-cover w-full h-72 lg:h-96"
+              className="w-full rounded-2xl object-cover shadow-premium"
+              style={{ height: "280px" }}
             />
-            <div className="absolute -bottom-4 -left-4 rounded-xl bg-white p-4 shadow-soft dark:bg-primary-800">
-              <p className="text-xs font-semibold text-primary-500 dark:text-white/60 uppercase tracking-wide">View</p>
-              <p className="mt-0.5 font-serif text-lg font-semibold text-primary-900 dark:text-white">Mount Ararat</p>
+            <div className="absolute bottom-0 left-4 rounded-xl bg-white p-3 shadow-soft dark:bg-primary-800 sm:bottom-0 sm:left-0 sm:p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-white/60">View</p>
+              <p className="mt-0.5 font-serif text-base font-semibold text-primary-900 dark:text-white sm:text-lg">Mount Ararat</p>
             </div>
           </div>
         </div>
 
         {/* Fact cards */}
-        <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:mt-16 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {facts.map((fact) => (
             <div
               key={fact.title}
-              className="card group flex gap-4 p-5 transition duration-300 hover:-translate-y-0.5 hover:shadow-premium"
+              className="card group flex gap-4 p-4 transition duration-300 hover:-translate-y-0.5 hover:shadow-premium sm:p-5"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-50 dark:bg-gold-900/20">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold-50 dark:bg-gold-900/20 sm:h-11 sm:w-11">
                 <fact.icon className="h-5 w-5 text-gold-500" />
               </div>
               <div>
-                <h3 className="font-semibold text-primary-900 dark:text-white">{fact.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-primary-500 dark:text-white/60">{fact.text}</p>
+                <h3 className="text-sm font-semibold text-primary-900 dark:text-white sm:text-base">{fact.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-primary-500 dark:text-white/60 sm:text-sm">{fact.text}</p>
               </div>
             </div>
           ))}

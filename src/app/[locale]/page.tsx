@@ -21,9 +21,9 @@ export default async function HomePage() {
     <>
       <Hero />
 
-      <section className="container-page py-16">
+      <section className="container-page py-10 sm:py-16">
         <div className="flex items-center justify-between">
-          <h2 className="font-serif text-3xl font-semibold text-primary-900 dark:text-white">
+          <h2 className="font-serif text-2xl font-semibold text-primary-900 dark:text-white sm:text-3xl">
             {t("featured")}
           </h2>
           <Link href="/search" className="text-sm font-medium text-gold-600 hover:underline">
@@ -31,16 +31,16 @@ export default async function HomePage() {
           </Link>
         </div>
         {featuredError ? (
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <EmptyState
               title={tCommon("fetchErrorTitle")}
               message={featuredError === "config" ? tCommon("fetchErrorConfig") : tCommon("fetchErrorNetwork")}
             />
           </div>
         ) : featured.length === 0 ? (
-          <p className="mt-8 text-center text-primary-500 dark:text-white/60">{tCommon("noProperties")}</p>
+          <p className="mt-6 text-center text-primary-500 dark:text-white/60 sm:mt-8">{tCommon("noProperties")}</p>
         ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featured.map((p) => (
               <PropertyCard key={p.id} property={p} />
             ))}
@@ -50,9 +50,9 @@ export default async function HomePage() {
 
       <DistrictGrid />
 
-      <section className="container-page py-16">
+      <section className="container-page py-10 sm:py-16">
         <div className="flex items-center justify-between">
-          <h2 className="font-serif text-3xl font-semibold text-primary-900 dark:text-white">
+          <h2 className="font-serif text-2xl font-semibold text-primary-900 dark:text-white sm:text-3xl">
             {t("latest")}
           </h2>
           <Link href="/search" className="text-sm font-medium text-gold-600 hover:underline">
@@ -60,16 +60,16 @@ export default async function HomePage() {
           </Link>
         </div>
         {latestError ? (
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <EmptyState
               title={tCommon("fetchErrorTitle")}
               message={latestError === "config" ? tCommon("fetchErrorConfig") : tCommon("fetchErrorNetwork")}
             />
           </div>
         ) : latest.length === 0 ? (
-          <p className="mt-8 text-center text-primary-500 dark:text-white/60">{tCommon("noProperties")}</p>
+          <p className="mt-6 text-center text-primary-500 dark:text-white/60 sm:mt-8">{tCommon("noProperties")}</p>
         ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {latest.map((p) => (
               <PropertyCard key={p.id} property={p} />
             ))}
@@ -77,18 +77,19 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="bg-primary-50 py-16 dark:bg-primary-800/30">
-        <div className="container-page grid items-center gap-10 lg:grid-cols-2">
+      <section className="bg-primary-50 py-10 dark:bg-primary-800/30 sm:py-16">
+        <div className="container-page grid items-center gap-6 sm:gap-10 lg:grid-cols-2">
           <div>
-            <h2 className="font-serif text-3xl font-semibold text-primary-900 dark:text-white">
+            <h2 className="font-serif text-2xl font-semibold text-primary-900 dark:text-white sm:text-3xl">
               {t("aboutTitle")}
             </h2>
-            <p className="mt-4 text-primary-600 dark:text-white/70">{t("aboutText")}</p>
+            <p className="mt-3 text-sm text-primary-600 dark:text-white/70 sm:mt-4 sm:text-base">{t("aboutText")}</p>
           </div>
           <img
             src="/yerevan-city.jpg"
             alt="Yerevan city at sunset"
-            className="rounded-2xl shadow-soft object-cover w-full h-80"
+            className="w-full rounded-2xl object-cover shadow-soft"
+            style={{ height: "clamp(200px, 40vw, 320px)" }}
           />
         </div>
       </section>
@@ -97,11 +98,11 @@ export default async function HomePage() {
       <AboutYerevan />
       <Testimonials />
 
-      <section className="container-page py-16" id="contact">
-        <h2 className="text-center font-serif text-3xl font-semibold text-primary-900 dark:text-white">
+      <section className="container-page py-10 sm:py-16" id="contact">
+        <h2 className="text-center font-serif text-2xl font-semibold text-primary-900 dark:text-white sm:text-3xl">
           {t("contactTitle")}
         </h2>
-        <div className="mx-auto mt-8 max-w-xl">
+        <div className="mx-auto mt-6 max-w-xl sm:mt-8">
           <ContactForm />
         </div>
       </section>
