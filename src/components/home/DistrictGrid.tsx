@@ -3,18 +3,18 @@ import { Link } from "@/i18n/routing";
 import { districts } from "@/lib/mock-data";
 
 const districtImages: Record<string, string> = {
-  kentron:         "photo-1486325212027-8081e485255e",
-  arabkir:         "photo-1570129477492-45c003edd2be",
-  davtashen:       "photo-1494526585095-c41746248156",
-  ajapnyak:        "photo-1460317442991-0ec209397118",
-  shengavit:       "photo-1448630360428-65456885c650",
-  kanakerZeytun:   "photo-1502672260266-1c1ef2d93688",
-  norNork:         "photo-1496588152823-86ff7695e68f",
-  malatiaSebastia: "photo-1480074568708-e7b720bb3f09",
-  avan:            "photo-1449844908441-8829872d2607",
-  erebuni:         "photo-1545324418-cc1a3fa10c00",
-  norkMarash:      "photo-1444723121867-7a241cacace9",
-  nubarashen:      "photo-1500382017468-9049fed747ef",
+  kentron:         "/district-kentron.jpg",
+  arabkir:         "/district-arabkir.jpg",
+  davtashen:       "/district-davtashen.jpg",
+  ajapnyak:        "/district-ajapnyak.jpg",
+  shengavit:       "/district-shengavit.jpg",
+  kanakerZeytun:   "/district-kanaker-zeytun.jpg",
+  norNork:         "/district-nor-nork.jpg",
+  malatiaSebastia: "/district-malatia-sebastia.jpg",
+  avan:            "/district-avan.jpg",
+  erebuni:         "/district-erebuni.jpg",
+  norkMarash:      "/district-nork-marash.jpg",
+  nubarashen:      "/district-nubarashen.jpg",
 };
 
 export default function DistrictGrid() {
@@ -41,7 +41,7 @@ export default function DistrictGrid() {
             style={{ height: "clamp(120px, 25vw, 192px)" }}
           >
             <img
-              src={`https://images.unsplash.com/${districtImages[d]}?auto=format&fit=crop&w=600&q=80`}
+              src={districtImages[d]}
               alt={tDistricts(d)}
               className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
               loading="lazy"
