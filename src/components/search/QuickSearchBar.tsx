@@ -17,6 +17,8 @@ export default function QuickSearchBar() {
   const [type, setType] = useState("");
   const [purpose, setPurpose] = useState("");
   const [district, setDistrict] = useState("");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
 
   function handleSearch() {
     const params = new URLSearchParams();
@@ -24,6 +26,8 @@ export default function QuickSearchBar() {
     if (type) params.set("type", type);
     if (purpose) params.set("purpose", purpose);
     if (district) params.set("district", district);
+    if (priceMin) params.set("priceMin", priceMin);
+    if (priceMax) params.set("priceMax", priceMax);
     router.push(`/search?${params.toString()}`);
   }
 
@@ -70,6 +74,24 @@ export default function QuickSearchBar() {
             <option key={d} value={d}>{tDistricts(d)}</option>
           ))}
         </select>
+      </div>
+
+      {/* Price range */}
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-3 sm:gap-3">
+        <input
+          type="number"
+          value={priceMin}
+          onChange={(e) => setPriceMin(e.target.value)}
+          placeholder={t("priceMin")}
+          className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none placeholder:text-primary-400"
+        />
+        <input
+          type="number"
+          value={priceMax}
+          onChange={(e) => setPriceMax(e.target.value)}
+          placeholder={t("priceMax")}
+          className="rounded-xl border border-white/30 bg-white/90 px-3 py-3 text-sm text-primary-900 outline-none placeholder:text-primary-400"
+        />
       </div>
 
       {/* Search button full width on mobile */}
