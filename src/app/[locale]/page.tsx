@@ -3,7 +3,6 @@ import Hero from "@/components/home/Hero";
 import DistrictGrid from "@/components/home/DistrictGrid";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import AboutYerevan from "@/components/home/AboutYerevan";
-import Testimonials from "@/components/home/Testimonials";
 import ContactForm from "@/components/contact/ContactForm";
 import PropertyCard from "@/components/property/PropertyCard";
 import EmptyState from "@/components/common/EmptyState";
@@ -96,7 +95,6 @@ export default async function HomePage() {
 
       <WhyChooseUs />
       <AboutYerevan />
-      <Testimonials />
 
       <section className="container-page py-10 sm:py-16" id="contact">
         <h2 className="text-center font-serif text-2xl font-semibold text-primary-900 dark:text-white sm:text-3xl">
