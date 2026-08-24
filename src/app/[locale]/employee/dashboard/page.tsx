@@ -31,7 +31,7 @@ interface Listing {
   createdAt: string;
 }
 
-type FormMode = "list" | "create" | "edit";
+type FormMode = "list" | "create" | "edit" | "password";
 
 const DISTRICTS = [
   { value: "kentron", label: "Kentron" },
@@ -90,6 +90,9 @@ export default function EmployeeDashboard() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [revealedImages, setRevealedImages] = useState<Record<string, boolean>>({});
   const [codeSearch, setCodeSearch] = useState("");
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [pwError, setPwError] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
 
   async function fetchListings() {
     const res = await fetch("/api/employee/listings");
@@ -203,10 +206,59 @@ export default function EmployeeDashboard() {
     await fetchListings();
   }
 
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError("");
+    if (pwForm.next !== pwForm.confirm) { setPwError("Passwords do not match."); return; }
+    if (pwForm.next.length < 6) { setPwError("Password must be at least 6 characters."); return; }
+    setPwSaving(true);
+    const res = await fetch("/api/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+    });
+    setPwSaving(false);
+    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setMode("list"); }
+    else { const d = await res.json(); setPwError(d.error ?? "Failed to change password."); }
+  }
+
   const toCode = (id: string) => id.slice(0, 6).toUpperCase();
 
   const inputCls = "w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white";
   const labelCls = "block text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-white/60 mb-1";
+
+  // ── Change Password ────────────────────────────────────────────────────────
+  if (mode === "password") {
+    return (
+      <div className="container-page py-10">
+        <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
+          <span className="font-serif font-semibold text-primary-900 dark:text-white">Change Password</span>
+          <button onClick={() => setMode("list")} className="btn-outline text-sm">← Back</button>
+        </div>
+        <form onSubmit={handleChangePassword} className="mt-8 max-w-sm space-y-4">
+          <div>
+            <label className={labelCls}>Current Password</label>
+            <input type="password" required className={inputCls} value={pwForm.current}
+              onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls}>New Password</label>
+            <input type="password" required className={inputCls} value={pwForm.next}
+              onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} />
+          </div>
+          <div>
+            <label className={labelCls}>Confirm New Password</label>
+            <input type="password" required className={inputCls} value={pwForm.confirm}
+              onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} />
+          </div>
+          {pwError && <p className="text-sm text-red-600">{pwError}</p>}
+          <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">
+            {pwSaving ? "Saving…" : "Change Password"}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   // ── Form ──────────────────────────────────────────────────────────────────
   if (mode === "create" || mode === "edit") {
@@ -466,6 +518,9 @@ export default function EmployeeDashboard() {
         <div className="flex items-center gap-3">
           <button onClick={startCreate} className="btn-primary gap-2 text-sm">
             <Plus className="h-4 w-4" /> Add Listing
+          </button>
+          <button onClick={() => setMode("password")} className="btn-outline text-sm">
+            Change Password
           </button>
           <button onClick={logout} className="btn-outline gap-2 text-sm">
             <LogOut className="h-4 w-4" /> Sign Out
