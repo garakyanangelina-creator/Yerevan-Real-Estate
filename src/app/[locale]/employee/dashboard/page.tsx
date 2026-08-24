@@ -95,6 +95,7 @@ export default function EmployeeDashboard() {
   const [pwError, setPwError] = useState("");
   const [pwSaving, setPwSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function fetchListings() {
@@ -158,18 +159,28 @@ export default function EmployeeDashboard() {
   async function handleUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploading(true);
+    setUploadError("");
     const uploaded: string[] = [];
     for (const file of Array.from(files)) {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch("/api/employee/upload", { method: "POST", body: fd });
-      if (res.ok) {
+      try {
+        const res = await fetch("/api/employee/upload", { method: "POST", body: fd });
         const data = await res.json();
-        uploaded.push(data.url);
+        if (res.ok && data.url) {
+          uploaded.push(data.url);
+        } else {
+          setUploadError(`Upload failed: ${data.error ?? res.status}`);
+        }
+      } catch (err) {
+        setUploadError(`Upload error: ${String(err)}`);
       }
     }
-    setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, ...uploaded] }));
+    if (uploaded.length > 0) {
+      setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, ...uploaded] }));
+    }
     setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
   }
 
   function removeImage(url: string) {
@@ -525,23 +536,21 @@ export default function EmployeeDashboard() {
             {/* Photo upload */}
             <div>
               <label className={labelCls}>Photos / Լուսանկարներ</label>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => handleUpload(e.target.files)}
-              />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary-200 py-4 text-sm text-primary-500 transition hover:border-gold-400 hover:text-gold-600 disabled:opacity-50 dark:border-white/10 dark:text-white/50"
+              <label
+                className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary-200 py-4 text-sm text-primary-500 transition hover:border-gold-400 hover:text-gold-600 dark:border-white/10 dark:text-white/50 ${uploading ? "opacity-50 pointer-events-none" : ""}`}
               >
                 <Upload className="h-4 w-4" />
                 {uploading ? "Uploading… / Բեռnavia…" : "Click to upload photos / Կտտացնել լուսանկար ավելացնելու"}
-              </button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => handleUpload(e.target.files)}
+                />
+              </label>
+              {uploadError && <p className="mt-1 text-xs text-red-500">{uploadError}</p>}
               {form.imageUrls.length > 0 && (
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {form.imageUrls.map((url) => (
