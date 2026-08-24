@@ -126,13 +126,19 @@ export default function FilterPanel({
       <div>
         <label className="text-xs font-medium uppercase text-primary-500">{t("priceMin")} – {t("priceMax")}</label>
         <div className="mt-2 flex flex-wrap gap-2">
-          {[
+          {(filters.purpose === "rent" ? [
+            { label: "< $400",          min: "",      max: "400" },
+            { label: "$400–$700",       min: "400",   max: "700" },
+            { label: "$700–$1,200",     min: "700",   max: "1200" },
+            { label: "$1,200–$2,000",   min: "1200",  max: "2000" },
+            { label: "$2,000+",         min: "2000",  max: "" },
+          ] : [
             { label: "< $50K",        min: "",       max: "50000" },
             { label: "$50K–$100K",    min: "50000",  max: "100000" },
             { label: "$100K–$200K",   min: "100000", max: "200000" },
             { label: "$200K–$500K",   min: "200000", max: "500000" },
             { label: "$500K+",        min: "500000", max: "" },
-          ].map((range) => {
+          ]).map((range) => {
             const active = filters.priceMin === range.min && filters.priceMax === range.max;
             return (
               <button
