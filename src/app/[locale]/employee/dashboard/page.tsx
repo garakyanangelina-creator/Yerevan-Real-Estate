@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "@/i18n/routing";
 import {
-  Plus, Pencil, Trash2, Eye, EyeOff, LogOut,
-  Building2, CheckCircle2, XCircle,
+  Plus, Pencil, Trash2, LogOut,
+  Building2, CheckCircle2, XCircle, Upload, X,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
@@ -34,30 +34,30 @@ interface Listing {
 type FormMode = "list" | "create" | "edit" | "password";
 
 const DISTRICTS = [
-  { value: "kentron", label: "Kentron" },
-  { value: "arabkir", label: "Arabkir" },
-  { value: "davtashen", label: "Davtashen" },
-  { value: "ajapnyak", label: "Ajapnyak" },
-  { value: "shengavit", label: "Shengavit" },
-  { value: "kanakerZeytun", label: "Kanaker-Zeytun" },
-  { value: "norNork", label: "Nor Nork" },
-  { value: "malatiaSebastia", label: "Malatia-Sebastia" },
-  { value: "avan", label: "Avan" },
-  { value: "erebuni", label: "Erebuni" },
-  { value: "norkMarash", label: "Nork-Marash" },
-  { value: "nubarashen", label: "Nubarashen" },
-  { value: "other", label: "Other" },
+  { value: "kentron",          label: "Kentron / Կենտրոն" },
+  { value: "arabkir",          label: "Arabkir / Արաբկիր" },
+  { value: "davtashen",        label: "Davtashen / Դավթաշեն" },
+  { value: "ajapnyak",         label: "Ajapnyak / Աջափնյակ" },
+  { value: "shengavit",        label: "Shengavit / Շենգավիթ" },
+  { value: "kanakerZeytun",    label: "Kanaker-Zeytun / Քանաքեռ-Զեյթուն" },
+  { value: "norNork",          label: "Nor Nork / Նոր Նորք" },
+  { value: "malatiaSebastia",  label: "Malatia-Sebastia / Մալաթիա-Սեբաստիա" },
+  { value: "avan",             label: "Avan / Ավան" },
+  { value: "erebuni",          label: "Erebuni / Էրեբունի" },
+  { value: "norkMarash",       label: "Nork-Marash / Նորք-Մարաշ" },
+  { value: "nubarashen",       label: "Nubarashen / Նուբարաշեն" },
+  { value: "other",            label: "Other / Այլ" },
 ];
 
 const AMENITY_KEYS = [
-  { key: "parking", label: "Parking" },
-  { key: "balcony", label: "Balcony" },
-  { key: "furniture", label: "Furnished" },
-  { key: "petFriendly", label: "Pet Friendly" },
-  { key: "newBuilding", label: "New Building" },
-  { key: "elevator", label: "Elevator" },
-  { key: "ac", label: "AC" },
-  { key: "heating", label: "Heating" },
+  { key: "parking",     label: "Parking / Կայանատեղի" },
+  { key: "balcony",     label: "Balcony / Պատշգամբ" },
+  { key: "furniture",   label: "Furnished / Կահավորված" },
+  { key: "petFriendly", label: "Pet Friendly / Ընտանի կենդ." },
+  { key: "newBuilding", label: "New Building / Նոր կառ." },
+  { key: "elevator",    label: "Elevator / Վերելակ" },
+  { key: "ac",          label: "AC / Կондեioner" },
+  { key: "heating",     label: "Heating / Ջեռուցում" },
 ];
 
 type AmenityMap = Record<string, boolean | string | number>;
@@ -73,7 +73,9 @@ function emptyForm() {
     closedBalcony: "0",
     ceilingHeight: "",
     view: "",
-    imageUrls: "",
+    ownerName: "",
+    ownerPhone: "",
+    imageUrls: [] as string[],
     amenities: {} as AmenityMap,
     status: "available",
   };
@@ -88,11 +90,12 @@ export default function EmployeeDashboard() {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [revealedImages, setRevealedImages] = useState<Record<string, boolean>>({});
   const [codeSearch, setCodeSearch] = useState("");
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [pwError, setPwError] = useState("");
   const [pwSaving, setPwSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   async function fetchListings() {
     const res = await fetch("/api/employee/listings");
@@ -138,10 +141,12 @@ export default function EmployeeDashboard() {
       closedBalcony: String(amenities.closedBalcony ?? "0"),
       ceilingHeight: String(amenities.ceilingHeight ?? ""),
       view: String(amenities.view ?? ""),
-      imageUrls: images.join("\n"),
+      ownerName: String(amenities.ownerName ?? ""),
+      ownerPhone: String(amenities.ownerPhone ?? ""),
+      imageUrls: images,
       amenities: Object.fromEntries(
         Object.entries(amenities).filter(([k]) =>
-          !["rooms","buildingType","openBalcony","closedBalcony","ceilingHeight","view"].includes(k)
+          !["rooms","buildingType","openBalcony","closedBalcony","ceilingHeight","view","ownerName","ownerPhone"].includes(k)
         )
       ) as AmenityMap,
       status: l.status,
@@ -150,13 +155,30 @@ export default function EmployeeDashboard() {
     setMode("edit");
   }
 
+  async function handleUpload(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/employee/upload", { method: "POST", body: fd });
+      if (res.ok) {
+        const data = await res.json();
+        uploaded.push(data.url);
+      }
+    }
+    setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, ...uploaded] }));
+    setUploading(false);
+  }
+
+  function removeImage(url: string) {
+    setForm((f) => ({ ...f, imageUrls: f.imageUrls.filter((u) => u !== url) }));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const images = form.imageUrls
-      .split(/[\n,]+/)
-      .map((u) => u.trim())
-      .filter(Boolean);
     const payload = {
       title: form.title,
       description: form.description || null,
@@ -171,7 +193,7 @@ export default function EmployeeDashboard() {
       area: Number(form.area) || 0,
       floor: Number(form.floor) || 0,
       totalFloors: Number(form.totalFloors) || 0,
-      images,
+      images: form.imageUrls,
       amenities: {
         ...form.amenities,
         rooms: Number(form.rooms) || 1,
@@ -180,6 +202,8 @@ export default function EmployeeDashboard() {
         closedBalcony: Number(form.closedBalcony) || 0,
         ...(form.ceilingHeight && { ceilingHeight: form.ceilingHeight }),
         ...(form.view && { view: form.view }),
+        ...(form.ownerName && { ownerName: form.ownerName }),
+        ...(form.ownerPhone && { ownerPhone: form.ownerPhone }),
       },
       status: form.status,
     };
@@ -232,28 +256,28 @@ export default function EmployeeDashboard() {
     return (
       <div className="container-page py-10">
         <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
-          <span className="font-serif font-semibold text-primary-900 dark:text-white">Change Password</span>
+          <span className="font-serif font-semibold text-primary-900 dark:text-white">Change Password / Փոխել գաղտնաբառը</span>
           <button onClick={() => setMode("list")} className="btn-outline text-sm">← Back</button>
         </div>
         <form onSubmit={handleChangePassword} className="mt-8 max-w-sm space-y-4">
           <div>
-            <label className={labelCls}>Current Password</label>
+            <label className={labelCls}>Current Password / Ընթացիկ գաղտնաբառ</label>
             <input type="password" required className={inputCls} value={pwForm.current}
               onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })} />
           </div>
           <div>
-            <label className={labelCls}>New Password</label>
+            <label className={labelCls}>New Password / Նոր գաղտնաբառ</label>
             <input type="password" required className={inputCls} value={pwForm.next}
               onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} />
           </div>
           <div>
-            <label className={labelCls}>Confirm New Password</label>
+            <label className={labelCls}>Confirm New Password / Հաստատել նոր գաղտնաբառը</label>
             <input type="password" required className={inputCls} value={pwForm.confirm}
               onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} />
           </div>
           {pwError && <p className="text-sm text-red-600">{pwError}</p>}
           <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">
-            {pwSaving ? "Saving…" : "Change Password"}
+            {pwSaving ? "Saving…" : "Change Password / Փոխել"}
           </button>
         </form>
       </div>
@@ -268,7 +292,7 @@ export default function EmployeeDashboard() {
           <div className="flex items-center gap-3">
             <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
             <span className="font-serif font-semibold text-primary-900 dark:text-white">
-              {mode === "create" ? "Add Listing" : "Edit Listing"}
+              {mode === "create" ? "Add Listing / Ավելացնել հայտ" : "Edit Listing / Խմբագրել հայտ"}
             </span>
           </div>
           <button onClick={() => setMode("list")} className="btn-outline text-sm">
@@ -279,42 +303,49 @@ export default function EmployeeDashboard() {
         <form onSubmit={handleSubmit} className="mt-8 grid gap-6 lg:grid-cols-2">
           {/* Left column */}
           <div className="space-y-4">
+
+            {/* Title */}
             <div>
-              <label className={labelCls}>Title *</label>
-              <input required className={inputCls} value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })} />
+              <label className={labelCls}>Title / Վերնագիր *</label>
+              <input required className={inputCls} placeholder="e.g. 3-room apartment in Kentron"
+                value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </div>
 
+            {/* Description */}
             <div>
-              <label className={labelCls}>Description</label>
-              <textarea rows={4} className={inputCls} value={form.description}
+              <label className={labelCls}>Description / Նկարագրություն</label>
+              <textarea rows={4} className={inputCls}
+                placeholder="Describe the property… / Նկարագրեք գույքը…"
+                value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </div>
 
+            {/* Type & Purpose */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Type</label>
+                <label className={labelCls}>Type / Տեսակ</label>
                 <select className={inputCls} value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value })}>
-                  <option value="apartment">Apartment</option>
-                  <option value="house">House</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="office">Office</option>
-                  <option value="land">Land</option>
+                  <option value="apartment">Apartment / Բնակարան</option>
+                  <option value="house">House / Տուն</option>
+                  <option value="commercial">Commercial / Կոմercial</option>
+                  <option value="office">Office / Գրասենյակ</option>
+                  <option value="land">Land / Հողամաս</option>
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Purpose</label>
+                <label className={labelCls}>Purpose / Նպատակ</label>
                 <select className={inputCls} value={form.purpose}
                   onChange={(e) => setForm({ ...form, purpose: e.target.value })}>
-                  <option value="sale">For Sale</option>
-                  <option value="rent">For Rent</option>
+                  <option value="sale">For Sale / Վաճառք</option>
+                  <option value="rent">For Rent / Վարձ</option>
                 </select>
               </div>
             </div>
 
+            {/* District */}
             <div>
-              <label className={labelCls}>District</label>
+              <label className={labelCls}>District / Թաղամաս</label>
               <select className={inputCls} value={form.district}
                 onChange={(e) => setForm({ ...form, district: e.target.value })}>
                 {DISTRICTS.map((d) => (
@@ -323,154 +354,215 @@ export default function EmployeeDashboard() {
               </select>
             </div>
 
+            {/* Address */}
             <div>
-              <label className={labelCls}>Address</label>
-              <input className={inputCls} value={form.address}
+              <label className={labelCls}>Address / Հասցե</label>
+              <input className={inputCls} placeholder="Street, building no. / Փողոց, շ. համ."
+                value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })} />
             </div>
 
+            {/* Price & Currency */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Price</label>
+                <label className={labelCls}>Price / Գին</label>
                 <input type="number" min="0" className={inputCls} value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Currency</label>
+                <label className={labelCls}>Currency / Արժույթ</label>
                 <select className={inputCls} value={form.currency}
                   onChange={(e) => setForm({ ...form, currency: e.target.value })}>
-                  <option value="AMD">AMD</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
+                  <option value="AMD">AMD ֏</option>
+                  <option value="USD">USD $</option>
+                  <option value="EUR">EUR €</option>
                 </select>
               </div>
             </div>
+
+            {/* Owner contacts — visible only to employees/admins */}
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-700/40 dark:bg-amber-900/20">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                Owner Contacts / Սեփականատիրոջ կապ (only visible to staff)
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>Owner Name / Անուն</label>
+                  <input className={inputCls} placeholder="Full name / Անուն ազգանուն"
+                    value={form.ownerName}
+                    onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
+                </div>
+                <div>
+                  <label className={labelCls}>Owner Phone / Հեռ.</label>
+                  <input className={inputCls} placeholder="+374 xx xxxxxx"
+                    value={form.ownerPhone}
+                    onChange={(e) => setForm({ ...form, ownerPhone: e.target.value })} />
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Right column */}
           <div className="space-y-4">
+
+            {/* Bedrooms / Bathrooms / Area */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className={labelCls}>Bedrooms</label>
+                <label className={labelCls}>Bedrooms / Ննջ.</label>
                 <input type="number" min="0" className={inputCls} value={form.bedrooms}
                   onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Bathrooms</label>
+                <label className={labelCls}>Bathrooms / Լ/Ս</label>
                 <input type="number" min="0" className={inputCls} value={form.bathrooms}
                   onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Area (m²)</label>
+                <label className={labelCls}>Area m² / Մ²</label>
                 <input type="number" min="0" className={inputCls} value={form.area}
                   onChange={(e) => setForm({ ...form, area: e.target.value })} />
               </div>
             </div>
 
+            {/* Floor / Total Floors */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Floor</label>
+                <label className={labelCls}>Floor / Հարկ</label>
                 <input type="number" min="0" className={inputCls} value={form.floor}
                   onChange={(e) => setForm({ ...form, floor: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Total Floors in Building</label>
+                <label className={labelCls}>Total Floors / Ընդ. հարկ</label>
                 <input type="number" min="0" className={inputCls} value={form.totalFloors}
                   onChange={(e) => setForm({ ...form, totalFloors: e.target.value })} />
               </div>
             </div>
 
+            {/* Rooms / Building Type */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Rooms</label>
+                <label className={labelCls}>Rooms / Սենյակ</label>
                 <select className={inputCls} value={form.rooms}
                   onChange={(e) => setForm({ ...form, rooms: e.target.value })}>
-                  {["1","2","3","4","5","6","6+"].map(v => <option key={v} value={v}>{v} room{v !== "1" ? "s" : ""}</option>)}
+                  {["1","2","3","4","5","6","6+"].map(v => (
+                    <option key={v} value={v}>{v} {v === "1" ? "room / սենյակ" : "rooms / սենյակ"}</option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Building Type</label>
+                <label className={labelCls}>Building Type / Կառ. Տ.</label>
                 <select className={inputCls} value={form.buildingType}
                   onChange={(e) => setForm({ ...form, buildingType: e.target.value })}>
-                  <option value="">— Select —</option>
-                  <option value="panel">Panel</option>
-                  <option value="newBuilding">New Building</option>
-                  <option value="stone">Stone Building</option>
+                  <option value="">— Select / Ընտրել —</option>
+                  <option value="panel">Panel / Պանել</option>
+                  <option value="newBuilding">New Building / Նոր կառ.</option>
+                  <option value="stone">Stone / Քար</option>
                 </select>
               </div>
             </div>
 
+            {/* Balconies */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Open Balcony</label>
+                <label className={labelCls}>Open Balcony / Բաց պատ.</label>
                 <select className={inputCls} value={form.openBalcony}
                   onChange={(e) => setForm({ ...form, openBalcony: e.target.value })}>
-                  <option value="0">None</option>
+                  <option value="0">None / Չկա</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Closed Balcony</label>
+                <label className={labelCls}>Closed Balcony / Փակ պատ.</label>
                 <select className={inputCls} value={form.closedBalcony}
                   onChange={(e) => setForm({ ...form, closedBalcony: e.target.value })}>
-                  <option value="0">None</option>
+                  <option value="0">None / Չկա</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
                 </select>
               </div>
             </div>
 
+            {/* Ceiling Height / View */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Ceiling Height</label>
+                <label className={labelCls}>Ceiling Height / Առ. բ.</label>
                 <select className={inputCls} value={form.ceilingHeight}
                   onChange={(e) => setForm({ ...form, ceilingHeight: e.target.value })}>
-                  <option value="">— Select —</option>
+                  <option value="">— Select / Ընտրել —</option>
                   <option value="2.6">2.6 m</option>
                   <option value="2.8">2.8 m</option>
                   <option value="3.0">3.0 m</option>
                   <option value="3.2">3.2 m</option>
-                  <option value="3.2+">More than 3.2 m</option>
+                  <option value="3.2+">3.2+ m</option>
                 </select>
               </div>
               <div>
-                <label className={labelCls}>View from Window</label>
+                <label className={labelCls}>View / Տեսարան</label>
                 <select className={inputCls} value={form.view}
                   onChange={(e) => setForm({ ...form, view: e.target.value })}>
-                  <option value="">— Select —</option>
-                  <option value="ararat">Ararat View</option>
-                  <option value="city">City View</option>
-                  <option value="garden">Garden View</option>
-                  <option value="street">Street View</option>
+                  <option value="">— Select / Ընտրել —</option>
+                  <option value="ararat">Ararat / Արարատ</option>
+                  <option value="city">City / Քաղաք</option>
+                  <option value="garden">Garden / Այգի</option>
+                  <option value="street">Street / Փողոց</option>
                 </select>
               </div>
             </div>
 
+            {/* Status */}
             <div>
-              <label className={labelCls}>Status</label>
+              <label className={labelCls}>Status / Կարգ.</label>
               <select className={inputCls} value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                <option value="available">Available</option>
-                <option value="sold">Sold</option>
-                <option value="rented">Rented</option>
+                <option value="available">Available / Հասanimus</option>
+                <option value="sold">Sold / Վաճառված</option>
+                <option value="rented">Rented / Վարձ</option>
               </select>
             </div>
 
+            {/* Photo upload */}
             <div>
-              <label className={labelCls}>Image URLs (one per line)</label>
-              <textarea
-                rows={4}
-                className={inputCls}
-                placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"
-                value={form.imageUrls}
-                onChange={(e) => setForm({ ...form, imageUrls: e.target.value })}
+              <label className={labelCls}>Photos / Լուսանկարներ</label>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => handleUpload(e.target.files)}
               />
-              <p className="mt-1 text-xs text-primary-400">Paste full image URLs, one per line</p>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary-200 py-4 text-sm text-primary-500 transition hover:border-gold-400 hover:text-gold-600 disabled:opacity-50 dark:border-white/10 dark:text-white/50"
+              >
+                <Upload className="h-4 w-4" />
+                {uploading ? "Uploading… / Բեռnavia…" : "Click to upload photos / Կտտացնել լուսանկար ավելացնելու"}
+              </button>
+              {form.imageUrls.length > 0 && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {form.imageUrls.map((url) => (
+                    <div key={url} className="relative">
+                      <img src={url} alt="" className="h-24 w-full rounded-lg object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(url)}
+                        className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
+            {/* Amenities */}
             <div>
-              <label className={labelCls}>Amenities</label>
+              <label className={labelCls}>Amenities / Հարմ.</label>
               <div className="grid grid-cols-2 gap-2">
                 {AMENITY_KEYS.map(({ key, label }) => (
                   <label key={key} className="flex cursor-pointer items-center gap-2 text-sm text-primary-700 dark:text-white/80">
@@ -489,13 +581,13 @@ export default function EmployeeDashboard() {
             </div>
           </div>
 
-          {/* Submit — full width */}
+          {/* Submit */}
           <div className="lg:col-span-2 flex justify-end gap-3 border-t border-primary-100 pt-6 dark:border-white/10">
             <button type="button" onClick={() => setMode("list")} className="btn-outline">
-              Cancel
+              Cancel / Չեղ.
             </button>
             <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
-              {saving ? "Saving…" : mode === "create" ? "Create Listing" : "Save Changes"}
+              {saving ? "Saving…" : mode === "create" ? "Create Listing / Ստ. հայt" : "Save Changes / Պah. փ."}
             </button>
           </div>
         </form>
@@ -511,8 +603,8 @@ export default function EmployeeDashboard() {
         <div className="flex items-center gap-3">
           <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
           <div>
-            <p className="font-serif font-semibold text-primary-900 dark:text-white">Employee Portal</p>
-            <p className="text-xs text-primary-400 dark:text-white/40">My Listings</p>
+            <p className="font-serif font-semibold text-primary-900 dark:text-white">Employee Portal / Աշ. Պanelelet</p>
+            <p className="text-xs text-primary-400 dark:text-white/40">My Listings / Իmy հայտեր</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -531,9 +623,9 @@ export default function EmployeeDashboard() {
       {/* Stats */}
       <div className="mt-6 grid grid-cols-3 gap-4">
         {[
-          { icon: Building2, label: "Total Listings", value: listings.length },
-          { icon: CheckCircle2, label: "Available", value: listings.filter(l => l.status === "available").length },
-          { icon: XCircle, label: "Sold / Rented", value: listings.filter(l => l.status !== "available").length },
+          { icon: Building2, label: "Total / Ընդ.", value: listings.length },
+          { icon: CheckCircle2, label: "Available / Հաunavail.", value: listings.filter(l => l.status === "available").length },
+          { icon: XCircle, label: "Sold/Rented / Վաճ/Վ.", value: listings.filter(l => l.status !== "available").length },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="card flex items-center gap-3 p-4">
             <Icon className="h-5 w-5 text-gold-500" />
@@ -550,7 +642,7 @@ export default function EmployeeDashboard() {
         <input
           value={codeSearch}
           onChange={(e) => setCodeSearch(e.target.value.toUpperCase())}
-          placeholder="Search by property code (e.g. CM1ABC)"
+          placeholder="Search by code / Որ. ըst կodով (e.g. CM1ABC)"
           className="w-full max-w-sm rounded-xl border border-primary-100 px-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
         />
       </div>
@@ -563,7 +655,7 @@ export default function EmployeeDashboard() {
       ) : listings.length === 0 ? (
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
           <Building2 className="h-12 w-12 text-primary-200" />
-          <p className="text-primary-500 dark:text-white/60">No listings yet.</p>
+          <p className="text-primary-500 dark:text-white/60">No listings yet. / Հայتеры չkyan.</p>
           <button onClick={startCreate} className="btn-primary gap-2">
             <Plus className="h-4 w-4" /> Add your first listing
           </button>
@@ -574,17 +666,18 @@ export default function EmployeeDashboard() {
             <thead className="border-b border-primary-100 dark:border-white/10">
               <tr className="text-primary-500 dark:text-white/60">
                 <th className="px-5 py-3">Code</th>
-                <th className="px-5 py-3">Title</th>
-                <th className="px-5 py-3">Price</th>
-                <th className="px-5 py-3">District</th>
+                <th className="px-5 py-3">Title / Վ.</th>
+                <th className="px-5 py-3">Price / Գ.</th>
+                <th className="px-5 py-3">District / Թ.</th>
+                <th className="px-5 py-3">Owner / Սep.</th>
                 <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3">Published</th>
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {listings.filter(l => !codeSearch || toCode(l.id).includes(codeSearch)).map((l) => {
                 const images = JSON.parse(l.images ?? "[]") as string[];
+                const amenities = JSON.parse(l.amenities ?? "{}") as AmenityMap;
                 return (
                   <tr key={l.id} className="border-b border-primary-50 last:border-0 dark:border-white/5">
                     <td className="px-5 py-3">
@@ -608,7 +701,17 @@ export default function EmployeeDashboard() {
                       {formatPrice(l.price, l.purpose as "sale" | "rent", l.currency)}
                     </td>
                     <td className="px-5 py-3 capitalize text-primary-500 dark:text-white/60">
-                      {DISTRICTS.find(d => d.value === l.district)?.label ?? l.district}
+                      {DISTRICTS.find(d => d.value === l.district)?.label?.split(" / ")[0] ?? l.district}
+                    </td>
+                    <td className="px-5 py-3">
+                      {amenities.ownerPhone ? (
+                        <div className="text-xs">
+                          <div className="font-medium text-primary-800 dark:text-white/80">{String(amenities.ownerName || "—")}</div>
+                          <div className="text-primary-500 dark:text-white/50">{String(amenities.ownerPhone)}</div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-primary-300 dark:text-white/20">—</span>
+                      )}
                     </td>
                     <td className="px-5 py-3">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -620,13 +723,6 @@ export default function EmployeeDashboard() {
                       }`}>
                         {l.status}
                       </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      {l.isPublished ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <span className="text-xs text-primary-400 dark:text-white/30">Draft</span>
-                      )}
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-1">
