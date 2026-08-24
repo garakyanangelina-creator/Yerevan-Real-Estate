@@ -1,30 +1,36 @@
-<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- HEAD / BEAK (small triangle, leftmost) -->
-  <polygon points="24,87 47,76 47,100" fill="#1B3860"/>
+  <!-- BEAK — tiny triangle, far left -->
+  <polygon points="38,158 64,140 64,177" fill="#1D3867"/>
 
-  <!-- LEFT WING (large solid triangle, goes up-left) -->
-  <polygon points="49,87 68,20 134,65" fill="#1B3860"/>
+  <!-- HEAD — small piece between beak and wing -->
+  <polygon points="66,140 108,120 108,178 66,177" fill="#1D3867"/>
 
-  <!-- LEFT BODY (below left wing) -->
-  <polygon points="70,88 134,65 94,148" fill="#1B3860"/>
+  <!-- LEFT WING — large triangle going up-left -->
+  <polygon points="68,158 136,34 216,136" fill="#1D3867"/>
 
-  <!-- RIGHT WING — section 1 (left) -->
-  <polygon points="136,65 136,40 162,30 163,56" fill="#1B3860"/>
+  <!-- LEFT BODY — large downward triangle, left side of V -->
+  <polygon points="72,168 216,144 144,298" fill="#1D3867"/>
 
-  <!-- RIGHT WING — section 2 (middle) -->
-  <polygon points="165,55 163,30 189,22 191,47" fill="#1B3860"/>
+  <!-- RIGHT WING upper — section 1 (leftmost) -->
+  <polygon points="220,136 218,94 258,76 262,120" fill="#1D3867"/>
 
-  <!-- RIGHT WING — section 3 (right) -->
-  <polygon points="193,46 190,22 214,30 210,54" fill="#1B3860"/>
+  <!-- RIGHT WING upper — section 2 (middle) -->
+  <polygon points="264,118 260,74 300,58 306,102" fill="#1D3867"/>
 
-  <!-- RIGHT BODY (below right wing sections) -->
-  <polygon points="136,66 165,56 150,152 122,142" fill="#1B3860"/>
+  <!-- RIGHT WING upper — section 3 (rightmost) -->
+  <polygon points="308,100 302,56 332,66 328,98" fill="#1D3867"/>
+
+  <!-- RIGHT LOWER BODY — section 1 (left of diagonal) -->
+  <polygon points="220,148 262,128 244,262 212,272" fill="#1D3867"/>
+
+  <!-- RIGHT LOWER BODY — section 2 (right of diagonal) -->
+  <polygon points="264,126 308,108 288,268 246,260" fill="#1D3867"/>
 
   <!-- LEFT TAIL -->
-  <polygon points="94,150 74,190 102,190" fill="#1B3860"/>
+  <polygon points="146,302 212,276 196,348 158,348" fill="#1D3867"/>
 
   <!-- RIGHT TAIL -->
-  <polygon points="124,144 150,154 140,196 114,184" fill="#1B3860"/>
+  <polygon points="214,278 248,264 236,352 200,350" fill="#1D3867"/>
 
 </svg>
