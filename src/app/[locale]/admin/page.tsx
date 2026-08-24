@@ -43,7 +43,7 @@ export default function LoginPage() {
     <div className="flex min-h-[80vh] items-center justify-center px-4">
       <form onSubmit={handleSubmit} className="card w-full max-w-sm space-y-5 p-8">
         <div className="flex flex-col items-center gap-3">
-          <Image src="/logo.svg" alt="Yerevan Real Estate" width={56} height={56} className="rounded-xl" />
+          <Image src="/logo-new.png" alt="Yerevan Real Estate" width={56} height={56} className="rounded-xl" />
           <h1 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">
             Staff Login
           </h1>

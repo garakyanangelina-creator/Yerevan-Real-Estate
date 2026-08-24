@@ -30,7 +30,7 @@ export default function Header() {
       <div className="container-page flex h-18 items-center justify-between py-2">
         <Link href="/" className="flex items-center gap-2.5">
           <img
-            src="/logo.svg"
+            src="/logo-new.png"
             alt="Yerevan Real Estate"
             width={44}
             height={44}

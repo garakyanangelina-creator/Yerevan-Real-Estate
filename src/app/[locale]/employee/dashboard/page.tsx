@@ -214,7 +214,7 @@ export default function EmployeeDashboard() {
       <div className="container-page py-10">
         <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
           <div className="flex items-center gap-3">
-            <Image src="/logo.svg" alt="" width={36} height={36} className="rounded-lg" />
+            <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
             <span className="font-serif font-semibold text-primary-900 dark:text-white">
               {mode === "create" ? "Add Listing" : "Edit Listing"}
             </span>
@@ -457,7 +457,7 @@ export default function EmployeeDashboard() {
       {/* Nav */}
       <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
         <div className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="" width={36} height={36} className="rounded-lg" />
+          <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
           <div>
             <p className="font-serif font-semibold text-primary-900 dark:text-white">Employee Portal</p>
             <p className="text-xs text-primary-400 dark:text-white/40">My Listings</p>

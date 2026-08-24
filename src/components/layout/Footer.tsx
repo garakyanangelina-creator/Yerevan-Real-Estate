@@ -19,7 +19,7 @@ export default function Footer() {
         {/* Brand + socials */}
         <div>
           <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Yerevan Real Estate logo" width={44} height={44} className="rounded-xl" />
+            <img src="/logo-new.png" alt="Yerevan Real Estate logo" width={44} height={44} className="rounded-xl" />
             <h3 className="font-serif text-base font-semibold leading-tight sm:text-lg">
               Yerevan<br />Real Estate
             </h3>
