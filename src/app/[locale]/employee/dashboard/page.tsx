@@ -60,13 +60,19 @@ const AMENITY_KEYS = [
   { key: "heating", label: "Heating" },
 ];
 
-type AmenityMap = Record<string, boolean>;
+type AmenityMap = Record<string, boolean | string | number>;
 
 function emptyForm() {
   return {
     title: "", description: "", type: "apartment", purpose: "sale",
     district: "kentron", address: "", price: "", currency: "AMD",
     bedrooms: "1", bathrooms: "1", area: "", floor: "1", totalFloors: "9",
+    rooms: "1",
+    buildingType: "",
+    openBalcony: "0",
+    closedBalcony: "0",
+    ceilingHeight: "",
+    view: "",
     imageUrls: "",
     amenities: {} as AmenityMap,
     status: "available",
@@ -122,8 +128,18 @@ export default function EmployeeDashboard() {
       area: String(l.area),
       floor: String(l.floor),
       totalFloors: String(l.totalFloors),
+      rooms: String(amenities.rooms ?? "1"),
+      buildingType: String(amenities.buildingType ?? ""),
+      openBalcony: String(amenities.openBalcony ?? "0"),
+      closedBalcony: String(amenities.closedBalcony ?? "0"),
+      ceilingHeight: String(amenities.ceilingHeight ?? ""),
+      view: String(amenities.view ?? ""),
       imageUrls: images.join("\n"),
-      amenities,
+      amenities: Object.fromEntries(
+        Object.entries(amenities).filter(([k]) =>
+          !["rooms","buildingType","openBalcony","closedBalcony","ceilingHeight","view"].includes(k)
+        )
+      ) as AmenityMap,
       status: l.status,
     });
     setEditId(l.id);
@@ -152,7 +168,15 @@ export default function EmployeeDashboard() {
       floor: Number(form.floor) || 0,
       totalFloors: Number(form.totalFloors) || 0,
       images,
-      amenities: form.amenities,
+      amenities: {
+        ...form.amenities,
+        rooms: Number(form.rooms) || 1,
+        ...(form.buildingType && { buildingType: form.buildingType }),
+        openBalcony: Number(form.openBalcony) || 0,
+        closedBalcony: Number(form.closedBalcony) || 0,
+        ...(form.ceilingHeight && { ceilingHeight: form.ceilingHeight }),
+        ...(form.view && { view: form.view }),
+      },
       status: form.status,
     };
 
@@ -295,9 +319,76 @@ export default function EmployeeDashboard() {
                   onChange={(e) => setForm({ ...form, floor: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Total Floors</label>
+                <label className={labelCls}>Total Floors in Building</label>
                 <input type="number" min="0" className={inputCls} value={form.totalFloors}
                   onChange={(e) => setForm({ ...form, totalFloors: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>Rooms</label>
+                <select className={inputCls} value={form.rooms}
+                  onChange={(e) => setForm({ ...form, rooms: e.target.value })}>
+                  {["1","2","3","4","5","6"].map(v => <option key={v} value={v}>{v} room{Number(v) > 1 ? "s" : ""}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Building Type</label>
+                <select className={inputCls} value={form.buildingType}
+                  onChange={(e) => setForm({ ...form, buildingType: e.target.value })}>
+                  <option value="">— Select —</option>
+                  <option value="panel">Panel</option>
+                  <option value="newBuilding">New Building</option>
+                  <option value="stone">Stone Building</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>Open Balcony</label>
+                <select className={inputCls} value={form.openBalcony}
+                  onChange={(e) => setForm({ ...form, openBalcony: e.target.value })}>
+                  <option value="0">None</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Closed Balcony</label>
+                <select className={inputCls} value={form.closedBalcony}
+                  onChange={(e) => setForm({ ...form, closedBalcony: e.target.value })}>
+                  <option value="0">None</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>Ceiling Height</label>
+                <select className={inputCls} value={form.ceilingHeight}
+                  onChange={(e) => setForm({ ...form, ceilingHeight: e.target.value })}>
+                  <option value="">— Select —</option>
+                  <option value="2.6">2.6 m</option>
+                  <option value="2.8">2.8 m</option>
+                  <option value="3.0">3.0 m</option>
+                  <option value="3.2">3.2 m</option>
+                  <option value="3.2+">More than 3.2 m</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>View from Window</label>
+                <select className={inputCls} value={form.view}
+                  onChange={(e) => setForm({ ...form, view: e.target.value })}>
+                  <option value="">— Select —</option>
+                  <option value="ararat">Ararat View</option>
+                  <option value="city">City View</option>
+                  <option value="garden">Garden View</option>
+                  <option value="street">Street View</option>
+                </select>
               </div>
             </div>
 
