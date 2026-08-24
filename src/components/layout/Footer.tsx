@@ -36,7 +36,7 @@ export default function Footer() {
               <Instagram className="h-4 w-4" />
             </a>
             <a
-              href="https://t.me/yerevanrealestate"
+              href="https://t.me/+37444222310"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Telegram"
