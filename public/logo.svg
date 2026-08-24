@@ -1,13 +1,30 @@
-<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background rounded square -->
-  <rect width="220" height="180" rx="34" fill="#C5DCF0"/>
+<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- Geometric origami bird, facing right -->
-  <polygon points="18,72 88,28 98,64 58,82" fill="#1B3A5C"/>
-  <polygon points="18,72 58,82 34,98" fill="#0F2A4A"/>
-  <polygon points="88,28 132,50 98,64" fill="#1E4570"/>
-  <polygon points="132,50 158,38 145,60" fill="#1B3A5C"/>
-  <polygon points="98,64 132,50 128,88 92,92" fill="#0F2A4A"/>
-  <polygon points="58,82 92,92 76,112" fill="#1B3A5C"/>
-  <polygon points="58,82 76,112 40,104" fill="#0F2A4A"/>
+  <!-- HEAD / BEAK (small triangle, leftmost) -->
+  <polygon points="24,87 47,76 47,100" fill="#1B3860"/>
+
+  <!-- LEFT WING (large solid triangle, goes up-left) -->
+  <polygon points="49,87 68,20 134,65" fill="#1B3860"/>
+
+  <!-- LEFT BODY (below left wing) -->
+  <polygon points="70,88 134,65 94,148" fill="#1B3860"/>
+
+  <!-- RIGHT WING — section 1 (left) -->
+  <polygon points="136,65 136,40 162,30 163,56" fill="#1B3860"/>
+
+  <!-- RIGHT WING — section 2 (middle) -->
+  <polygon points="165,55 163,30 189,22 191,47" fill="#1B3860"/>
+
+  <!-- RIGHT WING — section 3 (right) -->
+  <polygon points="193,46 190,22 214,30 210,54" fill="#1B3860"/>
+
+  <!-- RIGHT BODY (below right wing sections) -->
+  <polygon points="136,66 165,56 150,152 122,142" fill="#1B3860"/>
+
+  <!-- LEFT TAIL -->
+  <polygon points="94,150 74,190 102,190" fill="#1B3860"/>
+
+  <!-- RIGHT TAIL -->
+  <polygon points="124,144 150,154 140,196 114,184" fill="#1B3860"/>
+
 </svg>
