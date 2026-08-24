@@ -1,36 +1,41 @@
-<svg viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- BEAK — tiny triangle, far left -->
+  <!-- BEAK -->
   <polygon points="38,158 64,140 64,177" fill="#1D3867"/>
-
-  <!-- HEAD — small piece between beak and wing -->
+  <!-- HEAD -->
   <polygon points="66,140 108,120 108,178 66,177" fill="#1D3867"/>
-
-  <!-- LEFT WING — large triangle going up-left -->
+  <!-- LEFT WING -->
   <polygon points="68,158 136,34 216,136" fill="#1D3867"/>
-
-  <!-- LEFT BODY — large downward triangle, left side of V -->
+  <!-- LEFT BODY -->
   <polygon points="72,168 216,144 144,298" fill="#1D3867"/>
-
-  <!-- RIGHT WING upper — section 1 (leftmost) -->
+  <!-- RIGHT WING section 1 -->
   <polygon points="220,136 218,94 258,76 262,120" fill="#1D3867"/>
-
-  <!-- RIGHT WING upper — section 2 (middle) -->
+  <!-- RIGHT WING section 2 -->
   <polygon points="264,118 260,74 300,58 306,102" fill="#1D3867"/>
-
-  <!-- RIGHT WING upper — section 3 (rightmost) -->
+  <!-- RIGHT WING section 3 -->
   <polygon points="308,100 302,56 332,66 328,98" fill="#1D3867"/>
-
-  <!-- RIGHT LOWER BODY — section 1 (left of diagonal) -->
+  <!-- RIGHT LOWER BODY section 1 -->
   <polygon points="220,148 262,128 244,262 212,272" fill="#1D3867"/>
-
-  <!-- RIGHT LOWER BODY — section 2 (right of diagonal) -->
+  <!-- RIGHT LOWER BODY section 2 -->
   <polygon points="264,126 308,108 288,268 246,260" fill="#1D3867"/>
-
   <!-- LEFT TAIL -->
   <polygon points="146,302 212,276 196,348 158,348" fill="#1D3867"/>
-
   <!-- RIGHT TAIL -->
   <polygon points="214,278 248,264 236,352 200,350" fill="#1D3867"/>
+
+  <!-- YEREVAN -->
+  <text x="185" y="385" text-anchor="middle"
+        font-family="'Trebuchet MS', Arial, sans-serif"
+        font-weight="800" font-size="46" letter-spacing="5"
+        fill="#1D3867">YEREVAN</text>
+
+  <!-- divider line -->
+  <line x1="18" y1="394" x2="352" y2="394" stroke="#1D3867" stroke-width="1.5"/>
+
+  <!-- REAL ESTATE -->
+  <text x="185" y="416" text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-weight="400" font-size="22" letter-spacing="8"
+        fill="#1D3867">REAL ESTATE</text>
 
 </svg>
