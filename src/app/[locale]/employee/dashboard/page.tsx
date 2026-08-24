@@ -89,6 +89,7 @@ export default function EmployeeDashboard() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [revealedImages, setRevealedImages] = useState<Record<string, boolean>>({});
+  const [codeSearch, setCodeSearch] = useState("");
 
   async function fetchListings() {
     const res = await fetch("/api/employee/listings");
@@ -201,6 +202,8 @@ export default function EmployeeDashboard() {
     setDeleting(null);
     await fetchListings();
   }
+
+  const toCode = (id: string) => id.slice(0, 6).toUpperCase();
 
   const inputCls = "w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white";
   const labelCls = "block text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-white/60 mb-1";
@@ -487,6 +490,16 @@ export default function EmployeeDashboard() {
         ))}
       </div>
 
+      {/* Code search */}
+      <div className="mt-6">
+        <input
+          value={codeSearch}
+          onChange={(e) => setCodeSearch(e.target.value.toUpperCase())}
+          placeholder="Search by property code (e.g. CM1ABC)"
+          className="w-full max-w-sm rounded-xl border border-primary-100 px-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
+        />
+      </div>
+
       {/* Table */}
       {loading ? (
         <div className="mt-8 space-y-3">
@@ -505,6 +518,7 @@ export default function EmployeeDashboard() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-primary-100 dark:border-white/10">
               <tr className="text-primary-500 dark:text-white/60">
+                <th className="px-5 py-3">Code</th>
                 <th className="px-5 py-3">Title</th>
                 <th className="px-5 py-3">Price</th>
                 <th className="px-5 py-3">District</th>
@@ -514,10 +528,15 @@ export default function EmployeeDashboard() {
               </tr>
             </thead>
             <tbody>
-              {listings.map((l) => {
+              {listings.filter(l => !codeSearch || toCode(l.id).includes(codeSearch)).map((l) => {
                 const images = JSON.parse(l.images ?? "[]") as string[];
                 return (
                   <tr key={l.id} className="border-b border-primary-50 last:border-0 dark:border-white/5">
+                    <td className="px-5 py-3">
+                      <span className="rounded-md bg-gold-100 px-2 py-1 font-mono text-xs font-bold text-gold-700 dark:bg-gold-500/20 dark:text-gold-300">
+                        #{toCode(l.id)}
+                      </span>
+                    </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
                         {images[0] ? (
