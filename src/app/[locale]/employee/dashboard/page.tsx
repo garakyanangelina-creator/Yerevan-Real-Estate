@@ -330,7 +330,7 @@ export default function EmployeeDashboard() {
                 <label className={labelCls}>Rooms</label>
                 <select className={inputCls} value={form.rooms}
                   onChange={(e) => setForm({ ...form, rooms: e.target.value })}>
-                  {["1","2","3","4","5","6"].map(v => <option key={v} value={v}>{v} room{Number(v) > 1 ? "s" : ""}</option>)}
+                  {["1","2","3","4","5","6","6+"].map(v => <option key={v} value={v}>{v} room{v !== "1" ? "s" : ""}</option>)}
                 </select>
               </div>
               <div>
