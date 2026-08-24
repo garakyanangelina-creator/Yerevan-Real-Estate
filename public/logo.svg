@@ -1,35 +1,13 @@
-<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
   <!-- Background rounded square -->
-  <rect width="220" height="220" rx="34" fill="#C5DCF0"/>
-
-  <!-- Bottom arc -->
-  <path d="M 18,200 Q 110,228 202,200" stroke="#1B3A5C" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <rect width="220" height="180" rx="34" fill="#C5DCF0"/>
 
   <!-- Geometric origami bird, facing right -->
-  <!-- Left wing — dominant upper shape -->
   <polygon points="18,72 88,28 98,64 58,82" fill="#1B3A5C"/>
-  <!-- Wing lower tip -->
   <polygon points="18,72 58,82 34,98" fill="#0F2A4A"/>
-  <!-- Upper body / neck joining wing and head -->
   <polygon points="88,28 132,50 98,64" fill="#1E4570"/>
-  <!-- Head / beak — rightmost -->
   <polygon points="132,50 158,38 145,60" fill="#1B3A5C"/>
-  <!-- Lower body / breast -->
   <polygon points="98,64 132,50 128,88 92,92" fill="#0F2A4A"/>
-  <!-- Upper tail -->
   <polygon points="58,82 92,92 76,112" fill="#1B3A5C"/>
-  <!-- Lower tail tip -->
   <polygon points="58,82 76,112 40,104" fill="#0F2A4A"/>
-
-  <!-- YEREVAN -->
-  <text x="110" y="148" text-anchor="middle"
-        font-family="'Arial Black','Arial',sans-serif"
-        font-weight="900" font-size="24" letter-spacing="3"
-        fill="#1B3A5C">YEREVAN</text>
-
-  <!-- REAL ESTATE -->
-  <text x="110" y="172" text-anchor="middle"
-        font-family="'Arial',sans-serif"
-        font-weight="700" font-size="15" letter-spacing="2"
-        fill="#1B3A5C">REAL ESTATE</text>
 </svg>
