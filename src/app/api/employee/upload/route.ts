@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     {
       method: "POST",
       headers: {
+        apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
         "Content-Type": file.type || "image/jpeg",
         "x-upsert": "true",
