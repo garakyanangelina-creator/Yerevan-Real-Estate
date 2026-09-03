@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma, ensureDatabase } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { isStreetInDistrict } from "@/lib/yerevan-streets";
 
 export async function GET() {
   await ensureDatabase();
@@ -26,6 +27,16 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   if (!body?.title) return NextResponse.json({ error: "title required" }, { status: 400 });
+
+  // Validate district/street
+  const street = body.amenities?.street ?? "";
+  const district = body.district ?? "";
+  if (street && district && !isStreetInDistrict(district, street)) {
+    return NextResponse.json(
+      { error: `Street "${street}" does not belong to district "${district}".` },
+      { status: 422 }
+    );
+  }
 
   const listing = await prisma.dbProperty.create({
     data: {

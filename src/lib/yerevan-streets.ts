@@ -1,6 +1,20 @@
+/**
+ * Strict district → streets mapping for Yerevan.
+ * Each street appears in EXACTLY ONE district — the district where it
+ * primarily / geographically belongs. Long avenues that cross a border
+ * are assigned to the district that contains the majority of the street.
+ *
+ * This is the single source of truth used by:
+ *   - frontend autocomplete (filter by district, then by typed text)
+ *   - backend validation (reject district/street mismatches)
+ */
+
 export const streetsByDistrict: Record<string, string[]> = {
+
+  /* ─── Kentron (Կentron / Center) ──────────────────────────────────────── */
   kentron: [
     "Abovyan St",
+    "Agh Aram St",
     "Amiryan St",
     "Aram St",
     "Arami St",
@@ -10,6 +24,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Buzand St",
     "Charents St",
     "Dro St",
+    "France Square",
     "Gevorgyan St",
     "Grigor Lusavorich St",
     "Hanrapetutyan St",
@@ -20,6 +35,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Martiros Saryan St",
     "Moscovyan St",
     "Nalbandyan St",
+    "Nzhdeh St",
     "Parpetsi St",
     "Paronyan St",
     "Pushkin St",
@@ -34,12 +50,11 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Vazgen Sargsyan St",
   ],
 
+  /* ─── Arabkir (Արabkir) ───────────────────────────────────────────────── */
   arabkir: [
     "Andranik St",
     "Antarayin St",
     "Ashtarak Highway",
-    "Azatutyan Ave",
-    "Baghramyan Ave",
     "Byuzandakan St",
     "Davit Anhaght St",
     "Dzoraghbyur St",
@@ -54,9 +69,9 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Norageryan St",
     "Paruyr Sevak St",
     "Tbilisi Highway",
-    "Tigranyan St",
   ],
 
+  /* ─── Davtashen (Dawttashen) ──────────────────────────────────────────── */
   davtashen: [
     "Davtashen 1st District",
     "Davtashen 2nd District",
@@ -70,28 +85,24 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Vahan Teryan St",
   ],
 
+  /* ─── Ajapnyak (Ajafarnyak) ───────────────────────────────────────────── */
   ajapnyak: [
     "Ajapnyak 1st District",
     "Ajapnyak 2nd District",
     "Ajapnyak 3rd District",
     "Alek Manukyan St",
-    "Antarayin St",
     "Argishti St",
     "Artsvik St",
     "Ashotavan St",
     "Garegin Nzhdeh St",
-    "Gyumrian Highway",
-    "Hovhannes Shiraz St",
     "Hrachya Kochar St",
     "Khachatur Abovyan St",
     "Leningradsyan St",
-    "Paruyr Sevak St",
-    "Vahan Teryan St",
     "Vardavar St",
   ],
 
+  /* ─── Shengavit (Shengavit) ───────────────────────────────────────────── */
   shengavit: [
-    "Arshakunyats Ave",
     "Artashat Highway",
     "David Bek St",
     "Garegin Nzhdeh Square",
@@ -109,96 +120,104 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Yerznkyan St",
   ],
 
+  /* ─── Kanaker-Zeytun (Kanaker-Zeytun) ────────────────────────────────── */
   kanakerZeytun: [
-    "Arshakunyats Ave",
     "Avan-Arinj Highway",
     "Charentsavan St",
     "Gyulbenkyan St",
     "Kanaker 1st District",
     "Kanaker 2nd District",
-    "Movses Khorenatsi St",
-    "Paruyr Sevak St",
-    "Tigranashen St",
-    "Vazgen Sargsyan St",
+    "Kanaker-Zeytun Ave",
+    "Lernagorts St",
     "Yervand Kochar St",
     "Zeytun 1st District",
     "Zeytun 2nd District",
     "Zeytun 3rd District",
   ],
 
+  /* ─── Nor Nork (Norr Nork) ────────────────────────────────────────────── */
   norNork: [
-    "Antarayin St",
-    "Arshakunyats Ave",
-    "Gyumrian Highway",
     "Halabyan St",
-    "Margaryan St",
     "Nor Nork 1st District",
     "Nor Nork 2nd District",
     "Nor Nork 3rd District",
     "Nor Nork 4th District",
     "Nor Nork 5th District",
-    "Sebastia St",
+    "Norki St",
     "Teryan St",
   ],
 
+  /* ─── Malatia-Sebastia (Malatia-Sebastia) ────────────────────────────── */
   malatiaSebastia: [
     "Ararat St",
     "Armenakyan St",
-    "Khachatur Abovyan St",
     "Malatia 1st District",
     "Malatia 2nd District",
     "Malatia 3rd District",
     "Malatia 4th District",
     "Mushakan St",
-    "Sebastia St",
     "Zvartnots Highway",
   ],
 
+  /* ─── Avan (Avan) ─────────────────────────────────────────────────────── */
   avan: [
     "Abovyan Highway",
     "Avan 1st District",
     "Avan 2nd District",
     "Avan 3rd District",
     "Avan Ave",
-    "Avan-Arinj Highway",
     "Geghadir St",
     "Haghpat St",
     "Nor Arinj St",
     "Tsaghkadzori Highway",
   ],
 
+  /* ─── Erebuni (Erebuni) ───────────────────────────────────────────────── */
   erebuni: [
-    "Artashat Highway",
-    "David Bek St",
     "Erebuni 1st District",
     "Erebuni 2nd District",
     "Erebuni 3rd District",
-    "Karmir Blur St",
+    "Erebuni St",
     "Nairi Zarian St",
     "Sepuh St",
-    "Tigranashen St",
     "Zvartnots Airport Area",
   ],
 
+  /* ─── Nork-Marash (Nork-Marash) ──────────────────────────────────────── */
   norkMarash: [
-    "Antarayin St",
     "Marash St",
-    "Mher Mkrtchyan St",
     "Nork 1st District",
     "Nork 2nd District",
     "Nork 3rd District",
     "Nork Massiv",
-    "Tsaghkadzori Highway",
+    "Nork-Marash Ave",
     "Yeritsyan St",
   ],
 
+  /* ─── Nubarashen (Nubarashen) ─────────────────────────────────────────── */
   nubarashen: [
-    "Artashat Highway",
     "Nubarashen 1st District",
     "Nubarashen 2nd District",
     "Nubarashen 3rd District",
     "Nubarashen 4th District",
+    "Nubarashen Ave",
   ],
 
   other: [],
 };
+
+/** Flat set of all known streets — used by backend validation */
+export const allKnownStreets: Set<string> = new Set(
+  Object.values(streetsByDistrict).flat()
+);
+
+/**
+ * Returns true if the given street actually belongs to the given district.
+ * An empty street value always passes (field is optional).
+ */
+export function isStreetInDistrict(district: string, street: string): boolean {
+  if (!street) return true;
+  const list = streetsByDistrict[district];
+  if (!list) return true; // unknown district — don't block submission
+  return list.some((s) => s.toLowerCase() === street.toLowerCase());
+}

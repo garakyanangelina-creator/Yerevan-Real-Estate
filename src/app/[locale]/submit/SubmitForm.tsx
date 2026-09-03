@@ -39,7 +39,7 @@ export default function SubmitForm() {
   // Street autocomplete
   useEffect(() => {
     if (!streetQuery || streetQuery.length < 1) { setStreetSuggestions([]); return; }
-    const streets = streetsByDistrict[form.district] ?? Object.values(streetsByDistrict).flat();
+    const streets = streetsByDistrict[form.district] ?? [];
     const q = streetQuery.toLowerCase();
     setStreetSuggestions(streets.filter((s) => s.toLowerCase().includes(q)).slice(0, 20));
   }, [streetQuery, form.district]);

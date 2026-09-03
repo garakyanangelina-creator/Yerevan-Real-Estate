@@ -105,7 +105,7 @@ export default function EmployeeDashboard() {
 
   useEffect(() => {
     if (!streetQuery) { setStreetSuggestions([]); return; }
-    const streets = streetsByDistrict[form.district] ?? Object.values(streetsByDistrict).flat();
+    const streets = streetsByDistrict[form.district] ?? [];
     const q = streetQuery.toLowerCase();
     setStreetSuggestions(streets.filter((s) => s.toLowerCase().includes(q)).slice(0, 20));
   }, [streetQuery, form.district]);

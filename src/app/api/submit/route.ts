@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isStreetInDistrict } from "@/lib/yerevan-streets";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body?.name || !body?.phone) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  // Validate district/street combination
+  if (body.street && body.district && !isStreetInDistrict(body.district, body.street)) {
+    return NextResponse.json(
+      { error: `Street "${body.street}" does not belong to the selected district. Please check your address.` },
+      { status: 422 }
+    );
   }
 
   const photos: string[] = Array.isArray(body.photos) ? body.photos : [];
