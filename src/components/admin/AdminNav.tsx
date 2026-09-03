@@ -214,9 +214,9 @@ export default function AdminNav({
             </div>
             {tab === "password" && (
               <div className="space-y-3">
-                <input type="password" placeholder="Current password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className="input w-full" />
-                <input type="password" placeholder="New password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} className="input w-full" />
-                <input type="password" placeholder="Confirm new password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className="input w-full" />
+                <input type="password" placeholder="Current password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className="w-full rounded-lg border border-white/20 bg-primary-700 px-3 py-2.5 text-sm text-white placeholder-white/40 focus:border-gold-400 focus:outline-none" />
+                <input type="password" placeholder="New password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} className="w-full rounded-lg border border-white/20 bg-primary-700 px-3 py-2.5 text-sm text-white placeholder-white/40 focus:border-gold-400 focus:outline-none" />
+                <input type="password" placeholder="Confirm new password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className="w-full rounded-lg border border-white/20 bg-primary-700 px-3 py-2.5 text-sm text-white placeholder-white/40 focus:border-gold-400 focus:outline-none" />
                 {pwError && <p className="text-sm text-red-500">{pwError}</p>}
                 {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
                 <button onClick={changePassword} disabled={pwLoading} className="btn-primary w-full">{pwLoading ? "Saving…" : "Save Password"}</button>
@@ -224,8 +224,8 @@ export default function AdminNav({
             )}
             {tab === "username" && (
               <div className="space-y-3">
-                <input type="text" placeholder="New username" value={unForm.newUsername} onChange={e => setUnForm(f => ({ ...f, newUsername: e.target.value }))} className="input w-full" autoComplete="off" />
-                <input type="password" placeholder="Confirm with your password" value={unForm.password} onChange={e => setUnForm(f => ({ ...f, password: e.target.value }))} className="input w-full" />
+                <input type="text" placeholder="New username" value={unForm.newUsername} onChange={e => setUnForm(f => ({ ...f, newUsername: e.target.value }))} className="w-full rounded-lg border border-white/20 bg-primary-700 px-3 py-2.5 text-sm text-white placeholder-white/40 focus:border-gold-400 focus:outline-none" autoComplete="off" />
+                <input type="password" placeholder="Confirm with your password" value={unForm.password} onChange={e => setUnForm(f => ({ ...f, password: e.target.value }))} className="w-full rounded-lg border border-white/20 bg-primary-700 px-3 py-2.5 text-sm text-white placeholder-white/40 focus:border-gold-400 focus:outline-none" />
                 {pwError && <p className="text-sm text-red-500">{pwError}</p>}
                 {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
                 <button onClick={changeUsername} disabled={pwLoading} className="btn-primary w-full">{pwLoading ? "Saving…" : "Save Username"}</button>
