@@ -1,0 +1,78 @@
+export const streetsByDistrict: Record<string, string[]> = {
+  kentron: [
+    "Mashtots Ave", "Sayat-Nova Ave", "Abovyan St", "Nalbandyan St",
+    "Pushkin St", "Vardanants St", "Hanrapetutyan St", "Tigranyan St",
+    "Baghramyan Ave", "Isahakyan St", "Tumanyan St", "Khanjyan St",
+    "Grigor Lusavorich St", "Moscovyan St", "Terian St", "Koryun St",
+    "Charents St", "Parpetsi St", "Buzand St", "Amiryan St",
+    "Tigran Mets Ave", "Arshakunyats Ave", "Azatutyan Ave",
+    "Republic Square", "France Square", "Cascade Area",
+  ],
+  arabkir: [
+    "Komitas Ave", "Azatutyan Ave", "Norageryan St", "Vardanants St",
+    "Ashtaraki Highway", "Dzoraghbyur St", "Mher Mkrtchyan St",
+    "Hakob Hakobyan St", "Andranik St", "Baghramyan Ave",
+    "Muratsan St", "Davit Anhaght St", "Tbilisi Highway",
+    "Achapnyak 1st Lane", "Achapnyak 2nd Lane",
+  ],
+  davtashen: [
+    "Davtashen 1st District", "Davtashen 2nd District",
+    "Davtashen 3rd District", "Davtashen 4th District",
+    "Gyumrian Highway", "Gegham St", "Movses Khorenatsi St",
+    "Tsitsernakaberd Highway", "Vahan Teryan St",
+  ],
+  ajapnyak: [
+    "Leningradsyan St", "Ashotavan St", "Garegin Nzhdeh St",
+    "Hovhannes Shiraz St", "Ajapnyak 1st District",
+    "Ajapnyak 2nd District", "Ajapnyak 3rd District",
+    "Alek Manukyan St", "Paruyr Sevak St", "Hrachya Kochar St",
+    "Artsvik St", "Vardavar St", "Antarayin St",
+  ],
+  shengavit: [
+    "Tigranashen St", "Shengavit 1st District", "Shengavit 2nd District",
+    "Shengavit 3rd District", "Shengavit 4th District",
+    "Artashat Highway", "Garegin Nzhdeh Square",
+    "Arshakunyats Ave", "Rubinyants St", "Yerznkyan St",
+    "David Bek St", "Vardges Sureniants St",
+  ],
+  kanakerZeytun: [
+    "Zeytun 1st District", "Zeytun 2nd District", "Zeytun 3rd District",
+    "Kanaker 1st District", "Kanaker 2nd District",
+    "Paronyan St", "Vazgen Sargsyan St", "Gyulbenkyan St",
+    "Charentsavan St", "Arshakunyats Ave", "Avan-Arinj Highway",
+  ],
+  norNork: [
+    "Nor Nork 1st District", "Nor Nork 2nd District", "Nor Nork 3rd District",
+    "Nor Nork 4th District", "Nor Nork 5th District",
+    "Teryan St", "Sebastia St", "Halabyan St",
+    "Antarayin St", "Gyumrian Highway",
+  ],
+  malatiaSebastia: [
+    "Sebastia St", "Malatia 1st District", "Malatia 2nd District",
+    "Malatia 3rd District", "Malatia 4th District",
+    "Ararat St", "Khachatur Abovyan St", "Armenakyan St",
+    "Mushakan St", "Zvartnots Highway",
+  ],
+  avan: [
+    "Avan 1st District", "Avan 2nd District", "Avan 3rd District",
+    "Avan-Arinj Highway", "Nor Arinj St", "Geghadir St",
+    "Tsaghkadzori Highway", "Abovyan Highway",
+  ],
+  erebuni: [
+    "Artashat Highway", "Erebuni 1st District", "Erebuni 2nd District",
+    "Erebuni 3rd District", "Tigranashen St",
+    "Nairi Zarian St", "Sepuh St", "Karmir Blur St",
+    "Zvartnots Airport Area",
+  ],
+  norkMarash: [
+    "Nork 1st District", "Nork 2nd District", "Nork 3rd District",
+    "Nork Massiv", "Marash St", "Yeritsyan St",
+    "Tsaghkadzori Highway",
+  ],
+  nubarashen: [
+    "Nubarashen 1st District", "Nubarashen 2nd District",
+    "Nubarashen 3rd District", "Nubarashen 4th District",
+    "Artashat Highway",
+  ],
+  other: [],
+};

@@ -9,13 +9,24 @@ export async function POST(request: Request) {
 
   const photos: string[] = Array.isArray(body.photos) ? body.photos : [];
 
+  const addr = [body.district, body.street, body.buildingNumber].filter(Boolean).join(", ");
   const message = [
     `[PROPERTY SUBMISSION]`,
     `Type: ${body.propertyType ?? "—"} | Purpose: ${body.purpose ?? "—"}`,
-    `Address: ${body.address ?? "—"} | District: ${body.district ?? "—"}`,
+    `District: ${body.district ?? "—"} | Street: ${body.street ?? "—"} | Building: ${body.buildingNumber ?? "—"}`,
     `Price: ${body.price ?? "—"} ${body.currency ?? "AMD"}`,
+    body.area ? `Area: ${body.area} m²` : "",
+    body.rooms ? `Rooms: ${body.rooms}` : "",
+    body.floor || body.totalFloors ? `Floor: ${body.floor ?? "—"}/${body.totalFloors ?? "—"}` : "",
+    body.bedrooms ? `Bedrooms: ${body.bedrooms}` : "",
+    body.bathrooms ? `Bathrooms: ${body.bathrooms}` : "",
+    body.buildingType ? `Building type: ${body.buildingType}` : "",
+    (body.openBalcony && body.openBalcony !== "0") ? `Open balcony: ${body.openBalcony}` : "",
+    (body.closedBalcony && body.closedBalcony !== "0") ? `Closed balcony: ${body.closedBalcony}` : "",
+    body.ceilingHeight ? `Ceiling: ${body.ceilingHeight} m` : "",
+    body.view ? `View: ${body.view}` : "",
     `Description: ${body.description ?? "—"}`,
-    photos.length > 0 ? `Photos: ${photos.join(", ")}` : "",
+    photos.length > 0 ? `Photos:\n${photos.join("\n")}` : "",
   ].filter(Boolean).join("\n");
 
   await prisma.contactRequest.create({
