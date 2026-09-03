@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     `[PROPERTY SUBMISSION]`,
     `Type: ${body.propertyType ?? "—"} | Purpose: ${body.purpose ?? "—"}`,
     `Address: ${body.address ?? "—"} | District: ${body.district ?? "—"}`,
-    `Price: ${body.price ?? "—"}`,
+    `Price: ${body.price ?? "—"} ${body.currency ?? "AMD"}`,
     `Description: ${body.description ?? "—"}`,
     photos.length > 0 ? `Photos: ${photos.join(", ")}` : "",
   ].filter(Boolean).join("\n");

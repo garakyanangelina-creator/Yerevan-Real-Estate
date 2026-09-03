@@ -21,7 +21,7 @@ export default function SubmitForm() {
   const [form, setForm] = useState({
     name: "", phone: "", email: "",
     propertyType: "", purpose: "", address: "", district: "",
-    price: "", description: "",
+    price: "", currency: "AMD", description: "",
   });
 
   async function handlePhotoChange(files: FileList | null) {
@@ -128,9 +128,20 @@ export default function SubmitForm() {
         ))}
       </select>
 
-      <input required type="number" placeholder={t("price")} value={form.price}
-        onChange={(e) => setForm({ ...form, price: e.target.value })}
-        className="w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm dark:border-white/10 dark:bg-primary-800" />
+      <div className="grid grid-cols-3 gap-3">
+        <div className="col-span-2">
+          <input required type="number" placeholder={t("price")} value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            className="w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm dark:border-white/10 dark:bg-primary-800" />
+        </div>
+        <select value={form.currency}
+          onChange={(e) => setForm({ ...form, currency: e.target.value })}
+          className="rounded-lg border border-primary-100 px-3 py-2.5 text-sm dark:border-white/10 dark:bg-primary-800">
+          <option value="AMD">AMD ֏</option>
+          <option value="USD">USD $</option>
+          <option value="EUR">EUR €</option>
+        </select>
+      </div>
 
       <textarea required rows={4} placeholder={t("description")} value={form.description}
         onChange={(e) => setForm({ ...form, description: e.target.value })}
