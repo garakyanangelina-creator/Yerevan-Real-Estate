@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import {
   Users, LayoutDashboard, Building2,
-  UserCheck, UserCog,
+  UserCheck, UserCog, Eye, EyeOff,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import AdminNav from "@/components/admin/AdminNav";
@@ -58,6 +58,18 @@ function DashboardContent() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [matchesFor, setMatchesFor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState<string | null>(null);
+
+  async function togglePublish(l: DbListing) {
+    setToggling(l.id);
+    await fetch(`/api/employee/listings/${l.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPublished: !l.isPublished }),
+    });
+    setDbListings((prev) => prev.map((x) => x.id === l.id ? { ...x, isPublished: !l.isPublished } : x));
+    setToggling(null);
+  }
 
   useEffect(() => {
     const fromQuery = searchParams.get("matchesFor");
@@ -154,7 +166,7 @@ function DashboardContent() {
                   <th className="px-4 py-3">District</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">By</th>
-                  <th className="px-4 py-3">Published</th>
+                  <th className="px-4 py-3">Publish</th>
                 </tr>
               </thead>
               <tbody>
@@ -178,9 +190,18 @@ function DashboardContent() {
                     </td>
                     <td className="px-4 py-3 text-primary-500 dark:text-white/60">{l.createdBy.username}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs ${l.isPublished ? "text-green-600" : "text-primary-400"}`}>
-                        {l.isPublished ? "Yes" : "Draft"}
-                      </span>
+                      <button
+                        onClick={() => togglePublish(l)}
+                        disabled={toggling === l.id}
+                        title={l.isPublished ? "Unpublish" : "Publish to website"}
+                        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition disabled:opacity-50 ${
+                          l.isPublished
+                            ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-primary-100 text-primary-500 hover:bg-gold-100 hover:text-gold-700 dark:bg-white/10 dark:text-white/50"
+                        }`}
+                      >
+                        {l.isPublished ? <><Eye className="h-3 w-3" /> Published</> : <><EyeOff className="h-3 w-3" /> Draft</>}
+                      </button>
                     </td>
                   </tr>
                 ))}

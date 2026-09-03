@@ -318,8 +318,61 @@ function toPublicResult(result: PropertyFetchResult<Property>): PropertyFetchRes
   return { properties: result.properties.map(toPublicProperty), error: result.error };
 }
 
+async function getDbPublicProperties(): Promise<PublicProperty[]> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.dbProperty.findMany({
+      where: { isPublished: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return rows.map((r) => {
+      const amenities = (() => { try { return JSON.parse(r.amenities); } catch { return {}; } })();
+      const images = (() => { try { return JSON.parse(r.images); } catch { return []; } })();
+      const coords = districtCenters[r.district as District] ?? districtCenters.other;
+      return {
+        id: r.id,
+        title: r.title,
+        description: r.description ?? "",
+        type: r.type as PublicProperty["type"],
+        purpose: r.purpose as PublicProperty["purpose"],
+        district: r.district as District,
+        address: r.address ?? "",
+        price: r.price,
+        currency: r.currency,
+        bedrooms: r.bedrooms,
+        bathrooms: r.bathrooms,
+        area: r.area,
+        floor: r.floor,
+        totalFloors: r.totalFloors,
+        images,
+        amenities: {
+          parking: Boolean(amenities.parking),
+          balcony: Boolean(amenities.balcony || amenities.openBalcony || amenities.closedBalcony),
+          furniture: Boolean(amenities.furniture),
+          petFriendly: Boolean(amenities.petFriendly),
+          newBuilding: Boolean(amenities.newBuilding || amenities.buildingType === "newBuilding"),
+          elevator: Boolean(amenities.elevator),
+          ac: Boolean(amenities.ac),
+          heating: Boolean(amenities.heating),
+        },
+        featured: r.featured,
+        popularity: 0,
+        createdAt: r.createdAt.toISOString(),
+        lat: coords.lat,
+        lng: coords.lng,
+      } satisfies PublicProperty;
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function getPublicProperties(): Promise<PropertyFetchResult<PublicProperty>> {
-  return toPublicResult(await getApifyProperties());
+  const [apify, db] = await Promise.all([
+    toPublicResult(await getApifyProperties()),
+    getDbPublicProperties(),
+  ]);
+  return { properties: [...db, ...apify.properties], error: apify.error };
 }
 
 export async function getFeaturedProperties(limit = 6): Promise<PropertyFetchResult<PublicProperty>> {
