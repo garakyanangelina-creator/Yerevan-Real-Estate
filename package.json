@@ -9,7 +9,10 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "streets:fetch": "node scripts/fetch-yerevan-streets.mjs",
+    "streets:check": "node scripts/check-yerevan-streets.mjs",
+    "streets:test": "node scripts/test-yerevan-streets.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

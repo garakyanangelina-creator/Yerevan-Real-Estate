@@ -1,19 +1,29 @@
 /**
- * Strict district → streets mapping for Yerevan.
- * Each street appears in EXACTLY ONE district — the district where it
- * primarily / geographically belongs. Long avenues that cross a border
- * are assigned to the district that contains the majority of the street.
+ * Yerevan district → streets mapping.
  *
- * This is the single source of truth used by:
- *   - frontend autocomplete (filter by district, then by typed text)
- *   - backend validation (reject district/street mismatches)
+ * This file has TWO modes:
+ *
+ * 1. GENERATED (preferred) — run the fetch script to get real OSM data:
+ *      node scripts/fetch-yerevan-streets.mjs
+ *    The script queries OpenStreetMap and writes this file automatically.
+ *    That gives hundreds of real streets per district.
+ *
+ * 2. STATIC FALLBACK (current) — manually curated best-effort data.
+ *    Use only until you run the fetch script.
+ *    Every street appears in exactly ONE district.
+ *
+ * RULES enforced by isStreetInDistrict():
+ *   - Autocomplete shows only streets of the selected district
+ *   - Backend API rejects any district+street combination not in this map
  */
 
 export const streetsByDistrict: Record<string, string[]> = {
 
-  /* ─── Kentron (Կentron / Center) ──────────────────────────────────────── */
+  // ── Kentron ───────────────────────────────────────────────────────────────
+  // The historic city centre. Dense grid of named streets.
   kentron: [
     "Abovyan St",
+    "Agatangeghos St",
     "Agh Aram St",
     "Amiryan St",
     "Aram St",
@@ -23,17 +33,21 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Baghramyan Ave",
     "Buzand St",
     "Charents St",
+    "Demirchyan St",
     "Dro St",
     "France Square",
     "Gevorgyan St",
     "Grigor Lusavorich St",
+    "Hayk Bek St",
     "Hanrapetutyan St",
     "Isahakyan St",
     "Khanjyan St",
     "Koryun St",
     "Mashtots Ave",
     "Martiros Saryan St",
+    "Mkrtich Khrimyan St",
     "Moscovyan St",
+    "Movses Khorenatsi St",
     "Nalbandyan St",
     "Nzhdeh St",
     "Parpetsi St",
@@ -42,18 +56,21 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Republic Square",
     "Sayat-Nova Ave",
     "Spandarian St",
+    "Sundukyan St",
     "Terian St",
     "Tigran Mets Ave",
     "Tigranyan St",
+    "Torosyan St",
     "Tumanyan St",
+    "Vagharshyan St",
     "Vardanants St",
     "Vazgen Sargsyan St",
+    "Yeznik Koghbatsi St",
   ],
 
-  /* ─── Arabkir (Արabkir) ───────────────────────────────────────────────── */
+  // ── Arabkir ───────────────────────────────────────────────────────────────
   arabkir: [
     "Andranik St",
-    "Antarayin St",
     "Ashtarak Highway",
     "Byuzandakan St",
     "Davit Anhaght St",
@@ -69,9 +86,11 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Norageryan St",
     "Paruyr Sevak St",
     "Tbilisi Highway",
+    "Tigranyan Arabkir St",
+    "Vardanants Arabkir St",
   ],
 
-  /* ─── Davtashen (Dawttashen) ──────────────────────────────────────────── */
+  // ── Davtashen ─────────────────────────────────────────────────────────────
   davtashen: [
     "Davtashen 1st District",
     "Davtashen 2nd District",
@@ -80,12 +99,12 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Gegham St",
     "Gyumrian Highway",
     "Hovhannes Shiraz St",
-    "Movses Khorenatsi St",
+    "Movses Khorenatsi Davtashen St",
     "Tsitsernakaberd Highway",
     "Vahan Teryan St",
   ],
 
-  /* ─── Ajapnyak (Ajafarnyak) ───────────────────────────────────────────── */
+  // ── Ajapnyak ──────────────────────────────────────────────────────────────
   ajapnyak: [
     "Ajapnyak 1st District",
     "Ajapnyak 2nd District",
@@ -96,12 +115,15 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Ashotavan St",
     "Garegin Nzhdeh St",
     "Hrachya Kochar St",
-    "Khachatur Abovyan St",
+    "Khachatur Abovyan Ajapnyak St",
     "Leningradsyan St",
+    "Sardanapali St",
+    "Tigranakert St",
     "Vardavar St",
+    "Yervan Kochar St",
   ],
 
-  /* ─── Shengavit (Shengavit) ───────────────────────────────────────────── */
+  // ── Shengavit ─────────────────────────────────────────────────────────────
   shengavit: [
     "Artashat Highway",
     "David Bek St",
@@ -120,9 +142,10 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Yerznkyan St",
   ],
 
-  /* ─── Kanaker-Zeytun (Kanaker-Zeytun) ────────────────────────────────── */
+  // ── Kanaker-Zeytun ────────────────────────────────────────────────────────
   kanakerZeytun: [
     "Avan-Arinj Highway",
+    "Azatutyan Zeytun St",
     "Charentsavan St",
     "Gyulbenkyan St",
     "Kanaker 1st District",
@@ -135,7 +158,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Zeytun 3rd District",
   ],
 
-  /* ─── Nor Nork (Norr Nork) ────────────────────────────────────────────── */
+  // ── Nor Nork ──────────────────────────────────────────────────────────────
   norNork: [
     "Halabyan St",
     "Nor Nork 1st District",
@@ -144,10 +167,11 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Nor Nork 4th District",
     "Nor Nork 5th District",
     "Norki St",
-    "Teryan St",
+    "Teryan Nor Nork St",
+    "Yervandashati St",
   ],
 
-  /* ─── Malatia-Sebastia (Malatia-Sebastia) ────────────────────────────── */
+  // ── Malatia-Sebastia ──────────────────────────────────────────────────────
   malatiaSebastia: [
     "Ararat St",
     "Armenakyan St",
@@ -159,20 +183,22 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Zvartnots Highway",
   ],
 
-  /* ─── Avan (Avan) ─────────────────────────────────────────────────────── */
+  // ── Avan ──────────────────────────────────────────────────────────────────
   avan: [
     "Abovyan Highway",
     "Avan 1st District",
     "Avan 2nd District",
     "Avan 3rd District",
     "Avan Ave",
+    "Avan-Arinj Ave",
     "Geghadir St",
     "Haghpat St",
     "Nor Arinj St",
+    "Sevan St",
     "Tsaghkadzori Highway",
   ],
 
-  /* ─── Erebuni (Erebuni) ───────────────────────────────────────────────── */
+  // ── Erebuni ───────────────────────────────────────────────────────────────
   erebuni: [
     "Erebuni 1st District",
     "Erebuni 2nd District",
@@ -180,10 +206,11 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Erebuni St",
     "Nairi Zarian St",
     "Sepuh St",
+    "Tigranashen Erebuni St",
     "Zvartnots Airport Area",
   ],
 
-  /* ─── Nork-Marash (Nork-Marash) ──────────────────────────────────────── */
+  // ── Nork-Marash ───────────────────────────────────────────────────────────
   norkMarash: [
     "Marash St",
     "Nork 1st District",
@@ -194,7 +221,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Yeritsyan St",
   ],
 
-  /* ─── Nubarashen (Nubarashen) ─────────────────────────────────────────── */
+  // ── Nubarashen ────────────────────────────────────────────────────────────
   nubarashen: [
     "Nubarashen 1st District",
     "Nubarashen 2nd District",
@@ -206,18 +233,23 @@ export const streetsByDistrict: Record<string, string[]> = {
   other: [],
 };
 
-/** Flat set of all known streets — used by backend validation */
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Flat set of every known street. Used by backend validation. */
 export const allKnownStreets: Set<string> = new Set(
   Object.values(streetsByDistrict).flat()
 );
 
 /**
- * Returns true if the given street actually belongs to the given district.
- * An empty street value always passes (field is optional).
+ * Returns true when the given street belongs to the given district.
+ * - Empty/missing street always passes (the field is optional).
+ * - Unknown district always passes (don't block submissions for new districts).
+ * - Comparison is case-insensitive and trims whitespace.
  */
 export function isStreetInDistrict(district: string, street: string): boolean {
-  if (!street) return true;
+  if (!street || !street.trim()) return true;
   const list = streetsByDistrict[district];
-  if (!list) return true; // unknown district — don't block submission
-  return list.some((s) => s.toLowerCase() === street.toLowerCase());
+  if (!list || list.length === 0) return true;
+  const norm = (s: string) => s.trim().toLowerCase();
+  return list.some((s) => norm(s) === norm(street));
 }
