@@ -8,6 +8,7 @@ import {
   Building2, CheckCircle2, XCircle, Upload, X,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { streetsByDistrict } from "@/lib/yerevan-streets";
 
 interface Listing {
   id: string;
@@ -65,7 +66,8 @@ type AmenityMap = Record<string, boolean | string | number>;
 function emptyForm() {
   return {
     title: "", description: "", type: "apartment", purpose: "sale",
-    district: "kentron", address: "", price: "", currency: "AMD",
+    district: "kentron", street: "", buildingNumber: "", address: "",
+    price: "", currency: "AMD",
     bedrooms: "1", bathrooms: "1", area: "", floor: "1", totalFloors: "9",
     rooms: "1",
     buildingType: "",
@@ -97,6 +99,24 @@ export default function EmployeeDashboard() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const [streetQuery, setStreetQuery] = useState("");
+  const [streetSuggestions, setStreetSuggestions] = useState<string[]>([]);
+  const streetDropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!streetQuery) { setStreetSuggestions([]); return; }
+    const streets = streetsByDistrict[form.district] ?? Object.values(streetsByDistrict).flat();
+    const q = streetQuery.toLowerCase();
+    setStreetSuggestions(streets.filter((s) => s.toLowerCase().includes(q)).slice(0, 8));
+  }, [streetQuery, form.district]);
+
+  useEffect(() => {
+    function close(e: MouseEvent) {
+      if (streetDropRef.current && !streetDropRef.current.contains(e.target as Node)) setStreetSuggestions([]);
+    }
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
 
   async function fetchListings() {
     const res = await fetch("/api/employee/listings");
@@ -122,12 +142,17 @@ export default function EmployeeDashboard() {
   function startEdit(l: Listing) {
     const images = JSON.parse(l.images ?? "[]") as string[];
     const amenities = JSON.parse(l.amenities ?? "{}") as AmenityMap;
+    const existingStreet = String(amenities.street ?? "");
+    const existingBuilding = String(amenities.buildingNumber ?? "");
+    setStreetQuery(existingStreet);
     setForm({
       title: l.title,
       description: l.description ?? "",
       type: l.type,
       purpose: l.purpose,
       district: l.district,
+      street: existingStreet,
+      buildingNumber: existingBuilding,
       address: l.address ?? "",
       price: String(l.price),
       currency: l.currency,
@@ -147,7 +172,7 @@ export default function EmployeeDashboard() {
       imageUrls: images,
       amenities: Object.fromEntries(
         Object.entries(amenities).filter(([k]) =>
-          !["rooms","buildingType","openBalcony","closedBalcony","ceilingHeight","view","ownerName","ownerPhone"].includes(k)
+          !["rooms","street","buildingNumber","buildingType","openBalcony","closedBalcony","ceilingHeight","view","ownerName","ownerPhone"].includes(k)
         )
       ) as AmenityMap,
       status: l.status,
@@ -190,13 +215,14 @@ export default function EmployeeDashboard() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    const builtAddress = [form.street, form.buildingNumber].filter(Boolean).join(", ") || form.address || null;
     const payload = {
       title: form.title,
       description: form.description || null,
       type: form.type,
       purpose: form.purpose,
       district: form.district,
-      address: form.address || null,
+      address: builtAddress,
       price: Number(form.price) || 0,
       currency: form.currency,
       bedrooms: Number(form.bedrooms) || 0,
@@ -208,6 +234,8 @@ export default function EmployeeDashboard() {
       amenities: {
         ...form.amenities,
         rooms: Number(form.rooms) || 1,
+        ...(form.street && { street: form.street }),
+        ...(form.buildingNumber && { buildingNumber: form.buildingNumber }),
         ...(form.buildingType && { buildingType: form.buildingType }),
         openBalcony: Number(form.openBalcony) || 0,
         closedBalcony: Number(form.closedBalcony) || 0,
@@ -358,19 +386,42 @@ export default function EmployeeDashboard() {
             <div>
               <label className={labelCls}>District / Թաղամաս</label>
               <select className={inputCls} value={form.district}
-                onChange={(e) => setForm({ ...form, district: e.target.value })}>
+                onChange={(e) => { setForm({ ...form, district: e.target.value, street: "", buildingNumber: "" }); setStreetQuery(""); }}>
                 {DISTRICTS.map((d) => (
                   <option key={d.value} value={d.value}>{d.label}</option>
                 ))}
               </select>
             </div>
 
-            {/* Address */}
+            {/* Street autocomplete */}
+            <div ref={streetDropRef} className="relative">
+              <label className={labelCls}>Street / Փoclocc</label>
+              <input
+                className={inputCls}
+                placeholder="Type street name... e.g. Komitas Ave"
+                value={streetQuery}
+                autoComplete="off"
+                onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
+              />
+              {streetSuggestions.length > 0 && (
+                <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800">
+                  {streetSuggestions.map((s) => (
+                    <button key={s} type="button"
+                      onClick={() => { setStreetQuery(s); setForm({ ...form, street: s }); setStreetSuggestions([]); }}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-primary-800 hover:bg-primary-50 dark:text-white dark:hover:bg-white/10">
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Building number */}
             <div>
-              <label className={labelCls}>Address / Հասցե</label>
-              <input className={inputCls} placeholder="Street, building no. / Փողոց, շ. համ."
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })} />
+              <label className={labelCls}>Building No. / Շ. Hamlet.</label>
+              <input className={inputCls} placeholder="e.g. 12, 7a"
+                value={form.buildingNumber}
+                onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} />
             </div>
 
             {/* Price & Currency */}
