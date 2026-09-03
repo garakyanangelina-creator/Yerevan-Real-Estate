@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bell, LogOut, Users, LayoutDashboard, ShieldAlert, KeyRound, X } from "lucide-react";
+import { Bell, LogOut, Users, LayoutDashboard, ShieldAlert, KeyRound, X, MessageSquare } from "lucide-react";
 import { Link, useRouter } from "@/i18n/routing";
 
 interface AdminNotification {
@@ -13,7 +13,7 @@ interface AdminNotification {
   createdAt: string;
 }
 
-type ActiveTab = "dashboard" | "clients" | "users";
+type ActiveTab = "dashboard" | "clients" | "users" | "contacts";
 
 export default function AdminNav({
   active,
@@ -110,6 +110,7 @@ export default function AdminNav({
       <nav className="flex items-center gap-5">
         {navLink("/admin/dashboard", "dashboard", LayoutDashboard, "Dashboard")}
         {navLink("/admin/clients", "clients", Users, "Clients")}
+        {navLink("/admin/contacts", "contacts", MessageSquare, "Contacts")}
         {role === "super_admin" &&
           navLink("/admin/users", "users", ShieldAlert, "Users")}
       </nav>

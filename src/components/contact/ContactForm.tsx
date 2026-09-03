@@ -6,12 +6,30 @@ import { useTranslations } from "next-intl";
 export default function ContactForm({ propertyId }: { propertyId?: string }) {
   const t = useTranslations("contact");
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    // Phase 2: POST to /api/contact-requests with { ...form, propertyId }
-    setSent(true);
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, propertyId }),
+      });
+      if (res.ok) {
+        setSent(true);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } catch {
+      setError("Connection error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (sent) {
@@ -54,11 +72,9 @@ export default function ContactForm({ propertyId }: { propertyId?: string }) {
         onChange={(e) => setForm({ ...form, message: e.target.value })}
         className="w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm outline-none focus:border-gold-400 dark:border-white/10 dark:bg-primary-800"
       />
-      {propertyId && (
-        <input type="hidden" name="propertyId" value={propertyId} />
-      )}
-      <button type="submit" className="btn-primary w-full">
-        {t("send")}
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <button type="submit" disabled={submitting} className="btn-primary w-full disabled:opacity-60">
+        {submitting ? "Sending…" : t("send")}
       </button>
     </form>
   );

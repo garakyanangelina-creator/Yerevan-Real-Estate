@@ -52,6 +52,17 @@ model Notification {
   createdAt     DateTime @default(now())
 }
 
+model ContactRequest {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String
+  email      String?
+  message    String
+  propertyId String?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
 // ── Users & Access Control ────────────────────────────────────────────────────
 
 model User {
