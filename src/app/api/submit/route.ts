@@ -8,12 +8,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Validate district/street combination
+  // Log unrecognised district+street (warn only — dataset is incomplete until streets:fetch is run)
   if (body.street && body.district && !isStreetInDistrict(body.district, body.street)) {
-    return NextResponse.json(
-      { error: `Street "${body.street}" does not belong to the selected district. Please check your address.` },
-      { status: 422 }
-    );
+    console.warn("[submit] Street not in district list:", body.district, body.street);
   }
 
   const photos: string[] = Array.isArray(body.photos) ? body.photos : [];

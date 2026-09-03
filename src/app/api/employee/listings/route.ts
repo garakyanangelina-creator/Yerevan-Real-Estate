@@ -28,14 +28,11 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body?.title) return NextResponse.json({ error: "title required" }, { status: 400 });
 
-  // Validate district/street
+  // Log unrecognised district+street (warn only — dataset is incomplete until streets:fetch is run)
   const street = body.amenities?.street ?? "";
   const district = body.district ?? "";
   if (street && district && !isStreetInDistrict(district, street)) {
-    return NextResponse.json(
-      { error: `Street "${street}" does not belong to district "${district}".` },
-      { status: 422 }
-    );
+    console.warn("[listings] Street not in district list:", district, street);
   }
 
   const listing = await prisma.dbProperty.create({
