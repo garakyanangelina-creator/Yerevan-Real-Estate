@@ -1,7 +1,6 @@
 export const streetsByDistrict: Record<string, string[]> = {
   kentron: [
     "Abovyan St",
-    "Agh Aram St",
     "Amiryan St",
     "Aram St",
     "Arami St",
@@ -11,7 +10,6 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Buzand St",
     "Charents St",
     "Dro St",
-    "France Square",
     "Gevorgyan St",
     "Grigor Lusavorich St",
     "Hanrapetutyan St",
@@ -22,7 +20,6 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Martiros Saryan St",
     "Moscovyan St",
     "Nalbandyan St",
-    "Nzhdeh St",
     "Parpetsi St",
     "Paronyan St",
     "Pushkin St",
@@ -58,7 +55,6 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Paruyr Sevak St",
     "Tbilisi Highway",
     "Tigranyan St",
-    "Vardanants St",
   ],
 
   davtashen: [
@@ -85,8 +81,8 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Ashotavan St",
     "Garegin Nzhdeh St",
     "Gyumrian Highway",
-    "Hrachya Kochar St",
     "Hovhannes Shiraz St",
+    "Hrachya Kochar St",
     "Khachatur Abovyan St",
     "Leningradsyan St",
     "Paruyr Sevak St",
@@ -121,7 +117,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Kanaker 1st District",
     "Kanaker 2nd District",
     "Movses Khorenatsi St",
-    "Paronyan St",
+    "Paruyr Sevak St",
     "Tigranashen St",
     "Vazgen Sargsyan St",
     "Yervand Kochar St",
@@ -155,7 +151,6 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Malatia 4th District",
     "Mushakan St",
     "Sebastia St",
-    "Tigranyan St",
     "Zvartnots Highway",
   ],
 
@@ -179,7 +174,6 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Erebuni 2nd District",
     "Erebuni 3rd District",
     "Karmir Blur St",
-    "Khanjyan St",
     "Nairi Zarian St",
     "Sepuh St",
     "Tigranashen St",
