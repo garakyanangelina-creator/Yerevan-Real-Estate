@@ -94,8 +94,11 @@ export default function EmployeeDashboard() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [codeSearch, setCodeSearch] = useState("");
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [unForm, setUnForm] = useState({ newUsername: "", password: "" });
   const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
   const [pwSaving, setPwSaving] = useState(false);
+  const [accTab, setAccTab] = useState<"password" | "username">("password");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -271,7 +274,7 @@ export default function EmployeeDashboard() {
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
-    setPwError("");
+    setPwError(""); setPwSuccess("");
     if (pwForm.next !== pwForm.confirm) { setPwError("Passwords do not match."); return; }
     if (pwForm.next.length < 6) { setPwError("Password must be at least 6 characters."); return; }
     setPwSaving(true);
@@ -281,8 +284,23 @@ export default function EmployeeDashboard() {
       body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
     });
     setPwSaving(false);
-    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setMode("list"); }
+    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setPwSuccess("Password changed successfully."); }
     else { const d = await res.json(); setPwError(d.error ?? "Failed to change password."); }
+  }
+
+  async function handleChangeUsername(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError(""); setPwSuccess("");
+    if (!unForm.newUsername.trim() || !unForm.password) { setPwError("All fields required."); return; }
+    setPwSaving(true);
+    const res = await fetch("/api/auth/change-username", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newUsername: unForm.newUsername.trim(), password: unForm.password }),
+    });
+    setPwSaving(false);
+    if (res.ok) { setUnForm({ newUsername: "", password: "" }); setPwSuccess("Username changed successfully."); }
+    else { const d = await res.json(); setPwError(d.error ?? "Failed to change username."); }
   }
 
   const toCode = (id: string) => id.slice(0, 6).toUpperCase();
@@ -290,35 +308,54 @@ export default function EmployeeDashboard() {
   const inputCls = "w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white";
   const labelCls = "block text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-white/60 mb-1";
 
-  // ── Change Password ────────────────────────────────────────────────────────
+  // ── Account Settings (password + username) ────────────────────────────────
   if (mode === "password") {
     return (
       <div className="container-page py-10">
         <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
-          <span className="font-serif font-semibold text-primary-900 dark:text-white">Change Password / Փոխել գաղտնաբառը</span>
+          <span className="font-serif font-semibold text-primary-900 dark:text-white">Account Settings / Հաշվի կարգավորումներ</span>
           <button onClick={() => setMode("list")} className="btn-outline text-sm">← Back</button>
         </div>
-        <form onSubmit={handleChangePassword} className="mt-8 max-w-sm space-y-4">
-          <div>
-            <label className={labelCls}>Current Password / Ընթացիկ գաղտնաբառ</label>
-            <input type="password" required className={inputCls} value={pwForm.current}
-              onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })} />
+        <div className="mt-8 max-w-sm">
+          <div className="mb-6 flex gap-2">
+            <button onClick={() => { setAccTab("password"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${accTab === "password" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>Password / Գաղտնաբառ</button>
+            <button onClick={() => { setAccTab("username"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${accTab === "username" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>Username / Մուտքանուն</button>
           </div>
-          <div>
-            <label className={labelCls}>New Password / Նոր գաղտնաբառ</label>
-            <input type="password" required className={inputCls} value={pwForm.next}
-              onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} />
-          </div>
-          <div>
-            <label className={labelCls}>Confirm New Password / Հաստատել նոր գաղտնաբառը</label>
-            <input type="password" required className={inputCls} value={pwForm.confirm}
-              onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} />
-          </div>
-          {pwError && <p className="text-sm text-red-600">{pwError}</p>}
-          <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">
-            {pwSaving ? "Saving…" : "Change Password / Փոխել"}
-          </button>
-        </form>
+          {accTab === "password" && (
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className={labelCls}>Current Password / Ընթացիկ գաղտնաբառ</label>
+                <input type="password" required className={inputCls} value={pwForm.current} onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })} />
+              </div>
+              <div>
+                <label className={labelCls}>New Password / Նոր գաղտնաբառ</label>
+                <input type="password" required className={inputCls} value={pwForm.next} onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} />
+              </div>
+              <div>
+                <label className={labelCls}>Confirm New Password / Հաստատել</label>
+                <input type="password" required className={inputCls} value={pwForm.confirm} onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} />
+              </div>
+              {pwError && <p className="text-sm text-red-600">{pwError}</p>}
+              {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
+              <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">{pwSaving ? "Saving…" : "Change Password / Փոխել"}</button>
+            </form>
+          )}
+          {accTab === "username" && (
+            <form onSubmit={handleChangeUsername} className="space-y-4">
+              <div>
+                <label className={labelCls}>New Username / Նոր մուտqanun</label>
+                <input type="text" required autoComplete="off" className={inputCls} value={unForm.newUsername} onChange={(e) => setUnForm({ ...unForm, newUsername: e.target.value })} />
+              </div>
+              <div>
+                <label className={labelCls}>Confirm with Password / Հաստատել գաղտնաբառով</label>
+                <input type="password" required className={inputCls} value={unForm.password} onChange={(e) => setUnForm({ ...unForm, password: e.target.value })} />
+              </div>
+              {pwError && <p className="text-sm text-red-600">{pwError}</p>}
+              {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
+              <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">{pwSaving ? "Saving…" : "Change Username / Փոխել"}</button>
+            </form>
+          )}
+        </div>
       </div>
     );
   }

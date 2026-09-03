@@ -30,12 +30,15 @@ export default function AdminNav({
   const panelRef = useRef<HTMLDivElement>(null);
 
   const [showChangePw, setShowChangePw] = useState(false);
+  const [tab, setTab] = useState<"password" | "username">("password");
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [unForm, setUnForm] = useState({ newUsername: "", password: "" });
   const [pwError, setPwError] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
+  const [pwSuccess, setPwSuccess] = useState("");
 
   async function changePassword() {
-    setPwError("");
+    setPwError(""); setPwSuccess("");
     if (pwForm.next !== pwForm.confirm) { setPwError("Passwords don't match"); return; }
     if (pwForm.next.length < 6) { setPwError("Min 6 characters"); return; }
     setPwLoading(true);
@@ -46,8 +49,27 @@ export default function AdminNav({
     });
     setPwLoading(false);
     if (res.ok) {
-      setShowChangePw(false);
       setPwForm({ current: "", next: "", confirm: "" });
+      setPwSuccess("Password changed successfully.");
+    } else {
+      const d = await res.json();
+      setPwError(d.error ?? "Error");
+    }
+  }
+
+  async function changeUsername() {
+    setPwError(""); setPwSuccess("");
+    if (!unForm.newUsername.trim() || !unForm.password) { setPwError("All fields required"); return; }
+    setPwLoading(true);
+    const res = await fetch("/api/auth/change-username", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newUsername: unForm.newUsername.trim(), password: unForm.password }),
+    });
+    setPwLoading(false);
+    if (res.ok) {
+      setUnForm({ newUsername: "", password: "" });
+      setPwSuccess("Username changed successfully.");
     } else {
       const d = await res.json();
       setPwError(d.error ?? "Error");
@@ -181,32 +203,34 @@ export default function AdminNav({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-primary-800">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-serif text-lg font-semibold text-primary-900 dark:text-white">Change Password</h2>
-              <button onClick={() => setShowChangePw(false)} className="text-primary-400 hover:text-primary-700 dark:text-white/50 dark:hover:text-white">
+              <h2 className="font-serif text-lg font-semibold text-primary-900 dark:text-white">Account Settings</h2>
+              <button onClick={() => { setShowChangePw(false); setPwError(""); setPwSuccess(""); }} className="text-primary-400 hover:text-primary-700 dark:text-white/50 dark:hover:text-white">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="space-y-3">
-              <input
-                type="password" placeholder="Current password" value={pwForm.current}
-                onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))}
-                className="input w-full"
-              />
-              <input
-                type="password" placeholder="New password" value={pwForm.next}
-                onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))}
-                className="input w-full"
-              />
-              <input
-                type="password" placeholder="Confirm new password" value={pwForm.confirm}
-                onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
-                className="input w-full"
-              />
-              {pwError && <p className="text-sm text-red-500">{pwError}</p>}
-              <button onClick={changePassword} disabled={pwLoading} className="btn-primary w-full">
-                {pwLoading ? "Saving…" : "Save Password"}
-              </button>
+            <div className="mb-4 flex gap-2">
+              <button onClick={() => { setTab("password"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${tab === "password" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>Password</button>
+              <button onClick={() => { setTab("username"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${tab === "username" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>Username</button>
             </div>
+            {tab === "password" && (
+              <div className="space-y-3">
+                <input type="password" placeholder="Current password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className="input w-full" />
+                <input type="password" placeholder="New password" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} className="input w-full" />
+                <input type="password" placeholder="Confirm new password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className="input w-full" />
+                {pwError && <p className="text-sm text-red-500">{pwError}</p>}
+                {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
+                <button onClick={changePassword} disabled={pwLoading} className="btn-primary w-full">{pwLoading ? "Saving…" : "Save Password"}</button>
+              </div>
+            )}
+            {tab === "username" && (
+              <div className="space-y-3">
+                <input type="text" placeholder="New username" value={unForm.newUsername} onChange={e => setUnForm(f => ({ ...f, newUsername: e.target.value }))} className="input w-full" autoComplete="off" />
+                <input type="password" placeholder="Confirm with your password" value={unForm.password} onChange={e => setUnForm(f => ({ ...f, password: e.target.value }))} className="input w-full" />
+                {pwError && <p className="text-sm text-red-500">{pwError}</p>}
+                {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
+                <button onClick={changeUsername} disabled={pwLoading} className="btn-primary w-full">{pwLoading ? "Saving…" : "Save Username"}</button>
+              </div>
+            )}
           </div>
         </div>
       )}

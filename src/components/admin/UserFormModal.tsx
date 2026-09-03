@@ -45,9 +45,8 @@ export default function UserFormModal({ mode, user, onClose, onSaved }: Props) {
     }
 
     setSaving(true);
-    const payload: Record<string, unknown> = { role, email: email || null };
+    const payload: Record<string, unknown> = { role, email: email || null, username: username.trim() };
     if (mode === "create") {
-      payload.username = username.trim();
       payload.password = password;
     }
     if (mode === "edit" && password) {
@@ -88,19 +87,18 @@ export default function UserFormModal({ mode, user, onClose, onSaved }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          {mode === "create" && (
-            <div>
-              <label className={labelCls}>Username *</label>
-              <input
-                required
-                autoComplete="off"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className={inputCls}
-                placeholder="e.g. john_smith"
-              />
-            </div>
-          )}
+          <div>
+            <label className={labelCls}>Username *</label>
+            <input
+              required
+              autoComplete="off"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={inputCls}
+              placeholder="e.g. john_smith"
+              disabled={mode === "edit" ? false : false}
+            />
+          </div>
 
           <div>
             <label className={labelCls}>Email (optional)</label>

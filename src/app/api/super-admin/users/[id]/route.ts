@@ -26,6 +26,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const body = await request.json().catch(() => null);
   const data: Record<string, unknown> = {};
 
+  if (typeof body?.username === "string" && body.username.trim().length >= 3) {
+    const existing = await prisma.user.findFirst({ where: { username: body.username.trim(), NOT: { id: params.id } } });
+    if (existing) return NextResponse.json({ error: "Username already taken" }, { status: 409 });
+    data.username = body.username.trim();
+  }
   if (typeof body?.email === "string") data.email = body.email.trim() || null;
   if (typeof body?.role === "string" && ["super_admin", "admin", "employee"].includes(body.role))
     data.role = body.role;
