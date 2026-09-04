@@ -77,6 +77,12 @@ export default function PropertyCard({ property }: { property: PublicProperty })
             </button>
           )}
         </div>
+        {/* Listing code badge — bottom left */}
+        {code && (
+          <span className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-xs font-bold text-white backdrop-blur-sm">
+            #{code}
+          </span>
+        )}
         {/* Overlay shimmer on hover */}
         <div className="absolute inset-0 bg-primary-900/0 transition duration-300 group-hover:bg-primary-900/10" />
       </div>
