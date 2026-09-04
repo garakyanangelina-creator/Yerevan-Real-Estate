@@ -6,7 +6,9 @@ import { useRouter } from "@/i18n/routing";
 import {
   Plus, Pencil, Trash2, LogOut,
   Building2, CheckCircle2, XCircle, Upload, X,
+  BedDouble, Bath, Ruler, Phone, Link2, Check, Eye,
 } from "lucide-react";
+import { useLocale } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
 import { compressImage } from "@/lib/compressImage";
@@ -30,7 +32,141 @@ interface Listing {
   amenities: string;
   status: string;
   isPublished: boolean;
+  listingCode?: number | null;
   createdAt: string;
+}
+
+const STATUS_BADGE: Record<string, string> = {
+  active:    "bg-green-100 text-green-700",
+  available: "bg-green-100 text-green-700",
+  sold:      "bg-gray-100 text-gray-600",
+  rented:    "bg-blue-100 text-blue-700",
+  archived:  "bg-red-100 text-red-600",
+};
+
+const DISTRICT_SHORT: Record<string, string> = {
+  kentron: "Kentron", arabkir: "Arabkir", davtashen: "Davtashen",
+  ajapnyak: "Ajapnyak", shengavit: "Shengavit", kanakerZeytun: "Kanaker-Zeytun",
+  norNork: "Nor Nork", malatiaSebastia: "Malatia-Sebastia", avan: "Avan",
+  erebuni: "Erebuni", norkMarash: "Nork-Marash", nubarashen: "Nubarashen", other: "Other",
+};
+
+interface CardProps {
+  id: string; title: string; price: number; currency: string; purpose: string;
+  district: string; status: string; isPublished: boolean;
+  bedrooms: number; bathrooms: number; area: number;
+  images: string[]; ownerName: string; ownerPhone: string;
+  displayCode: string | null; locale: string;
+  onEdit: () => void; onDelete: () => void; deleting: boolean;
+}
+
+function EmployeeListingCard(p: CardProps) {
+  const [copied, setCopied] = useState(false);
+
+  async function copyLink(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!p.displayCode) return;
+    const url = `${window.location.origin}/${p.locale}/listing/${p.displayCode}`;
+    try { await navigator.clipboard.writeText(url); }
+    catch {
+      const el = document.createElement("textarea");
+      el.value = url; el.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(el); el.focus(); el.select();
+      document.execCommand("copy"); document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  return (
+    <div className="card group flex flex-col overflow-hidden">
+      {/* Photo */}
+      <div className="relative h-52 w-full overflow-hidden bg-primary-50 dark:bg-primary-800/30">
+        {p.images[0] ? (
+          <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <Building2 className="h-10 w-10 text-primary-200" />
+          </div>
+        )}
+        {/* Status + published overlays */}
+        <div className="absolute left-3 top-3 flex flex-col gap-1">
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_BADGE[p.status] ?? STATUS_BADGE.available}`}>
+            {p.status}
+          </span>
+          {!p.isPublished && (
+            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">Draft</span>
+          )}
+        </div>
+        {p.displayCode && (
+          <span className="absolute right-3 top-3 rounded bg-black/60 px-2 py-0.5 font-mono text-xs text-white">
+            #{p.displayCode}
+          </span>
+        )}
+      </div>
+
+      {/* Body */}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-lg font-bold text-gold-600">{formatPrice(p.price, p.purpose as "sale"|"rent", p.currency)}</p>
+            <h3 className="mt-0.5 line-clamp-2 font-serif text-sm font-semibold text-primary-900 dark:text-white">{p.title}</h3>
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-primary-500 dark:text-white/50">
+              <span className="h-1.5 w-1.5 rounded-full bg-gold-500" />
+              {DISTRICT_SHORT[p.district] ?? p.district}
+            </p>
+          </div>
+        </div>
+
+        {/* Specs */}
+        <div className="mt-3 flex items-center gap-3 text-xs text-primary-600 dark:text-white/60">
+          <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5 text-gold-500" />{p.bedrooms || "—"}</span>
+          <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5 text-gold-500" />{p.bathrooms || "—"}</span>
+          <span className="flex items-center gap-1"><Ruler className="h-3.5 w-3.5 text-gold-500" />{p.area || "—"} m²</span>
+        </div>
+
+        {/* Owner info (private) */}
+        {(p.ownerName || p.ownerPhone) && (
+          <div className="mt-3 rounded-lg border border-amber-200/60 bg-amber-50/80 px-3 py-2 dark:border-amber-700/30 dark:bg-amber-900/10">
+            {p.ownerName  && <p className="text-xs font-medium text-primary-800 dark:text-white/80">{p.ownerName}</p>}
+            {p.ownerPhone && (
+              <a href={`tel:${p.ownerPhone}`} className="flex items-center gap-1 text-xs text-gold-600 hover:underline dark:text-gold-400">
+                <Phone className="h-3 w-3" />{p.ownerPhone}
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="mt-4 flex items-center gap-2">
+          <a
+            href={`/${p.locale}/employee/listing/${p.id}`}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary-900 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-800 dark:bg-white/10 dark:hover:bg-white/20"
+          >
+            <Eye className="h-3.5 w-3.5" /> View Details
+          </a>
+          {p.displayCode && (
+            <button onClick={copyLink}
+              className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
+                copied
+                  ? "border-green-400 bg-green-50 text-green-700 dark:border-green-600 dark:bg-green-900/20 dark:text-green-400"
+                  : "border-gold-300 bg-gold-50 text-gold-700 hover:bg-gold-100 dark:border-gold-600/40 dark:bg-gold-900/10 dark:text-gold-400"
+              }`}>
+              {copied ? <><Check className="h-3.5 w-3.5" /> Copied!</> : <><Link2 className="h-3.5 w-3.5" /> Copy link</>}
+            </button>
+          )}
+          <button onClick={p.onEdit} title="Edit"
+            className="rounded-xl border border-primary-200 p-2 text-primary-500 hover:border-gold-400 hover:text-gold-600 dark:border-white/15 dark:text-white/50">
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={p.onDelete} disabled={p.deleting} title="Delete"
+            className="rounded-xl border border-red-200 p-2 text-red-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:border-red-800/30">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 type FormMode = "list" | "create" | "edit" | "password";
@@ -86,6 +222,7 @@ function emptyForm() {
 
 export default function EmployeeDashboard() {
   const router = useRouter();
+  const locale = useLocale();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<FormMode>("list");
@@ -708,20 +845,20 @@ export default function EmployeeDashboard() {
   return (
     <div className="container-page py-10">
       {/* Nav */}
-      <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-primary-100 pb-4 dark:border-white/10">
         <div className="flex items-center gap-3">
           <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
           <div>
-            <p className="font-serif font-semibold text-primary-900 dark:text-white">Employee Portal / Աշ. Պanelelet</p>
-            <p className="text-xs text-primary-400 dark:text-white/40">My Listings / Իmy հայտեր</p>
+            <p className="font-serif font-semibold text-primary-900 dark:text-white">Employee Portal</p>
+            <p className="text-xs text-primary-400 dark:text-white/40">My Listings</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button onClick={startCreate} className="btn-primary gap-2 text-sm">
             <Plus className="h-4 w-4" /> Add Listing
           </button>
           <button onClick={() => setMode("password")} className="btn-outline text-sm">
-            Change Password
+            Account
           </button>
           <button onClick={logout} className="btn-outline gap-2 text-sm">
             <LogOut className="h-4 w-4" /> Sign Out
@@ -732,9 +869,9 @@ export default function EmployeeDashboard() {
       {/* Stats */}
       <div className="mt-6 grid grid-cols-3 gap-4">
         {[
-          { icon: Building2, label: "Total / Ընդ.", value: listings.length },
-          { icon: CheckCircle2, label: "Available / Հաunavail.", value: listings.filter(l => l.status === "available").length },
-          { icon: XCircle, label: "Sold/Rented / Վաճ/Վ.", value: listings.filter(l => l.status !== "available").length },
+          { icon: Building2, label: "Total",    value: listings.length },
+          { icon: CheckCircle2, label: "Active", value: listings.filter(l => l.status === "available" || l.status === "active").length },
+          { icon: XCircle, label: "Closed",      value: listings.filter(l => l.status === "sold" || l.status === "rented").length },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="card flex items-center gap-3 p-4">
             <Icon className="h-5 w-5 text-gold-500" />
@@ -746,117 +883,69 @@ export default function EmployeeDashboard() {
         ))}
       </div>
 
-      {/* Code search */}
+      {/* Search */}
       <div className="mt-6">
         <input
           value={codeSearch}
-          onChange={(e) => setCodeSearch(e.target.value.toUpperCase())}
-          placeholder="Search by code / Որ. ըst կodով (e.g. CM1ABC)"
+          onChange={(e) => setCodeSearch(e.target.value)}
+          placeholder="Search listings by title or code…"
           className="w-full max-w-sm rounded-xl border border-primary-100 px-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
         />
       </div>
 
-      {/* Table */}
+      {/* Cards */}
       {loading ? (
-        <div className="mt-8 space-y-3">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-16 skeleton rounded-xl" />)}
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => <div key={i} className="h-80 skeleton rounded-2xl" />)}
         </div>
       ) : listings.length === 0 ? (
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
           <Building2 className="h-12 w-12 text-primary-200" />
-          <p className="text-primary-500 dark:text-white/60">No listings yet. / Հայتеры չkyan.</p>
+          <p className="text-primary-500 dark:text-white/60">No listings yet.</p>
           <button onClick={startCreate} className="btn-primary gap-2">
             <Plus className="h-4 w-4" /> Add your first listing
           </button>
         </div>
       ) : (
-        <div className="mt-8 card overflow-hidden p-0">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-primary-100 dark:border-white/10">
-              <tr className="text-primary-500 dark:text-white/60">
-                <th className="px-5 py-3">Code</th>
-                <th className="px-5 py-3">Title / Վ.</th>
-                <th className="px-5 py-3">Price / Գ.</th>
-                <th className="px-5 py-3">District / Թ.</th>
-                <th className="px-5 py-3">Owner / Սep.</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {listings.filter(l => !codeSearch || toCode(l.id).includes(codeSearch)).map((l) => {
-                const images = JSON.parse(l.images ?? "[]") as string[];
-                const amenities = JSON.parse(l.amenities ?? "{}") as AmenityMap;
-                return (
-                  <tr key={l.id} className="border-b border-primary-50 last:border-0 dark:border-white/5">
-                    <td className="px-5 py-3">
-                      <span className="rounded-md bg-gold-100 px-2 py-1 font-mono text-xs font-bold text-gold-700 dark:bg-gold-500/20 dark:text-gold-300">
-                        #{toCode(l.id)}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2">
-                        {images[0] ? (
-                          <img src={images[0]} alt="" className="h-10 w-14 rounded object-cover" />
-                        ) : (
-                          <div className="flex h-10 w-14 items-center justify-center rounded bg-primary-50 dark:bg-primary-700/30">
-                            <Building2 className="h-4 w-4 text-primary-300" />
-                          </div>
-                        )}
-                        <span className="font-medium text-primary-900 dark:text-white">{l.title}</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      {formatPrice(l.price, l.purpose as "sale" | "rent", l.currency)}
-                    </td>
-                    <td className="px-5 py-3 capitalize text-primary-500 dark:text-white/60">
-                      {DISTRICTS.find(d => d.value === l.district)?.label?.split(" / ")[0] ?? l.district}
-                    </td>
-                    <td className="px-5 py-3">
-                      {amenities.ownerPhone ? (
-                        <div className="text-xs">
-                          <div className="font-medium text-primary-800 dark:text-white/80">{String(amenities.ownerName || "—")}</div>
-                          <div className="text-primary-500 dark:text-white/50">{String(amenities.ownerPhone)}</div>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-primary-300 dark:text-white/20">—</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        l.status === "available"
-                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                          : l.status === "sold"
-                          ? "bg-primary-100 text-primary-600 dark:bg-primary-700/30 dark:text-white/50"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                      }`}>
-                        {l.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => startEdit(l)}
-                          title="Edit"
-                          className="rounded p-1.5 hover:bg-primary-50 dark:hover:bg-white/10"
-                        >
-                          <Pencil className="h-4 w-4 text-primary-500 dark:text-white/50" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(l.id, l.title)}
-                          disabled={deleting === l.id}
-                          title="Delete"
-                          className="rounded p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:hover:bg-red-900/20"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {listings
+            .filter(l => {
+              if (!codeSearch) return true;
+              const q = codeSearch.toLowerCase();
+              const code = l.listingCode ? String(l.listingCode).padStart(4, "0") : "";
+              return l.title.toLowerCase().includes(q) || code.includes(q);
+            })
+            .map((l) => {
+              const images = (() => { try { return JSON.parse(l.images ?? "[]") as string[]; } catch { return [] as string[]; } })();
+              const amenities = (() => { try { return JSON.parse(l.amenities ?? "{}") as AmenityMap; } catch { return {} as AmenityMap; } })();
+              const ownerPhone = String(amenities.ownerPhone ?? "").trim();
+              const ownerName  = String(amenities.ownerName  ?? "").trim();
+              const displayCode = l.listingCode ? String(l.listingCode).padStart(4, "0") : null;
+              return (
+                <EmployeeListingCard
+                  key={l.id}
+                  id={l.id}
+                  title={l.title}
+                  price={l.price}
+                  currency={l.currency}
+                  purpose={l.purpose}
+                  district={l.district}
+                  status={l.status}
+                  isPublished={l.isPublished}
+                  bedrooms={l.bedrooms}
+                  bathrooms={l.bathrooms}
+                  area={l.area}
+                  images={images}
+                  ownerName={ownerName}
+                  ownerPhone={ownerPhone}
+                  displayCode={displayCode}
+                  locale={locale}
+                  onEdit={() => startEdit(l)}
+                  onDelete={() => handleDelete(l.id, l.title)}
+                  deleting={deleting === l.id}
+                />
+              );
+            })}
         </div>
       )}
     </div>

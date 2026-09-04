@@ -3,7 +3,10 @@ import { prisma, ensureDatabase } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
 async function getListing(id: string) {
-  return prisma.dbProperty.findUnique({ where: { id } });
+  return prisma.dbProperty.findUnique({
+    where: { id },
+    include: { createdBy: { select: { username: true } } },
+  });
 }
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {

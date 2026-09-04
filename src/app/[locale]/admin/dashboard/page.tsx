@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import {
   Users, LayoutDashboard, Building2,
-  UserCheck, UserCog, Eye, EyeOff, Plus, X, Upload,
+  UserCheck, UserCog, Eye, EyeOff, Plus, X, Upload, ExternalLink,
 } from "lucide-react";
+import { useLocale } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import AdminNav from "@/components/admin/AdminNav";
 import MatchingClientsModal from "@/components/admin/MatchingClientsModal";
@@ -99,6 +100,7 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const locale = useLocale();
   const [role, setRole] = useState<string | null>(null);
   const [dbListings, setDbListings] = useState<DbListing[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -512,6 +514,7 @@ function DashboardContent() {
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">By</th>
                   <th className="px-4 py-3">Publish</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody>
@@ -548,6 +551,15 @@ function DashboardContent() {
                       >
                         {l.isPublished ? <><Eye className="h-3 w-3" /> Published</> : <><EyeOff className="h-3 w-3" /> Draft</>}
                       </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <a
+                        href={`/${locale}/admin/listing/${l.id}`}
+                        title="View full listing"
+                        className="flex items-center gap-1 rounded-lg border border-primary-200 px-2.5 py-1 text-xs font-medium text-primary-600 hover:border-gold-400 hover:text-gold-600 dark:border-white/15 dark:text-white/60 dark:hover:border-gold-400 dark:hover:text-gold-400"
+                      >
+                        <ExternalLink className="h-3 w-3" /> View
+                      </a>
                     </td>
                   </tr>
                 ))}

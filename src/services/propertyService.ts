@@ -83,6 +83,7 @@ function mapDbRowToPublic(r: DbPropertyRow): PublicProperty {
 function mapDbRowToProperty(r: DbPropertyRow): Property {
   return {
     ...mapDbRowToPublic(r),
+    address: r.address ?? "",
     ownerPhone: "",
     ownerName: "",
   };
