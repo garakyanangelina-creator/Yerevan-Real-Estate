@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { formatPrice } from "@/lib/utils";
+import Gallery from "@/components/property/Gallery";
 
 export interface StaffListing {
   id: string;
@@ -65,7 +66,6 @@ const STATUS_COLORS: Record<string, string> = {
 export default function StaffListingView({ listing, backHref, onEdit, onDelete, role }: Props) {
   const locale = useLocale();
   const router = useRouter();
-  const [currentImg, setCurrentImg] = useState(0);
   const [copied, setCopied] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [isPublished, setIsPublished] = useState(listing.isPublished);
@@ -156,40 +156,7 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
 
       {/* Photo gallery */}
       {listing.images.length > 0 ? (
-        <div className="overflow-hidden rounded-2xl bg-primary-900">
-          <div className="relative aspect-[16/9] max-h-[520px] w-full">
-            <img
-              src={listing.images[currentImg]}
-              alt={listing.title}
-              className="h-full w-full object-cover"
-            />
-            {listing.images.length > 1 && (
-              <>
-                <button
-                  onClick={() => setCurrentImg((i) => (i - 1 + listing.images.length) % listing.images.length)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
-                >‹</button>
-                <button
-                  onClick={() => setCurrentImg((i) => (i + 1) % listing.images.length)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
-                >›</button>
-                <span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
-                  {currentImg + 1} / {listing.images.length}
-                </span>
-              </>
-            )}
-          </div>
-          {listing.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto p-3">
-              {listing.images.map((src, i) => (
-                <button key={i} onClick={() => setCurrentImg(i)}
-                  className={`shrink-0 overflow-hidden rounded-lg transition ${i === currentImg ? "ring-2 ring-gold-500" : "opacity-60 hover:opacity-100"}`}>
-                  <img src={src} alt="" className="h-16 w-24 object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <Gallery images={listing.images} title={listing.title} />
       ) : (
         <div className="flex h-64 items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-800/30">
           <Building2 className="h-16 w-16 text-primary-200" />

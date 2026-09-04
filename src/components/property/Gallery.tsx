@@ -1,89 +1,115 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import PhotoLightbox from "./PhotoLightbox";
 
-export default function Gallery({ images, title }: { images: string[]; title: string }) {
+interface Props {
+  images: string[];
+  title: string;
+}
+
+export default function Gallery({ images, title }: Props) {
   const gallery = images.length > 0 ? images : ["/images/placeholder-property.svg"];
-  const [active, setActive] = useState(0);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [active, setActive]   = useState(0);
+  const [lightbox, setLightbox] = useState(false);
 
-  function next() {
-    setActive((i) => (i + 1) % gallery.length);
-  }
-  function prev() {
-    setActive((i) => (i - 1 + gallery.length) % gallery.length);
-  }
+  function prev(e?: React.MouseEvent) { e?.stopPropagation(); setActive((i) => (i - 1 + gallery.length) % gallery.length); }
+  function next(e?: React.MouseEvent) { e?.stopPropagation(); setActive((i) => (i + 1) % gallery.length); }
 
   return (
-    <div>
-      <div className="relative h-[420px] w-full overflow-hidden rounded-xl2">
-        <Image
-          src={gallery[active]}
-          alt={`${title} photo ${active + 1}`}
-          fill
-          priority
-          unoptimized
-          className="object-cover"
-        />
-        <button
-          onClick={prev}
-          aria-label="Previous photo"
-          className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 hover:bg-white"
+    <>
+      {/* Main photo */}
+      <div className="overflow-hidden rounded-2xl bg-primary-900">
+        {/* 16:9 container — object-contain so full room is always visible */}
+        <div
+          className="relative w-full cursor-zoom-in"
+          style={{ aspectRatio: "16/9", maxHeight: 520 }}
+          onClick={() => setLightbox(true)}
         >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={next}
-          aria-label="Next photo"
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 hover:bg-white"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => setFullscreen(true)}
-          aria-label="Fullscreen"
-          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 hover:bg-white"
-        >
-          <Maximize2 className="h-4 w-4" />
-        </button>
-      </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={active}
+            src={gallery[active]}
+            alt={`${title} — photo ${active + 1}`}
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "contain",          // full room, no cropping
+              display: "block",
+            }}
+          />
 
-      <div className="mt-3 flex gap-2 overflow-x-auto">
-        {gallery.map((src, i) => (
-          <button
-            key={src + i}
-            onClick={() => setActive(i)}
-            className={`relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border-2 ${
-              i === active ? "border-gold-500" : "border-transparent"
-            }`}
-          >
-            <Image src={src} alt="" fill unoptimized className="object-cover" />
-          </button>
-        ))}
-      </div>
+          {/* Prev / Next */}
+          {gallery.length > 1 && (
+            <>
+              <button
+                onClick={prev}
+                aria-label="Previous photo"
+                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2.5 text-white hover:bg-black/70"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={next}
+                aria-label="Next photo"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2.5 text-white hover:bg-black/70"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
 
-      {fullscreen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90">
-          <button
-            onClick={() => setFullscreen(false)}
-            className="absolute right-6 top-6 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
-            aria-label="Close"
-          >
-            <X className="h-6 w-6" />
-          </button>
-          <button onClick={prev} className="absolute left-6 top-1/2 -translate-y-1/2 text-white">
-            <ChevronLeft className="h-8 w-8" />
-          </button>
-          <div className="relative h-[80vh] w-[80vw]">
-            <Image src={gallery[active]} alt="" fill unoptimized className="object-contain" />
+          {/* Expand hint + counter */}
+          <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            {gallery.length > 1 && (
+              <span className="rounded-full bg-black/60 px-2.5 py-1 text-xs text-white">
+                {active + 1} / {gallery.length}
+              </span>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightbox(true); }}
+              aria-label="View fullscreen"
+              className="rounded-full bg-black/60 p-1.5 text-white hover:bg-black/80"
+            >
+              <Expand className="h-4 w-4" />
+            </button>
           </div>
-          <button onClick={next} className="absolute right-6 top-1/2 -translate-y-1/2 text-white">
-            <ChevronRight className="h-8 w-8" />
-          </button>
         </div>
+
+        {/* Thumbnail strip */}
+        {gallery.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto p-3">
+            {gallery.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                aria-label={`Photo ${i + 1}`}
+                className={`shrink-0 overflow-hidden rounded-lg border-2 transition ${
+                  i === active ? "border-gold-500 opacity-100" : "border-transparent opacity-55 hover:opacity-90"
+                }`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt=""
+                  style={{ width: 96, height: 64, objectFit: "cover", display: "block" }}
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <PhotoLightbox
+          images={gallery}
+          initialIndex={active}
+          title={title}
+          onClose={() => setLightbox(false)}
+        />
       )}
-    </div>
+    </>
   );
 }
