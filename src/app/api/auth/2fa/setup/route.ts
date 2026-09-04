@@ -20,8 +20,9 @@ export async function GET() {
   const secret = generateTotpSecret();
   const uri = getTotpUri(secret, user.username);
 
-  // Generate QR code as a data URI (no external service needed)
-  const qrDataUrl = await QRCode.toDataURL(uri, { width: 200, margin: 2 });
+  // Generate QR code as SVG (no canvas dependency needed)
+  const qrSvg = await QRCode.toString(uri, { type: "svg", width: 200, margin: 2 });
+  const qrDataUrl = `data:image/svg+xml;base64,${Buffer.from(qrSvg).toString("base64")}`;
 
   // Store the pending secret temporarily (user must verify before it's activated)
   await prisma.user.update({ where: { id: session.userId }, data: { totpSecret: secret, totpEnabled: false } });
