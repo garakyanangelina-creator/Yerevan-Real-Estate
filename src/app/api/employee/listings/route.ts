@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma, ensureDatabase } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { isStreetInDistrict } from "@/lib/yerevan-streets";
+import { writeAuditLog, getIp } from "@/lib/audit";
 import {
   ALLOWED_TYPES,
   ALLOWED_PURPOSES,
@@ -89,5 +90,6 @@ export async function POST(request: Request) {
       },
     });
   });
+  await writeAuditLog({ session, action: "listing.create", target: title, targetId: listing.id, ip: getIp(request) });
   return NextResponse.json({ listing }, { status: 201 });
 }

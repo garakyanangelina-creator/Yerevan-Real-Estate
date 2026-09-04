@@ -9,9 +9,11 @@ export async function GET() {
   await ensureDatabase();
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, username: true, role: true, isActive: true },
+    select: { id: true, username: true, role: true, isActive: true, totpEnabled: true },
   });
   if (!user || !user.isActive) return NextResponse.json({ user: null });
 
-  return NextResponse.json({ user: { id: user.id, username: user.username, role: user.role } });
+  return NextResponse.json({
+    user: { id: user.id, username: user.username, role: user.role, totpEnabled: user.totpEnabled },
+  });
 }

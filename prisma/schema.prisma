@@ -72,11 +72,31 @@ model User {
   passwordHash String
   role         String       @default("employee") // super_admin | admin | employee
   isActive     Boolean      @default(true)
+  totpSecret   String?      // TOTP secret for 2FA (null = 2FA not enabled)
+  totpEnabled  Boolean      @default(false)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   createdById  String?
 
   listings     DbProperty[]
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  username   String
+  role       String
+  action     String   // e.g. "login", "logout", "listing.create", "listing.delete", "user.create"
+  target     String?  // e.g. listing title, user username
+  targetId   String?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 // ── Employee Property Listings ────────────────────────────────────────────────

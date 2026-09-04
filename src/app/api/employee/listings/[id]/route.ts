@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma, ensureDatabase } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { writeAuditLog, getIp } from "@/lib/audit";
 import {
   ALLOWED_TYPES,
   ALLOWED_PURPOSES,
@@ -75,6 +76,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   const updated = await prisma.dbProperty.update({ where: { id: params.id }, data });
+  await writeAuditLog({ session, action: "listing.update", target: listing.title, targetId: params.id, ip: getIp(request) });
   return NextResponse.json({ listing: updated });
 }
 
@@ -90,5 +92,6 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   await prisma.dbProperty.delete({ where: { id: params.id } });
+  await writeAuditLog({ session, action: "listing.delete", target: listing.title, targetId: params.id, ip: getIp(request) });
   return NextResponse.json({ ok: true });
 }
