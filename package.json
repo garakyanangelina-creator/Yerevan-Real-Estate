@@ -39,7 +39,7 @@
     "typescript": "^5.5.4"
   },
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "allowScripts": {
     "unrs-resolver@1.12.2": true,
