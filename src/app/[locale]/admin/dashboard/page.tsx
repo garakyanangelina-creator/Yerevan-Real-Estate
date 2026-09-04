@@ -356,25 +356,25 @@ function DashboardContent() {
                 <div>
                   <label className={labelCls}>Type / Տեսակ</label>
                   <select className={inputCls} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-                    <option value="apartment">Apartment / Բնակartan</option>
-                    <option value="house">House / Տuun</option>
-                    <option value="commercial">Commercial / Komerrcial</option>
-                    <option value="office">Office / Grasenyak</option>
-                    <option value="land">Land / Hoghamas</option>
+                    <option value="apartment">Apartment / Բնակարան</option>
+                    <option value="house">House / Տուն</option>
+                    <option value="commercial">Commercial / Կոմերցիոն</option>
+                    <option value="office">Office / Գրասենյակ</option>
+                    <option value="land">Land / Հողամաս</option>
                   </select>
                 </div>
                 <div>
-                  <label className={labelCls}>Purpose / Նpataak</label>
+                  <label className={labelCls}>Purpose / Նպատակ</label>
                   <select className={inputCls} value={form.purpose} onChange={(e) => setForm({ ...form, purpose: e.target.value })}>
-                    <option value="sale">For Sale / Վaacharrk</option>
-                    <option value="rent">For Rent / Varrtz</option>
+                    <option value="sale">For Sale / Վաճառք</option>
+                    <option value="rent">For Rent / Վարձ</option>
                   </select>
                 </div>
               </div>
 
               {/* District */}
               <div>
-                <label className={labelCls}>District / Թaghamas</label>
+                <label className={labelCls}>District / Թաղամաս</label>
                 <select className={inputCls} value={form.district}
                   onChange={(e) => { setForm({ ...form, district: e.target.value, street: "" }); setStreetQuery(""); }}>
                   {DISTRICTS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
@@ -383,7 +383,7 @@ function DashboardContent() {
 
               {/* Street autocomplete */}
               <div ref={streetRef} className="relative">
-                <label className={labelCls}>Street / Phoghos</label>
+                <label className={labelCls}>Street / Փողոց</label>
                 <input className={inputCls} placeholder="Type street name…" value={streetQuery} autoComplete="off"
                   onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }} />
                 {streetSuggestions.length > 0 && (
@@ -401,7 +401,7 @@ function DashboardContent() {
 
               {/* Building number */}
               <div>
-                <label className={labelCls}>Building No. / Sh. ham.</label>
+                <label className={labelCls}>Building No. / Շ. համար</label>
                 <input className={inputCls} placeholder="e.g. 12, 7a"
                   value={form.buildingNumber} onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} />
               </div>
@@ -409,7 +409,7 @@ function DashboardContent() {
               {/* Price & Currency */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <label className={labelCls}>Price / Gin *</label>
+                  <label className={labelCls}>Price / Գին *</label>
                   <input required type="number" min="0" className={inputCls} value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })} />
                 </div>
@@ -426,12 +426,12 @@ function DashboardContent() {
               {/* Bedrooms / Bathrooms */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Bedrooms</label>
+                  <label className={labelCls}>Bedrooms / Ննջ.</label>
                   <input type="number" min="0" className={inputCls} value={form.bedrooms}
                     onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} />
                 </div>
                 <div>
-                  <label className={labelCls}>Bathrooms</label>
+                  <label className={labelCls}>Bathrooms / Լ/Ս</label>
                   <input type="number" min="0" className={inputCls} value={form.bathrooms}
                     onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} />
                 </div>
@@ -440,15 +440,15 @@ function DashboardContent() {
               {/* Owner contacts */}
               <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-700/40 dark:bg-amber-900/20">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-                  Owner Contacts (staff only)
+                  Owner Contacts / Սեփ. կապ (staff only)
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Owner Name</label>
+                    <label className={labelCls}>Owner Name / Անուն</label>
                     <input className={inputCls} value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
                   </div>
                   <div>
-                    <label className={labelCls}>Owner Phone</label>
+                    <label className={labelCls}>Owner Phone / Հեռ.</label>
                     <input type="tel" className={inputCls} value={form.ownerPhone} onChange={(e) => setForm({ ...form, ownerPhone: e.target.value })} />
                   </div>
                 </div>
@@ -463,7 +463,7 @@ function DashboardContent() {
 
               {/* Photo upload */}
               <div>
-                <label className={labelCls}>Photos / Lus. (optional)</label>
+                <label className={labelCls}>Photos / Լուսանկարներ</label>
                 <label className="flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-primary-200 p-4 text-sm text-primary-500 dark:border-white/15 hover:border-gold-400 transition">
                   <Upload className="h-5 w-5" />
                   {uploading ? "Uploading…" : "Upload photos"}
