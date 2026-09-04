@@ -86,16 +86,20 @@ export default function AdminNav({
 
   async function start2FaSetup() {
     clearMsg(); setLoading(true);
-    const res = await fetch("/api/auth/2fa/setup");
-    setLoading(false);
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/auth/2fa/setup");
       const data = await res.json();
-      setQrUri(data.uri);
-      setQrDataUrl(data.qrDataUrl ?? null);
-      setQrSecret(data.secret);
-    } else {
-      const d = await res.json();
-      setMsg({ text: d.error ?? "Error", ok: false });
+      if (res.ok) {
+        setQrUri(data.uri);
+        setQrDataUrl(null);
+        setQrSecret(data.secret);
+      } else {
+        setMsg({ text: data.error ?? "Setup failed", ok: false });
+      }
+    } catch {
+      setMsg({ text: "Network error, please try again", ok: false });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -340,7 +344,7 @@ export default function AdminNav({
                     <div className="flex justify-center rounded-xl bg-white p-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={qrDataUrl ?? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrUri)}`}
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrUri)}`}
                         alt="2FA QR Code"
                         width={180}
                         height={180}
