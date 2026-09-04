@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Lock, UploadCloud, X } from "lucide-react";
 import { districts } from "@/lib/mock-data";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
+import { compressImage } from "@/lib/compressImage";
 
 const inputCls = "w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm outline-none focus:border-gold-400 dark:border-white/10 dark:bg-primary-800 dark:text-white";
 const labelCls = "block text-xs font-semibold uppercase tracking-wide text-primary-500 dark:text-white/60 mb-1";
@@ -72,7 +73,8 @@ export default function SubmitForm() {
     const newPreviews = Array.from(files).map((f) => URL.createObjectURL(f));
     setPreviews((p) => [...p, ...newPreviews]);
     const uploaded: string[] = [];
-    for (const file of Array.from(files)) {
+    for (const rawFile of Array.from(files)) {
+      const file = await compressImage(rawFile);
       const fd = new FormData();
       fd.append("file", file);
       try {

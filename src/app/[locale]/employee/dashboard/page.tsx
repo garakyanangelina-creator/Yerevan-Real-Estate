@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
+import { compressImage } from "@/lib/compressImage";
 
 interface Listing {
   id: string;
@@ -199,7 +200,8 @@ export default function EmployeeDashboard() {
     setUploading(true);
     setUploadError("");
     const uploaded: string[] = [];
-    for (const file of Array.from(files)) {
+    for (const rawFile of Array.from(files)) {
+      const file = await compressImage(rawFile);
       const fd = new FormData();
       fd.append("file", file);
       try {

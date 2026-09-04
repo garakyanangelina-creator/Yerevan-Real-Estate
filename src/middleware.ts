@@ -101,6 +101,16 @@ export default async function middleware(req: NextRequest) {
     return maybeRefreshSession(session, intlMiddleware(req));
   }
 
+  // Public page routes — refresh session cookie if the user is logged in and close to expiry
+  // This ensures admins/employees stay logged in while browsing the public site
+  const sessionForPublic = req.cookies.get(SESSION_COOKIE)?.value;
+  if (sessionForPublic) {
+    const session = await getSessionFromRequest(req);
+    if (session) {
+      return maybeRefreshSession(session, intlMiddleware(req));
+    }
+  }
+
   return intlMiddleware(req);
 }
 
