@@ -80,7 +80,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json({ listing: updated });
 }
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   await ensureDatabase();
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

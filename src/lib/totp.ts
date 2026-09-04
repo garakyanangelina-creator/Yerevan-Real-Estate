@@ -1,5 +1,6 @@
 import "server-only";
-import { authenticator } from "otplib";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { authenticator } = require("otplib") as typeof import("otplib");
 
 // 30-second window, standard TOTP
 authenticator.options = { window: 1 };
