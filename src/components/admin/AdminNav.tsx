@@ -94,7 +94,7 @@ export default function AdminNav({
         setQrDataUrl(null);
         setQrSecret(data.secret);
       } else {
-        setMsg({ text: data.error ?? "Setup failed", ok: false });
+        setMsg({ text: data.error ?? "Setup failed (unknown)", ok: false });
       }
     } catch {
       setMsg({ text: "Network error, please try again", ok: false });
