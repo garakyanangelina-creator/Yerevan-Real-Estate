@@ -53,6 +53,8 @@ function parseAmenities(raw: string): PropertyAmenities {
 function mapDbRowToPublic(r: DbPropertyRow): PublicProperty {
   const images = (() => { try { return JSON.parse(r.images); } catch { return []; } })();
   const coords = districtCenters[r.district as District] ?? districtCenters.other;
+  // NOTE: address (street + building number) is intentionally excluded — it is private info.
+  // PublicProperty omits `address` so building numbers never reach guest browsers.
   return {
     id: r.id,
     listingCode: r.listingCode ?? undefined,
@@ -61,7 +63,6 @@ function mapDbRowToPublic(r: DbPropertyRow): PublicProperty {
     type: r.type as PropertyType,
     purpose: r.purpose as Purpose,
     district: r.district as District,
-    address: r.address ?? "",
     price: r.price,
     currency: r.currency,
     bedrooms: r.bedrooms,

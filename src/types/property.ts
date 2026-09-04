@@ -54,7 +54,11 @@ export interface Property {
   ownerName: string;
 }
 
-export interface PublicProperty extends Omit<Property, "ownerPhone" | "ownerName"> {}
+/**
+ * Data safe to send to unauthenticated users.
+ * address is omitted because it contains the building number (private).
+ */
+export interface PublicProperty extends Omit<Property, "ownerPhone" | "ownerName" | "address"> {}
 
 export function toPublicProperty(property: Property): PublicProperty {
   const { ownerPhone, ownerName, ...rest } = property;

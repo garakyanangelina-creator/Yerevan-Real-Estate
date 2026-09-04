@@ -32,7 +32,7 @@ export default function SearchClient({
 
   const results = useMemo(() => {
     let list = initialProperties.filter((p) => {
-      if (filters.q && !`${p.title} ${p.address}`.toLowerCase().includes(filters.q.toLowerCase())) return false;
+      if (filters.q && !`${p.title} ${p.description} ${p.district}`.toLowerCase().includes(filters.q.toLowerCase())) return false;
       if (filters.type && p.type !== filters.type) return false;
       if (filters.purpose && p.purpose !== filters.purpose) return false;
       if (filters.district && p.district !== filters.district) return false;

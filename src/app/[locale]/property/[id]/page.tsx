@@ -76,7 +76,6 @@ export default async function PropertyPage({
     image: property.images,
     address: {
       "@type": "PostalAddress",
-      streetAddress: property.address,
       addressLocality: "Yerevan",
       addressCountry: "AM",
     },
@@ -99,7 +98,7 @@ export default async function PropertyPage({
                 {property.title}
               </h1>
               <p className="mt-1 flex items-center gap-1 text-primary-500 dark:text-white/60">
-                <MapPin className="h-4 w-4" /> {property.address}, {tDistricts(property.district)}
+                <MapPin className="h-4 w-4" /> {tDistricts(property.district)}, Yerevan
               </p>
             </div>
             <p className="text-2xl font-semibold text-gold-600">

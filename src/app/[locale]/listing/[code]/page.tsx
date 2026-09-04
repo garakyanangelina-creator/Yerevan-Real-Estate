@@ -79,7 +79,7 @@ export default async function ListingPage({
     image: property.images,
     address: {
       "@type": "PostalAddress",
-      streetAddress: property.address,
+      // streetAddress intentionally omitted — building number is private
       addressLocality: "Yerevan",
       addressCountry: "AM",
     },
@@ -108,7 +108,7 @@ export default async function ListingPage({
                 {property.title}
               </h1>
               <p className="mt-1 flex items-center gap-1 text-primary-500 dark:text-white/60">
-                <MapPin className="h-4 w-4" /> {property.address}, {tDistricts(property.district)}
+                <MapPin className="h-4 w-4" /> {tDistricts(property.district)}, Yerevan
               </p>
             </div>
             <p className="text-2xl font-semibold text-gold-600">
@@ -185,6 +185,12 @@ export default async function ListingPage({
 
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
           <ContactButtons propertyId={property.id} />
+          <div className="card p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-400 dark:text-white/40">
+              Share this listing
+            </p>
+            <CopyLinkButton code={displayCode} fullWidth />
+          </div>
         </aside>
       </div>
 
