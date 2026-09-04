@@ -28,35 +28,48 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body?.title) return NextResponse.json({ error: "title required" }, { status: 400 });
 
-  // Log unrecognised district+street (warn only — dataset is incomplete until streets:fetch is run)
   const street = body.amenities?.street ?? "";
   const district = body.district ?? "";
   if (street && district && !isStreetInDistrict(district, street)) {
-    console.warn("[listings] Street not in district list:", district, street);
+    return NextResponse.json(
+      { error: "Street does not belong to the selected district." },
+      { status: 422 }
+    );
   }
 
-  const listing = await prisma.dbProperty.create({
-    data: {
-      title: String(body.title).trim(),
-      description: body.description ? String(body.description).trim() : null,
-      type: body.type ?? "apartment",
-      purpose: body.purpose ?? "sale",
-      district: body.district ?? "other",
-      address: body.address ? String(body.address).trim() : null,
-      price: Number(body.price) || 0,
-      currency: body.currency ?? "AMD",
-      bedrooms: Number(body.bedrooms) || 0,
-      bathrooms: Number(body.bathrooms) || 0,
-      area: Number(body.area) || 0,
-      floor: Number(body.floor) || 0,
-      totalFloors: Number(body.totalFloors) || 0,
-      images: JSON.stringify(Array.isArray(body.images) ? body.images : []),
-      amenities: JSON.stringify(body.amenities ?? {}),
-      status: body.status ?? "available",
-      isPublished: session.role !== "employee" ? Boolean(body.isPublished) : false,
-      featured: session.role !== "employee" ? Boolean(body.featured) : false,
-      createdById: session.userId,
-    },
+  const isAdmin = session.role !== "employee";
+
+  const listing = await prisma.$transaction(async (tx) => {
+    // Use raw query to safely get MAX listingCode — avoids TS errors before client regen
+    const [{ max }] = await tx.$queryRaw<[{ max: number | null }]>`
+      SELECT MAX("listingCode") as max FROM "DbProperty"
+    `;
+    const nextCode = (max ?? 500) + 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (tx.dbProperty as any).create({
+      data: {
+        listingCode: nextCode,
+        title: String(body.title).trim(),
+        description: body.description ? String(body.description).trim() : null,
+        type: body.type ?? "apartment",
+        purpose: body.purpose ?? "sale",
+        district: body.district ?? "other",
+        address: body.address ? String(body.address).trim() : null,
+        price: Number(body.price) || 0,
+        currency: body.currency ?? "AMD",
+        bedrooms: Number(body.bedrooms) || 0,
+        bathrooms: Number(body.bathrooms) || 0,
+        area: Number(body.area) || 0,
+        floor: Number(body.floor) || 0,
+        totalFloors: Number(body.totalFloors) || 0,
+        images: JSON.stringify(Array.isArray(body.images) ? body.images : []),
+        amenities: JSON.stringify(body.amenities ?? {}),
+        status: "active",
+        isPublished: true,
+        featured: isAdmin ? Boolean(body.featured) : false,
+        createdById: session.userId,
+      },
+    });
   });
   return NextResponse.json({ listing }, { status: 201 });
 }

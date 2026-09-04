@@ -8,9 +8,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Log unrecognised district+street (warn only — dataset is incomplete until streets:fetch is run)
   if (body.street && body.district && !isStreetInDistrict(body.district, body.street)) {
-    console.warn("[submit] Street not in district list:", body.district, body.street);
+    return NextResponse.json(
+      { error: "Street does not belong to the selected district." },
+      { status: 422 }
+    );
   }
 
   const photos: string[] = Array.isArray(body.photos) ? body.photos : [];

@@ -98,7 +98,8 @@ model DbProperty {
   totalFloors Int      @default(0)
   images      String   @default("[]") // JSON array of URL strings
   amenities   String   @default("{}") // JSON object
-  status      String   @default("available") // available | sold | rented
+  listingCode Int?     @unique
+  status      String   @default("available") // available | active | draft | sold | rented | archived
   isPublished Boolean  @default(false)
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())

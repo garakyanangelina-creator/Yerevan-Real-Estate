@@ -318,52 +318,80 @@ function toPublicResult(result: PropertyFetchResult<Property>): PropertyFetchRes
   return { properties: result.properties.map(toPublicProperty), error: result.error };
 }
 
+type DbPropertyRow = {
+  id: string; title: string; description: string | null; type: string; purpose: string;
+  district: string; address: string | null; price: number; currency: string;
+  bedrooms: number; bathrooms: number; area: number; floor: number; totalFloors: number;
+  images: string; amenities: string; featured: boolean; createdAt: Date;
+  listingCode?: number | null;
+};
+
+function mapDbRow(r: DbPropertyRow): PublicProperty {
+  const amenities = (() => { try { return JSON.parse(r.amenities); } catch { return {}; } })();
+  const images = (() => { try { return JSON.parse(r.images); } catch { return []; } })();
+  const coords = districtCenters[r.district as District] ?? districtCenters.other;
+  return {
+    id: r.id,
+    listingCode: r.listingCode ?? undefined,
+    title: r.title,
+    description: r.description ?? "",
+    type: r.type as PublicProperty["type"],
+    purpose: r.purpose as PublicProperty["purpose"],
+    district: r.district as District,
+    address: r.address ?? "",
+    price: r.price,
+    currency: r.currency,
+    bedrooms: r.bedrooms,
+    bathrooms: r.bathrooms,
+    area: r.area,
+    floor: r.floor,
+    totalFloors: r.totalFloors,
+    images,
+    amenities: {
+      parking: Boolean(amenities.parking),
+      balcony: Boolean(amenities.balcony || amenities.openBalcony || amenities.closedBalcony),
+      furniture: Boolean(amenities.furniture),
+      petFriendly: Boolean(amenities.petFriendly),
+      newBuilding: Boolean(amenities.newBuilding || amenities.buildingType === "newBuilding"),
+      elevator: Boolean(amenities.elevator),
+      ac: Boolean(amenities.ac),
+      heating: Boolean(amenities.heating),
+    },
+    featured: r.featured,
+    popularity: 0,
+    createdAt: r.createdAt.toISOString(),
+    lat: coords.lat,
+    lng: coords.lng,
+  };
+}
+
 async function getDbPublicProperties(): Promise<PublicProperty[]> {
   try {
     const { prisma } = await import("@/lib/prisma");
     const rows = await prisma.dbProperty.findMany({
-      where: { isPublished: true },
+      where: { isPublished: true, status: { in: ["active", "available"] } },
       orderBy: { createdAt: "desc" },
     });
-    return rows.map((r) => {
-      const amenities = (() => { try { return JSON.parse(r.amenities); } catch { return {}; } })();
-      const images = (() => { try { return JSON.parse(r.images); } catch { return []; } })();
-      const coords = districtCenters[r.district as District] ?? districtCenters.other;
-      return {
-        id: r.id,
-        title: r.title,
-        description: r.description ?? "",
-        type: r.type as PublicProperty["type"],
-        purpose: r.purpose as PublicProperty["purpose"],
-        district: r.district as District,
-        address: r.address ?? "",
-        price: r.price,
-        currency: r.currency,
-        bedrooms: r.bedrooms,
-        bathrooms: r.bathrooms,
-        area: r.area,
-        floor: r.floor,
-        totalFloors: r.totalFloors,
-        images,
-        amenities: {
-          parking: Boolean(amenities.parking),
-          balcony: Boolean(amenities.balcony || amenities.openBalcony || amenities.closedBalcony),
-          furniture: Boolean(amenities.furniture),
-          petFriendly: Boolean(amenities.petFriendly),
-          newBuilding: Boolean(amenities.newBuilding || amenities.buildingType === "newBuilding"),
-          elevator: Boolean(amenities.elevator),
-          ac: Boolean(amenities.ac),
-          heating: Boolean(amenities.heating),
-        },
-        featured: r.featured,
-        popularity: 0,
-        createdAt: r.createdAt.toISOString(),
-        lat: coords.lat,
-        lng: coords.lng,
-      } satisfies PublicProperty;
-    });
+    return rows.map((r) => mapDbRow(r as DbPropertyRow));
   } catch {
     return [];
+  }
+}
+
+export async function getPublicPropertyByCode(
+  code: string
+): Promise<{ property: PublicProperty | null; error: PropertyFetchErrorCode }> {
+  const numericCode = parseInt(code, 10);
+  if (isNaN(numericCode)) return { property: null, error: null };
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const row = await (prisma.dbProperty as any).findFirst({
+      where: { listingCode: numericCode, isPublished: true },
+    });
+    return { property: row ? mapDbRow(row as DbPropertyRow) : null, error: null };
+  } catch {
+    return { property: null, error: "network" };
   }
 }
 

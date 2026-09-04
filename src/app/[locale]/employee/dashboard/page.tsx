@@ -110,7 +110,17 @@ export default function EmployeeDashboard() {
     if (!streetQuery) { setStreetSuggestions([]); return; }
     const streets = streetsByDistrict[form.district] ?? [];
     const q = streetQuery.toLowerCase();
-    setStreetSuggestions(streets.filter((s) => s.toLowerCase().includes(q)).slice(0, 20));
+    const filtered = q.length <= 2
+      ? streets.filter((s) => s.toLowerCase().startsWith(q))
+      : streets.filter((s) => s.toLowerCase().includes(q));
+    const seen = new Set<string>();
+    const unique = filtered.filter((s) => {
+      const key = s.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    setStreetSuggestions(unique.slice(0, 30));
   }, [streetQuery, form.district]);
 
   useEffect(() => {

@@ -2,10 +2,27 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { getSessionFromRequest } from "./lib/session";
+import { getSessionFromRequest, createSessionToken, SESSION_COOKIE } from "./lib/session";
 
 const intlMiddleware = createIntlMiddleware(routing);
 const LOCALES = ["en", "ru", "hy"];
+const REFRESH_THRESHOLD_MS = 2 * 60 * 60 * 1000; // refresh if < 2h remaining
+const SESSION_MAX_AGE = 8 * 60 * 60; // 8h in seconds
+
+async function maybeRefreshSession(session: Awaited<ReturnType<typeof getSessionFromRequest>>, response: NextResponse): Promise<NextResponse> {
+  if (!session) return response;
+  if (session.expiresAt - Date.now() < REFRESH_THRESHOLD_MS) {
+    const newToken = await createSessionToken(session.userId, session.role);
+    response.cookies.set(SESSION_COOKIE, newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+    });
+  }
+  return response;
+}
 
 function getLocale(pathname: string): string {
   return LOCALES.find((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`)) ?? "en";
@@ -66,10 +83,10 @@ export default async function middleware(req: NextRequest) {
     if (!session || !["super_admin", "admin"].includes(session.role)) {
       return NextResponse.redirect(new URL(`/${locale}/admin`, req.url));
     }
-    // Users page: super_admin only
     if (local.startsWith("/admin/users") && session.role !== "super_admin") {
       return NextResponse.redirect(new URL(`/${locale}/admin/dashboard`, req.url));
     }
+    return maybeRefreshSession(session, intlMiddleware(req));
   }
 
   // Employee pages
@@ -78,10 +95,10 @@ export default async function middleware(req: NextRequest) {
     if (!session) {
       return NextResponse.redirect(new URL(`/${locale}/admin`, req.url));
     }
-    // Admins/super-admins shouldn't use employee routes
     if (["super_admin", "admin"].includes(session.role)) {
       return NextResponse.redirect(new URL(`/${locale}/admin/dashboard`, req.url));
     }
+    return maybeRefreshSession(session, intlMiddleware(req));
   }
 
   return intlMiddleware(req);

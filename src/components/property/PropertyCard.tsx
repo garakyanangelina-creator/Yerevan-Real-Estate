@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Heart, BedDouble, Bath, Ruler, MapPin, ArrowRight } from "lucide-react";
+import { Heart, BedDouble, Bath, Ruler, MapPin, ArrowRight, Link2, Check } from "lucide-react";
 import { Link } from "@/i18n/routing";
+import { useLocale } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import type { PublicProperty } from "@/types/property";
 
@@ -12,8 +13,34 @@ export default function PropertyCard({ property }: { property: PublicProperty })
   const t = useTranslations("property");
   const tTypes = useTranslations("propertyTypes");
   const tDistricts = useTranslations("districts");
+  const locale = useLocale();
   const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
   const coverImage = property.images[0] || "/images/placeholder-property.svg";
+
+  const code = property.listingCode ? String(property.listingCode).padStart(4, "0") : null;
+  const detailHref = code ? `/listing/${code}` : `/property/${property.id}`;
+
+  async function copyLink(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!code) return;
+    const url = `${window.location.origin}/${locale}/listing/${code}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = url;
+      el.style.position = "fixed";
+      el.style.opacity = "0";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   return (
     <div className="card group flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1.5 hover:shadow-premium">
@@ -31,14 +58,25 @@ export default function PropertyCard({ property }: { property: PublicProperty })
         <span className="absolute left-3 top-3 rounded-full bg-primary-900/75 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
           {tTypes(property.type)}
         </span>
-        {/* Favourite */}
-        <button
-          onClick={() => setSaved((v) => !v)}
-          aria-label={t("favorite")}
-          className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-primary-800 shadow-card backdrop-blur-sm transition hover:bg-white hover:scale-110"
-        >
-          <Heart className={saved ? "h-4 w-4 fill-gold-500 text-gold-500" : "h-4 w-4"} />
-        </button>
+        {/* Action buttons */}
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
+          <button
+            onClick={() => setSaved((v) => !v)}
+            aria-label={t("favorite")}
+            className="rounded-full bg-white/90 p-2 text-primary-800 shadow-card backdrop-blur-sm transition hover:bg-white hover:scale-110"
+          >
+            <Heart className={saved ? "h-4 w-4 fill-gold-500 text-gold-500" : "h-4 w-4"} />
+          </button>
+          {code && (
+            <button
+              onClick={copyLink}
+              aria-label="Copy link"
+              className="rounded-full bg-white/90 p-2 text-primary-800 shadow-card backdrop-blur-sm transition hover:bg-white hover:scale-110"
+            >
+              {copied ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
+            </button>
+          )}
+        </div>
         {/* Overlay shimmer on hover */}
         <div className="absolute inset-0 bg-primary-900/0 transition duration-300 group-hover:bg-primary-900/10" />
       </div>
@@ -81,7 +119,7 @@ export default function PropertyCard({ property }: { property: PublicProperty })
 
         {/* CTA */}
         <Link
-          href={`/property/${property.id}`}
+          href={detailHref as "/property/[id]"}
           className="btn-primary mt-5 w-full gap-2 group/btn"
         >
           {t("viewDetails")}

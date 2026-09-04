@@ -48,6 +48,7 @@ export interface Property {
   createdAt: string;
   lat: number;
   lng: number;
+  listingCode?: number;
   /** Owner phone is private. Never sent to client-facing components. */
   ownerPhone: string;
   ownerName: string;
