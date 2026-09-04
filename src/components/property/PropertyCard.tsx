@@ -58,37 +58,46 @@ export default function PropertyCard({ property }: { property: PublicProperty })
         <span className="absolute left-3 top-3 rounded-full bg-primary-900/75 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
           {tTypes(property.type)}
         </span>
-        {/* Action buttons */}
-        <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
-          <button
-            onClick={() => setSaved((v) => !v)}
-            aria-label={t("favorite")}
-            className="rounded-full bg-white/90 p-2 text-primary-800 shadow-card backdrop-blur-sm transition hover:bg-white hover:scale-110"
-          >
-            <Heart className={saved ? "h-4 w-4 fill-gold-500 text-gold-500" : "h-4 w-4"} />
-          </button>
-          {code && (
-            <button
-              onClick={copyLink}
-              aria-label="Copy link"
-              className="rounded-full bg-white/90 p-2 text-primary-800 shadow-card backdrop-blur-sm transition hover:bg-white hover:scale-110"
-            >
-              {copied ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
-            </button>
-          )}
-        </div>
-        {/* Listing code badge — bottom left */}
-        {code && (
-          <span className="absolute bottom-3 left-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-xs font-bold text-white backdrop-blur-sm">
-            #{code}
-          </span>
-        )}
+        {/* Favorite */}
+        <button
+          onClick={() => setSaved((v) => !v)}
+          aria-label={t("favorite")}
+          className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-primary-800 shadow-card backdrop-blur-sm transition hover:bg-white hover:scale-110"
+        >
+          <Heart className={saved ? "h-4 w-4 fill-gold-500 text-gold-500" : "h-4 w-4"} />
+        </button>
         {/* Overlay shimmer on hover */}
         <div className="absolute inset-0 bg-primary-900/0 transition duration-300 group-hover:bg-primary-900/10" />
       </div>
 
       {/* Content */}
       <div className="flex flex-1 flex-col p-5">
+
+        {/* Listing code — prominent, above price */}
+        {code && (
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 rounded-lg bg-primary-900 px-3 py-1.5 dark:bg-white/10">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/60">Listing</span>
+              <span className="font-mono text-base font-bold text-gold-400">#{code}</span>
+            </div>
+            {/* Copy Link button — visible and labeled */}
+            <button
+              onClick={copyLink}
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                copied
+                  ? "border-green-400 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                  : "border-primary-200 text-primary-600 hover:border-gold-400 hover:bg-gold-50 hover:text-gold-700 dark:border-white/20 dark:text-white/70 dark:hover:border-gold-400"
+              }`}
+            >
+              {copied ? (
+                <><Check className="h-3.5 w-3.5" /> Copied!</>
+              ) : (
+                <><Link2 className="h-3.5 w-3.5" /> Copy Link</>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* Price + district */}
         <div className="flex items-center justify-between">
           <p className="text-xl font-bold text-primary-800 dark:text-white">
