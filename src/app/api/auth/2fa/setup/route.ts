@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma, ensureDatabase } from "@/lib/prisma";
 import { generateTotpSecret, getTotpUri } from "@/lib/totp";
+import QRCode from "qrcode";
 
 // GET: generate a new TOTP secret and return the QR URI (not yet saved)
 export async function GET() {
@@ -19,8 +20,11 @@ export async function GET() {
   const secret = generateTotpSecret();
   const uri = getTotpUri(secret, user.username);
 
+  // Generate QR code as a data URI (no external service needed)
+  const qrDataUrl = await QRCode.toDataURL(uri, { width: 200, margin: 2 });
+
   // Store the pending secret temporarily (user must verify before it's activated)
   await prisma.user.update({ where: { id: session.userId }, data: { totpSecret: secret, totpEnabled: false } });
 
-  return NextResponse.json({ secret, uri });
+  return NextResponse.json({ secret, uri, qrDataUrl });
 }

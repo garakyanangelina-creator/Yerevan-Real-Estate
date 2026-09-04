@@ -23,8 +23,8 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       // Styles: self + inline (Tailwind generates inline styles)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      // Images: self + data URIs + Supabase storage + Unsplash + Cloudinary
-      "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://res.cloudinary.com",
+      // Images: self + data URIs + Supabase storage + Unsplash + Cloudinary + QR code generator
+      "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://res.cloudinary.com https://api.qrserver.com",
       // Fonts
       "font-src 'self' https://fonts.gstatic.com",
       // API calls: self only (no external fetch from browser except storage)

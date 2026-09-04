@@ -42,6 +42,7 @@ export default function AdminNav({
   // 2FA state
   const [twoFaEnabled, setTwoFaEnabled] = useState<boolean | null>(null);
   const [qrUri, setQrUri] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrSecret, setQrSecret] = useState<string | null>(null);
   const [totpCode, setTotpCode] = useState("");
   const [disableForm, setDisableForm] = useState({ password: "", code: "" });
@@ -90,6 +91,7 @@ export default function AdminNav({
     if (res.ok) {
       const data = await res.json();
       setQrUri(data.uri);
+      setQrDataUrl(data.qrDataUrl ?? null);
       setQrSecret(data.secret);
     } else {
       const d = await res.json();
@@ -338,7 +340,7 @@ export default function AdminNav({
                     <div className="flex justify-center rounded-xl bg-white p-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrUri)}`}
+                        src={qrDataUrl ?? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrUri)}`}
                         alt="2FA QR Code"
                         width={180}
                         height={180}
