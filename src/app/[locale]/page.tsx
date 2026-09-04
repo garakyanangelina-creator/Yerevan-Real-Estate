@@ -5,7 +5,6 @@ import WhyChooseUs from "@/components/home/WhyChooseUs";
 import AboutYerevan from "@/components/home/AboutYerevan";
 import ContactForm from "@/components/contact/ContactForm";
 import PropertyCard from "@/components/property/PropertyCard";
-import EmptyState from "@/components/common/EmptyState";
 import { Link } from "@/i18n/routing";
 import { getFeaturedProperties, getLatestProperties } from "@/services/propertyService";
 
@@ -13,7 +12,7 @@ export default async function HomePage() {
   const t = await getTranslations("home");
   const tCommon = await getTranslations("common");
 
-  const [{ properties: featured, error: featuredError }, { properties: latest, error: latestError }] =
+  const [{ properties: featured }, { properties: latest }] =
     await Promise.all([getFeaturedProperties(6), getLatestProperties(6)]);
 
   return (
@@ -29,14 +28,7 @@ export default async function HomePage() {
             {t("viewAll")}
           </Link>
         </div>
-        {featuredError ? (
-          <div className="mt-6 sm:mt-8">
-            <EmptyState
-              title={tCommon("fetchErrorTitle")}
-              message={featuredError === "config" ? tCommon("fetchErrorConfig") : tCommon("fetchErrorNetwork")}
-            />
-          </div>
-        ) : featured.length === 0 ? (
+        {featured.length === 0 ? (
           <p className="mt-6 text-center text-primary-500 dark:text-white/60 sm:mt-8">{tCommon("noProperties")}</p>
         ) : (
           <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -58,14 +50,7 @@ export default async function HomePage() {
             {t("viewAll")}
           </Link>
         </div>
-        {latestError ? (
-          <div className="mt-6 sm:mt-8">
-            <EmptyState
-              title={tCommon("fetchErrorTitle")}
-              message={latestError === "config" ? tCommon("fetchErrorConfig") : tCommon("fetchErrorNetwork")}
-            />
-          </div>
-        ) : latest.length === 0 ? (
+        {latest.length === 0 ? (
           <p className="mt-6 text-center text-primary-500 dark:text-white/60 sm:mt-8">{tCommon("noProperties")}</p>
         ) : (
           <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
