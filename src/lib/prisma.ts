@@ -31,8 +31,12 @@ async function seedSuperAdmin(): Promise<void> {
         const exists = await prisma.user.findFirst({ where: { role: "super_admin" } });
         if (!exists) {
           const { hashSync } = await import("bcryptjs");
-          const username = process.env.SUPER_ADMIN_USERNAME ?? "superadmin";
-          const password = process.env.SUPER_ADMIN_PASSWORD ?? "SuperAdmin@2025";
+          const username = process.env.SUPER_ADMIN_USERNAME;
+          const password = process.env.SUPER_ADMIN_PASSWORD;
+          if (!username || !password) {
+            console.warn("[seed] SUPER_ADMIN_USERNAME or SUPER_ADMIN_PASSWORD not set — skipping super admin seed.");
+            return;
+          }
           await prisma.user.create({
             data: {
               username,
