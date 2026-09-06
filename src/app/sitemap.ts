@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
 import { getPublicProperties } from "@/services/propertyService";
 
-const BASE_URL = "https://yerevanrealestate.am";
+const BASE_URL = "https://yerevanreal.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPaths = ["", "/search", "/submit", "/contact"];
