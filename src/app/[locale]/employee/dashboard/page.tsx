@@ -46,9 +46,9 @@ const STATUS_BADGE: Record<string, string> = {
 
 const DISTRICT_SHORT: Record<string, string> = {
   kentron: "Kentron", arabkir: "Arabkir", davtashen: "Davtashen",
-  ajapnyak: "Ajapnyak", shengavit: "Shengavit", kanakerZeytun: "Kanaker-Zeytun",
-  norNork: "Nor Nork", malatiaSebastia: "Malatia-Sebastia", avan: "Avan",
-  erebuni: "Erebuni", norkMarash: "Nork-Marash", nubarashen: "Nubarashen", other: "Other",
+  ajapnyak: "Ajapnyak", shengavit: "Shengavit", "kanaker-zeytun": "Kanaker-Zeytun",
+  "nor-nork": "Nor Nork", "malatia-sebastia": "Malatia-Sebastia", avan: "Avan",
+  erebuni: "Erebuni", "nork-marash": "Nork-Marash", nubarashen: "Nubarashen", other: "Other",
 };
 
 interface CardProps {
@@ -177,12 +177,12 @@ const DISTRICTS = [
   { value: "davtashen",        label: "Davtashen / Դավթաշեն" },
   { value: "ajapnyak",         label: "Ajapnyak / Աջափնյակ" },
   { value: "shengavit",        label: "Shengavit / Շենգավիթ" },
-  { value: "kanakerZeytun",    label: "Kanaker-Zeytun / Քանաքեռ-Զեյթուն" },
-  { value: "norNork",          label: "Nor Nork / Նոր Նորք" },
-  { value: "malatiaSebastia",  label: "Malatia-Sebastia / Մալաթիա-Սեբաստիա" },
+  { value: "kanaker-zeytun",   label: "Kanaker-Zeytun / Քանաքեռ-Զեյթուն" },
+  { value: "nor-nork",         label: "Nor Nork / Նոր Նորք" },
+  { value: "malatia-sebastia", label: "Malatia-Sebastia / Մալաթիա-Սեբաստիա" },
   { value: "avan",             label: "Avan / Ավան" },
   { value: "erebuni",          label: "Erebuni / Էրեբունի" },
-  { value: "norkMarash",       label: "Nork-Marash / Նորք-Մարաշ" },
+  { value: "nork-marash",      label: "Nork-Marash / Նորք-Մարաշ" },
   { value: "nubarashen",       label: "Nubarashen / Նուբարաշեն" },
   { value: "other",            label: "Other / Այլ" },
 ];

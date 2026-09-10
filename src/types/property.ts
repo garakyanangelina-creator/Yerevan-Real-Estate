@@ -6,12 +6,12 @@ export type District =
   | "davtashen"
   | "ajapnyak"
   | "shengavit"
-  | "kanakerZeytun"
-  | "norNork"
-  | "malatiaSebastia"
+  | "kanaker-zeytun"
+  | "nor-nork"
+  | "malatia-sebastia"
   | "avan"
   | "erebuni"
-  | "norkMarash"
+  | "nork-marash"
   | "nubarashen"
   | "other";
 

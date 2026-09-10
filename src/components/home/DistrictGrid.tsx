@@ -8,12 +8,12 @@ const districtImages: Record<string, string> = {
   davtashen:       "/district-davtashen.jpg",
   ajapnyak:        "/district-ajapnyak.jpg",
   shengavit:       "/district-shengavit.jpg",
-  kanakerZeytun:   "/district-kanaker-zeytun.jpg",
-  norNork:         "/district-nor-nork.jpg",
-  malatiaSebastia: "/district-malatia-sebastia.jpg",
-  avan:            "/district-avan.jpg",
-  erebuni:         "/district-erebuni.jpg",
-  norkMarash:      "/district-nork-marash.jpg",
+  "kanaker-zeytun":   "/district-kanaker-zeytun.jpg",
+  "nor-nork":         "/district-nor-nork.jpg",
+  "malatia-sebastia": "/district-malatia-sebastia.jpg",
+  avan:               "/district-avan.jpg",
+  erebuni:            "/district-erebuni.jpg",
+  "nork-marash":      "/district-nork-marash.jpg",
   nubarashen:      "/district-nubarashen.jpg",
 };
 
