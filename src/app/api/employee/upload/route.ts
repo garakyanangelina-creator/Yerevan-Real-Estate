@@ -26,6 +26,9 @@ export async function POST(request: Request) {
   const filename = safeFilename("", file.name);
   const arrayBuffer = await file.arrayBuffer();
 
+  // Use the actual MIME type so Supabase stores it correctly
+  const contentType = file.type || "image/jpeg";
+
   const uploadRes = await fetch(
     `${supabaseUrl}/storage/v1/object/listings/${filename}`,
     {
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
       headers: {
         apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
-        "Content-Type": "image/jpeg", // always declare image/jpeg — don't trust browser Content-Type
+        "Content-Type": contentType,
         "x-upsert": "true",
       },
       body: arrayBuffer,

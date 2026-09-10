@@ -45,9 +45,9 @@ interface Props {
 
 const DISTRICT_LABELS: Record<string, string> = {
   kentron: "Kentron", arabkir: "Arabkir", davtashen: "Davtashen",
-  ajapnyak: "Ajapnyak", shengavit: "Shengavit", kanakerZeytun: "Kanaker-Zeytun",
-  norNork: "Nor Nork", malatiaSebastia: "Malatia-Sebastia", avan: "Avan",
-  erebuni: "Erebuni", norkMarash: "Nork-Marash", nubarashen: "Nubarashen", other: "Other",
+  ajapnyak: "Ajapnyak", shengavit: "Shengavit", "kanaker-zeytun": "Kanaker-Zeytun",
+  "nor-nork": "Nor Nork", "malatia-sebastia": "Malatia-Sebastia", avan: "Avan",
+  erebuni: "Erebuni", "nork-marash": "Nork-Marash", nubarashen: "Nubarashen", other: "Other",
 };
 
 const TYPE_LABELS: Record<string, string> = {

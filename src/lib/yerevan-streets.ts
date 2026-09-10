@@ -696,7 +696,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Վարդաշենի 10-րդ փողոց",
   ],
 
-  kanakerZeytun: [
+  "kanaker-zeytun": [
     "Aghasi Street",
     "Aghasi Street 1st lane",
     "Aram Cholakyan street",
@@ -942,7 +942,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Վահագնի թաղամաս",
   ],
 
-  malatiaSebastia: [
+  "malatia-sebastia": [
     "Armin Vegner street",
     "Armin Vegner street 2nd lane",
     "Arno Babajanian street",
@@ -1077,7 +1077,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Րաֆֆու փողոց",
   ],
 
-  norNork: [
+  "nor-nork": [
     "Aksel Bakunts street",
     "Aksel Bakunts street 1st lane",
     "Aksel Bakunts street 2nd lane",
@@ -1150,7 +1150,7 @@ export const streetsByDistrict: Record<string, string[]> = {
     "Սիրող Սրտեր Թաղամաս",
   ],
 
-  norkMarash: [
+  "nork-marash": [
     "Ara Harutyunyan street",
     "Ara Harutyunyan street 1st lane",
     "Ara Harutyunyan street 2nd lane",
