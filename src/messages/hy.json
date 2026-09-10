@@ -150,7 +150,10 @@
     "officeTitle": "Մեր գրասենյակը",
     "address": "Երևան, Հայաստան",
     "callUs": "Զանգահարեք մեզ",
-    "emailUs": "Գրեք մեզ"
+    "emailUs": "Գրեք մեզ",
+    "phoneOffice": "Գրասենյակ / WhatsApp",
+    "phoneSales": "Վաճառքի բաժին / WhatsApp",
+    "phoneDirector": "Գործադիր տնօրեն / WhatsApp"
   },
   "admin": {
     "loginTitle": "Ադմինիստրատորի մուտք",

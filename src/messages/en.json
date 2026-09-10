@@ -150,7 +150,10 @@
     "officeTitle": "Our Office",
     "address": "Yerevan, Armenia",
     "callUs": "Call Us",
-    "emailUs": "Email Us"
+    "emailUs": "Email Us",
+    "phoneOffice": "Office Phone / WhatsApp",
+    "phoneSales": "Sales Department / WhatsApp",
+    "phoneDirector": "Managing Director / WhatsApp"
   },
   "admin": {
     "loginTitle": "Administrator Login",

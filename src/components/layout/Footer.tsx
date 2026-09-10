@@ -3,9 +3,9 @@ import { Instagram, Send, Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "@/i18n/routing";
 
 const PHONES = [
-  { display: "+374 77 757 762", tel: "+37477757762" },
-  { display: "+374 44 222 310", tel: "+37444222310" },
-  { display: "+374 93 524 419", tel: "+37493524419" },
+  { display: "+374 77 757 762", tel: "+37477757762", label: "Office / WhatsApp" },
+  { display: "+374 44 222 310", tel: "+37444222310", label: "Sales / WhatsApp" },
+  { display: "+374 93 524 419", tel: "+37493524419", label: "Director / WhatsApp" },
 ];
 
 export default function Footer() {
@@ -54,7 +54,6 @@ export default function Footer() {
             <li><Link href="/search" className="transition hover:text-white">{nav("search")}</Link></li>
             <li><Link href="/submit" className="transition hover:text-white">{nav("submit")}</Link></li>
             <li><Link href="/contact" className="transition hover:text-white">{nav("contact")}</Link></li>
-            <li><Link href="/admin" className="transition hover:text-white">{nav("admin")}</Link></li>
           </ul>
         </div>
 
@@ -64,10 +63,14 @@ export default function Footer() {
           <ul className="mt-3 space-y-2 text-sm text-white/70 sm:mt-4 sm:space-y-2.5">
             {PHONES.map((p) => (
               <li key={p.tel}>
-                <a href={`tel:${p.tel}`} className="flex items-center gap-2 transition hover:text-gold-400">
-                  <Phone className="h-4 w-4 shrink-0 text-gold-500" />
-                  {p.display}
-                </a>
+                <span className="text-xs text-white/40 block">{p.label}</span>
+                <div className="flex items-center gap-3">
+                  <a href={`tel:${p.tel}`} className="flex items-center gap-2 transition hover:text-gold-400">
+                    <Phone className="h-4 w-4 shrink-0 text-gold-500" />
+                    {p.display}
+                  </a>
+                  <a href={`https://wa.me/${p.tel.replace("+", "")}`} target="_blank" rel="noopener noreferrer" className="text-xs text-green-400 hover:text-green-300 transition">WA</a>
+                </div>
               </li>
             ))}
             <li className="flex items-center gap-2 pt-1">

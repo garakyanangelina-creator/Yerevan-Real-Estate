@@ -150,7 +150,10 @@
     "officeTitle": "Наш офис",
     "address": "Ереван, Армения",
     "callUs": "Позвоните нам",
-    "emailUs": "Напишите нам"
+    "emailUs": "Напишите нам",
+    "phoneOffice": "Офис / WhatsApp",
+    "phoneSales": "Отдел продаж / WhatsApp",
+    "phoneDirector": "Управляющий директор / WhatsApp"
   },
   "admin": {
     "loginTitle": "Вход для администратора",

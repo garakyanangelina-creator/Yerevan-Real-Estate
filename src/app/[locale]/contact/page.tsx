@@ -25,17 +25,26 @@ export default async function ContactPage() {
             </h2>
             <ul className="mt-4 space-y-3 text-sm text-primary-700 dark:text-white/70">
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-gold-500" /> {t("address")}</li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-gold-500" />
-                <a href="tel:+37477757762" className="transition hover:text-gold-600">+374 77 757 762</a>
+              <li>
+                <span className="text-xs text-primary-400 dark:text-white/40">{t("phoneOffice")}</span>
+                <div className="flex items-center gap-3">
+                  <a href="tel:+37477757762" className="flex items-center gap-2 transition hover:text-gold-600"><Phone className="h-4 w-4 shrink-0 text-gold-500" />+374 77 757 762</a>
+                  <a href="https://wa.me/37477757762" target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:text-green-500 transition">WhatsApp</a>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-gold-500" />
-                <a href="tel:+37444222310" className="transition hover:text-gold-600">+374 44 222 310</a>
+              <li>
+                <span className="text-xs text-primary-400 dark:text-white/40">{t("phoneSales")}</span>
+                <div className="flex items-center gap-3">
+                  <a href="tel:+37444222310" className="flex items-center gap-2 transition hover:text-gold-600"><Phone className="h-4 w-4 shrink-0 text-gold-500" />+374 44 222 310</a>
+                  <a href="https://wa.me/37444222310" target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:text-green-500 transition">WhatsApp</a>
+                </div>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-gold-500" />
-                <a href="tel:+37493524419" className="transition hover:text-gold-600">+374 93 524 419</a>
+              <li>
+                <span className="text-xs text-primary-400 dark:text-white/40">{t("phoneDirector")}</span>
+                <div className="flex items-center gap-3">
+                  <a href="tel:+37493524419" className="flex items-center gap-2 transition hover:text-gold-600"><Phone className="h-4 w-4 shrink-0 text-gold-500" />+374 93 524 419</a>
+                  <a href="https://wa.me/37493524419" target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:text-green-500 transition">WhatsApp</a>
+                </div>
               </li>
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0 text-gold-500" /> info@yerevanrealestate.am</li>
             </ul>
