@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
@@ -57,15 +57,9 @@ export default function SubmitForm() {
     setStreetSuggestions(unique.slice(0, 30));
   }, [streetQuery, form.district]);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (streetRef.current && !streetRef.current.contains(e.target as Node)) {
-        setStreetSuggestions([]);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
+  function closeStreetSuggestionsDelayed() {
+    setTimeout(() => setStreetSuggestions([]), 150);
+  }
 
   async function handlePhotoChange(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -185,9 +179,14 @@ export default function SubmitForm() {
           onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
           className={inputCls}
           autoComplete="off"
+          onBlur={closeStreetSuggestionsDelayed}
         />
         {streetSuggestions.length > 0 && (
-          <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-primary-100 bg-white shadow-soft dark:border-white/10 dark:bg-primary-800">
+          <div
+            className="absolute z-20 mt-1 w-full overflow-y-auto rounded-xl border border-primary-100 bg-white shadow-soft dark:border-white/10 dark:bg-primary-800"
+            style={{ maxHeight: "12rem" }}
+            onMouseDown={(e) => e.preventDefault()}
+          >
             {streetSuggestions.map((s) => (
               <button
                 key={s}
