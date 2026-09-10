@@ -261,13 +261,9 @@ export default function EmployeeDashboard() {
     setStreetSuggestions(unique.slice(0, 30));
   }, [streetQuery, form.district]);
 
-  useEffect(() => {
-    function close(e: MouseEvent) {
-      if (streetDropRef.current && !streetDropRef.current.contains(e.target as Node)) setStreetSuggestions([]);
-    }
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, []);
+  function closeStreetSuggestionsDelayed() {
+    setTimeout(() => setStreetSuggestions([]), 150);
+  }
 
   async function fetchListings() {
     const res = await fetch("/api/employee/listings");
@@ -588,9 +584,14 @@ export default function EmployeeDashboard() {
                 value={streetQuery}
                 autoComplete="off"
                 onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
+                onBlur={closeStreetSuggestionsDelayed}
               />
               {streetSuggestions.length > 0 && (
-                <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800">
+                <div
+                  className="absolute z-20 mt-1 w-full overflow-y-auto rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800"
+                  style={{ maxHeight: "12rem" }}
+                  onMouseDown={(e) => e.preventDefault()}
+                >
                   {streetSuggestions.map((s) => (
                     <button key={s} type="button"
                       onClick={() => { setStreetQuery(s); setForm({ ...form, street: s }); setStreetSuggestions([]); }}

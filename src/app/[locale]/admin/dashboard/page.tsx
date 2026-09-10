@@ -141,13 +141,14 @@ function DashboardContent() {
     setStreetSuggestions(unique.slice(0, 30));
   }, [streetQuery, form.district]);
 
-  useEffect(() => {
-    function close(e: MouseEvent) {
-      if (streetRef.current && !streetRef.current.contains(e.target as Node)) setStreetSuggestions([]);
-    }
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, []);
+  // Closing the street suggestions via blur+timeout is the correct cross-platform approach.
+  // A document "mousedown" listener fails on iOS Safari because tapping a non-focusable
+  // element (like a <button> inside the list) causes iOS to fire mousedown on the body
+  // rather than the button, making the dropdown close before the click event fires.
+  // The 150 ms delay lets the click handler run before blur clears the list.
+  function closeStreetSuggestionsDelayed() {
+    setTimeout(() => setStreetSuggestions([]), 150);
+  }
 
   async function togglePublish(l: DbListing) {
     setToggling(l.id);
@@ -385,9 +386,14 @@ function DashboardContent() {
               <div ref={streetRef} className="relative">
                 <label className={labelCls}>Street / Փողոց</label>
                 <input className={inputCls} placeholder="Type street name…" value={streetQuery} autoComplete="off"
-                  onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }} />
+                  onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
+                  onBlur={closeStreetSuggestionsDelayed} />
                 {streetSuggestions.length > 0 && (
-                  <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800">
+                  <div
+                    className="absolute z-20 mt-1 w-full overflow-y-auto rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800"
+                    style={{ maxHeight: "12rem" }}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
                     {streetSuggestions.map((s) => (
                       <button key={s} type="button"
                         onClick={() => { setStreetQuery(s); setForm({ ...form, street: s }); setStreetSuggestions([]); }}
