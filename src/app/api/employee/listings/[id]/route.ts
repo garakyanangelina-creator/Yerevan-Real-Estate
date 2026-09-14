@@ -8,6 +8,9 @@ import {
   ALLOWED_DISTRICTS,
   ALLOWED_CURRENCIES,
   ALLOWED_STATUSES,
+  ALLOWED_RENOVATIONS,
+  ALLOWED_STREET_LINES,
+  ALLOWED_COMMERCIAL_LEVELS,
   sanitizeImageUrls,
 } from "@/lib/listingValidation";
 
@@ -67,6 +70,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (body?.totalFloors !== undefined) data.totalFloors = Math.max(0, Math.min(200, Number(body.totalFloors) || 0));
   if (body?.images !== undefined) data.images = JSON.stringify(sanitizeImageUrls(body.images));
   if (body?.amenities !== undefined) data.amenities = JSON.stringify(body.amenities ?? {});
+  if (body?.landArea !== undefined) data.landArea = Math.max(0, Number(body.landArea) || 0);
+  if (body?.renovation !== undefined)
+    data.renovation = body.renovation && ALLOWED_RENOVATIONS.has(body.renovation) ? body.renovation : null;
+  if (body?.streetLine !== undefined)
+    data.streetLine = body.streetLine && ALLOWED_STREET_LINES.has(body.streetLine) ? body.streetLine : null;
+  if (body?.storefront !== undefined)
+    data.storefront = body.storefront != null ? Boolean(body.storefront) : null;
+  if (body?.commercialLevel !== undefined)
+    data.commercialLevel = body.commercialLevel && ALLOWED_COMMERCIAL_LEVELS.has(body.commercialLevel) ? body.commercialLevel : null;
   if (body?.status && ALLOWED_STATUSES.has(body.status)) data.status = body.status;
 
   // Only admins can publish/feature

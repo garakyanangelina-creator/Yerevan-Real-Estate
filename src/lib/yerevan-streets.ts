@@ -9,6 +9,13 @@ export const streetsByDistrict: Record<string, string[]> = {
     "1915 Battle of Van street",
     "Abovyan street",
     "Adana street",
+    // ── Major avenues missing from OSM export ──────────────────────────────
+    "Mashtots Avenue",
+    "Mesrop Mashtots Avenue",
+    "Komitas Avenue",
+    "Baghramyan Avenue",
+    "Hanrapetutyan street",
+    "Tigranyan street",
     "Admiral Isakov Avenue",
     "Agatangeghos street",
     "Agatangeghos Street",

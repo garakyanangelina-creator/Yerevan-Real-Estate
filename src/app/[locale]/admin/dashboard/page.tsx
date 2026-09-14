@@ -18,6 +18,7 @@ import StaffFilterBar, {
   type StaffFilters,
 } from "@/components/staff/StaffFilterBar";
 import { compressImage } from "@/lib/compressImage";
+import PropertyTypeFields, { emptyTypeFields, type TypeFields } from "@/components/staff/PropertyTypeFields";
 
 interface DbListing {
   id: string;
@@ -62,10 +63,10 @@ function emptyForm() {
     title: "", description: "", type: "apartment", purpose: "sale",
     district: "kentron", street: "", buildingNumber: "",
     price: "", currency: "AMD",
-    bedrooms: "1", bathrooms: "1", area: "", floor: "1", totalFloors: "9",
     ownerName: "", ownerPhone: "",
     featured: false,
     imageUrls: [] as string[],
+    typeFields: emptyTypeFields(),
   };
 }
 
@@ -251,6 +252,7 @@ function DashboardContent() {
     setSaving(true);
     setSaveError("");
     const builtAddress = [form.street, form.buildingNumber].filter(Boolean).join(", ") || null;
+    const tf = form.typeFields;
     const payload = {
       title: form.title,
       description: form.description || null,
@@ -260,14 +262,25 @@ function DashboardContent() {
       address: builtAddress,
       price: Number(form.price) || 0,
       currency: form.currency,
-      bedrooms: Number(form.bedrooms) || 0,
-      bathrooms: Number(form.bathrooms) || 0,
-      area: 0,
-      floor: 0,
-      totalFloors: 0,
+      bedrooms: Number(tf.bedrooms) || 0,
+      bathrooms: Number(tf.bathrooms) || 0,
+      area: Number(tf.area) || 0,
+      floor: Number(tf.floor) || 0,
+      totalFloors: Number(tf.totalFloors) || 0,
+      landArea: Number(tf.landArea) || 0,
+      renovation: tf.renovation || null,
+      streetLine: tf.streetLine || null,
+      storefront: tf.storefront === 'true' ? true : tf.storefront === 'false' ? false : null,
+      commercialLevel: tf.commercialLevel || null,
       images: form.imageUrls,
       featured: form.featured,
       amenities: {
+        rooms: Number(tf.rooms) || 1,
+        ...(tf.buildingType && { buildingType: tf.buildingType }),
+        openBalcony: Number(tf.openBalcony) || 0,
+        closedBalcony: Number(tf.closedBalcony) || 0,
+        ...(tf.ceilingHeight && { ceilingHeight: tf.ceilingHeight }),
+        ...(tf.view && { view: tf.view }),
         ...(form.street && { street: form.street }),
         ...(form.buildingNumber && { buildingNumber: form.buildingNumber }),
         ...(form.ownerName && { ownerName: form.ownerName }),
@@ -470,22 +483,15 @@ function DashboardContent() {
                 </div>
               </div>
 
-              {/* Bedrooms / Bathrooms */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>Bedrooms / Ննջ.</label>
-                  <input type="number" min="0" className={inputCls} value={form.bedrooms}
-                    onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} />
-                </div>
-                <div>
-                  <label className={labelCls}>Bathrooms / Լ/Ս</label>
-                  <input type="number" min="0" className={inputCls} value={form.bathrooms}
-                    onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} />
-                </div>
-              </div>
+              {/* Type-specific fields — changes dynamically with Property Type */}
+              <PropertyTypeFields
+                type={form.type}
+                fields={form.typeFields}
+                onChange={(patch) => setForm((f) => ({ ...f, typeFields: { ...f.typeFields, ...patch } }))}
+              />
 
-              {/* Owner contacts */}
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-700/40 dark:bg-amber-900/20">
+              {/* Owner Contacts */}
+              <div>
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
                   Owner Contacts / Սեփ. կապ (staff only)
                 </p>

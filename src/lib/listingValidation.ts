@@ -1,6 +1,6 @@
 /** Allowed enum values for listing fields — validated server-side on create and update. */
 
-export const ALLOWED_TYPES = new Set(["apartment", "house", "commercial", "land", "villa", "studio", "penthouse"]);
+export const ALLOWED_TYPES = new Set(["apartment", "house", "commercial", "land", "villa", "studio", "penthouse", "office"]);
 export const ALLOWED_PURPOSES = new Set(["sale", "rent"]);
 export const ALLOWED_DISTRICTS = new Set([
   "kentron", "arabkir", "avan", "davtashen", "erebuni",
@@ -8,7 +8,10 @@ export const ALLOWED_DISTRICTS = new Set([
   "shengavit", "kanaker-zeytun", "ajapnyak", "other",
 ]);
 export const ALLOWED_CURRENCIES = new Set(["AMD", "USD", "EUR", "RUB"]);
-export const ALLOWED_STATUSES = new Set(["active", "available", "sold", "rented", "inactive", "pending"]);
+export const ALLOWED_STATUSES = new Set(["active", "available", "sold", "rented", "inactive", "pending", "archived"]);
+export const ALLOWED_RENOVATIONS = new Set(["new", "euro", "good", "cosmetic", "old"]);
+export const ALLOWED_STREET_LINES = new Set(["first", "second"]);
+export const ALLOWED_COMMERCIAL_LEVELS = new Set(["basement", "semi-basement", "ground", "upper"]);
 
 export function sanitizeImageUrls(images: unknown): string[] {
   if (!Array.isArray(images)) return [];

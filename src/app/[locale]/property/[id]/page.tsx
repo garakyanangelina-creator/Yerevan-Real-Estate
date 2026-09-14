@@ -8,7 +8,7 @@ import PropertyCard from "@/components/property/PropertyCard";
 import EmptyState from "@/components/common/EmptyState";
 import { getPublicPropertyById, getSimilarPublicProperties } from "@/services/propertyService";
 import { formatPrice } from "@/lib/utils";
-import { BedDouble, Bath, Ruler, Building2, MapPin } from "lucide-react";
+import { BedDouble, Bath, Ruler, Building2, MapPin, TreePine, Layers, Store, AlignJustify } from "lucide-react";
 
 // Listings are fetched live from Apify per request, so there's no fixed set of
 // ids to pre-render at build time.
@@ -107,18 +107,108 @@ export default async function PropertyPage({
           </div>
 
           <div className="mt-6 flex flex-wrap gap-6 rounded-xl2 bg-primary-50 p-5 text-sm text-primary-700 dark:bg-primary-800/40 dark:text-white/80">
-            <span className="flex items-center gap-2">
-              <BedDouble className="h-4 w-4" /> {property.bedrooms === 0 ? t("studio") : `${property.bedrooms} ${property.bedrooms === 1 ? t("bed") : t("beds")}`}
-            </span>
-            <span className="flex items-center gap-2">
-              <Bath className="h-4 w-4" /> {property.bathrooms} {property.bathrooms === 1 ? t("bath") : t("baths")}
-            </span>
-            <span className="flex items-center gap-2">
-              <Ruler className="h-4 w-4" /> {property.area} m²
-            </span>
-            <span className="flex items-center gap-2">
-              <Building2 className="h-4 w-4" /> {t("floorLabel")} {property.floor}/{property.totalFloors}
-            </span>
+            {/* Apartment / Office: bedrooms, bathrooms, area, floor */}
+            {["apartment", "office", "studio", "penthouse"].includes(property.type) && (
+              <>
+                <span className="flex items-center gap-2">
+                  <BedDouble className="h-4 w-4" /> {property.bedrooms === 0 ? t("studio") : `${property.bedrooms} ${property.bedrooms === 1 ? t("bed") : t("beds")}`}
+                </span>
+                <span className="flex items-center gap-2">
+                  <Bath className="h-4 w-4" /> {property.bathrooms} {property.bathrooms === 1 ? t("bath") : t("baths")}
+                </span>
+                <span className="flex items-center gap-2">
+                  <Ruler className="h-4 w-4" /> {property.area} m²
+                </span>
+                <span className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" /> {t("floorLabel")} {property.floor}/{property.totalFloors}
+                </span>
+              </>
+            )}
+
+            {/* House / Villa: house area + land area + bedrooms + stories */}
+            {["house", "villa"].includes(property.type) && (
+              <>
+                {property.area > 0 && (
+                  <span className="flex items-center gap-2">
+                    <Ruler className="h-4 w-4" /> House {property.area} m²
+                  </span>
+                )}
+                {(property.landArea ?? 0) > 0 && (
+                  <span className="flex items-center gap-2">
+                    <TreePine className="h-4 w-4" /> Land {property.landArea} m²
+                  </span>
+                )}
+                <span className="flex items-center gap-2">
+                  <BedDouble className="h-4 w-4" /> {property.bedrooms} {property.bedrooms === 1 ? t("bed") : t("beds")}
+                </span>
+                <span className="flex items-center gap-2">
+                  <Bath className="h-4 w-4" /> {property.bathrooms} {property.bathrooms === 1 ? t("bath") : t("baths")}
+                </span>
+                {property.totalFloors > 0 && (
+                  <span className="flex items-center gap-2">
+                    <Layers className="h-4 w-4" /> {property.totalFloors} {property.totalFloors === 1 ? "story" : "stories"}
+                  </span>
+                )}
+              </>
+            )}
+
+            {/* Commercial: area, street line, level, storefront */}
+            {property.type === "commercial" && (
+              <>
+                {property.area > 0 && (
+                  <span className="flex items-center gap-2">
+                    <Ruler className="h-4 w-4" /> {property.area} m²
+                  </span>
+                )}
+                {property.streetLine && (
+                  <span className="flex items-center gap-2">
+                    <AlignJustify className="h-4 w-4" /> {property.streetLine === "first" ? "First line" : "Second line"}
+                  </span>
+                )}
+                {property.commercialLevel && (
+                  <span className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4" /> {
+                      property.commercialLevel === "basement" ? "Basement" :
+                      property.commercialLevel === "semi-basement" ? "Semi-basement" :
+                      property.commercialLevel === "ground" ? "Ground floor" : "Upper floor"
+                    }
+                  </span>
+                )}
+                {property.storefront != null && (
+                  <span className="flex items-center gap-2">
+                    <Store className="h-4 w-4" /> {property.storefront ? "Has storefront" : "No storefront"}
+                  </span>
+                )}
+              </>
+            )}
+
+            {/* Land */}
+            {property.type === "land" && (
+              <>
+                {(property.landArea ?? 0) > 0 && (
+                  <span className="flex items-center gap-2">
+                    <TreePine className="h-4 w-4" /> {property.landArea} m²
+                  </span>
+                )}
+                {property.area > 0 && (
+                  <span className="flex items-center gap-2">
+                    <Ruler className="h-4 w-4" /> Building {property.area} m²
+                  </span>
+                )}
+              </>
+            )}
+
+            {/* Renovation — shown for any type that has it */}
+            {property.renovation && (
+              <span className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" /> {
+                  property.renovation === "new" ? "New" :
+                  property.renovation === "euro" ? "Euro renovation" :
+                  property.renovation === "good" ? "Good condition" :
+                  property.renovation === "cosmetic" ? "Cosmetic renovation" : "Needs renovation"
+                }
+              </span>
+            )}
           </div>
 
           <section className="mt-8">

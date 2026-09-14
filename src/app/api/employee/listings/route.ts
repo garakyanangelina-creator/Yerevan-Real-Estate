@@ -8,6 +8,9 @@ import {
   ALLOWED_PURPOSES,
   ALLOWED_DISTRICTS,
   ALLOWED_CURRENCIES,
+  ALLOWED_RENOVATIONS,
+  ALLOWED_STREET_LINES,
+  ALLOWED_COMMERCIAL_LEVELS,
   sanitizeImageUrls,
 } from "@/lib/listingValidation";
 
@@ -83,6 +86,11 @@ export async function POST(request: Request) {
         totalFloors: Math.max(0, Math.min(200, Number(body?.totalFloors) || 0)),
         images: JSON.stringify(sanitizeImageUrls(body?.images)),
         amenities: JSON.stringify(body?.amenities ?? {}),
+        landArea: Math.max(0, Number(body?.landArea) || 0),
+        renovation: body?.renovation && ALLOWED_RENOVATIONS.has(body.renovation) ? body.renovation : null,
+        streetLine: body?.streetLine && ALLOWED_STREET_LINES.has(body.streetLine) ? body.streetLine : null,
+        storefront: body?.storefront != null ? Boolean(body.storefront) : null,
+        commercialLevel: body?.commercialLevel && ALLOWED_COMMERCIAL_LEVELS.has(body.commercialLevel) ? body.commercialLevel : null,
         status: "active",
         isPublished: true,
         featured: isAdmin ? Boolean(body?.featured) : false,

@@ -26,6 +26,10 @@ export interface PropertyAmenities {
   heating: boolean;
 }
 
+export type CommercialLevel = "basement" | "semi-basement" | "ground" | "upper";
+export type StreetLine = "first" | "second";
+export type Renovation = "new" | "euro" | "good" | "cosmetic" | "old";
+
 export interface Property {
   id: string;
   title: string;
@@ -38,9 +42,14 @@ export interface Property {
   currency: string;
   bedrooms: number; // 0 = studio
   bathrooms: number;
-  area: number;
+  area: number;       // Interior/building area m²
   floor: number;
   totalFloors: number;
+  landArea: number;          // House: plot/territory area m² (0 = not applicable)
+  renovation: Renovation | null;
+  streetLine: StreetLine | null;   // Commercial: first/second line
+  storefront: boolean | null;      // Commercial: has display windows
+  commercialLevel: CommercialLevel | null;
   images: string[];
   amenities: PropertyAmenities;
   featured: boolean;

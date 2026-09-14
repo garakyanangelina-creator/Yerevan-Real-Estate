@@ -2,6 +2,7 @@ import "server-only";
 
 import { districtCenters } from "@/lib/mock-data";
 import {
+  type CommercialLevel,
   type District,
   type Property,
   type PropertyAmenities,
@@ -10,6 +11,8 @@ import {
   type PropertyType,
   type PublicProperty,
   type Purpose,
+  type Renovation,
+  type StreetLine,
 } from "@/types/property";
 
 // ── DB row helpers ────────────────────────────────────────────────────────────
@@ -29,6 +32,11 @@ type DbPropertyRow = {
   area: number;
   floor: number;
   totalFloors: number;
+  landArea: number;
+  renovation: string | null;
+  streetLine: string | null;
+  storefront: boolean | null;
+  commercialLevel: string | null;
   images: string;
   amenities: string;
   featured: boolean;
@@ -70,6 +78,11 @@ function mapDbRowToPublic(r: DbPropertyRow): PublicProperty {
     area: r.area,
     floor: r.floor,
     totalFloors: r.totalFloors,
+    landArea: r.landArea ?? 0,
+    renovation: (r.renovation ?? null) as Renovation | null,
+    streetLine: (r.streetLine ?? null) as StreetLine | null,
+    storefront: r.storefront ?? null,
+    commercialLevel: (r.commercialLevel ?? null) as CommercialLevel | null,
     images,
     amenities: parseAmenities(r.amenities),
     featured: r.featured,

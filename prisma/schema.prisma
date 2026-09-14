@@ -116,14 +116,20 @@ model DbProperty {
   area        Float    @default(0)
   floor       Int      @default(0)
   totalFloors Int      @default(0)
-  images      String   @default("[]") // JSON array of URL strings
-  amenities   String   @default("{}") // JSON object
-  listingCode Int?     @unique
-  status      String   @default("available") // available | active | draft | sold | rented | archived
-  isPublished Boolean  @default(false)
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  images          String   @default("[]") // JSON array of URL strings
+  amenities       String   @default("{}") // JSON object
+  // Type-specific structured fields
+  landArea        Float    @default(0)   // House: plot/territory area (separate from interior area)
+  renovation      String?               // "new" | "euro" | "good" | "cosmetic" | "old"
+  streetLine      String?               // Commercial: "first" | "second"
+  storefront      Boolean?              // Commercial: has display windows
+  commercialLevel String?               // Commercial: "basement" | "semi-basement" | "ground" | "upper"
+  listingCode     Int?     @unique
+  status          String   @default("available") // available | active | draft | sold | rented | archived
+  isPublished     Boolean  @default(false)
+  featured        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id])

@@ -18,6 +18,7 @@ import StaffFilterBar, {
   type StaffFilters,
 } from "@/components/staff/StaffFilterBar";
 import { compressImage } from "@/lib/compressImage";
+import PropertyTypeFields, { emptyTypeFields, type TypeFields } from "@/components/staff/PropertyTypeFields";
 
 interface Listing {
   id: string;
@@ -34,6 +35,11 @@ interface Listing {
   area: number;
   floor: number;
   totalFloors: number;
+  landArea?: number;
+  renovation?: string | null;
+  streetLine?: string | null;
+  storefront?: boolean | null;
+  commercialLevel?: string | null;
   images: string;
   amenities: string;
   status: string;
@@ -211,18 +217,12 @@ function emptyForm() {
     title: "", description: "", type: "apartment", purpose: "sale",
     district: "kentron", street: "", buildingNumber: "", address: "",
     price: "", currency: "AMD",
-    bedrooms: "1", bathrooms: "1", area: "", floor: "1", totalFloors: "9",
-    rooms: "1",
-    buildingType: "",
-    openBalcony: "0",
-    closedBalcony: "0",
-    ceilingHeight: "",
-    view: "",
     ownerName: "",
     ownerPhone: "",
     imageUrls: [] as string[],
     amenities: {} as AmenityMap,
     status: "available",
+    typeFields: emptyTypeFields(),
   };
 }
 
@@ -318,6 +318,25 @@ export default function EmployeeDashboard() {
     const existingStreet = String(amenities.street ?? "");
     const existingBuilding = String(amenities.buildingNumber ?? "");
     setStreetQuery(existingStreet);
+    const tf: TypeFields = {
+      ...emptyTypeFields(),
+      area: String(l.area ?? ""),
+      bedrooms: String(l.bedrooms ?? "0"),
+      bathrooms: String(l.bathrooms ?? "0"),
+      floor: String(l.floor ?? "0"),
+      totalFloors: String(l.totalFloors ?? "0"),
+      rooms: String(amenities.rooms ?? "1"),
+      buildingType: String(amenities.buildingType ?? ""),
+      openBalcony: String(amenities.openBalcony ?? "0"),
+      closedBalcony: String(amenities.closedBalcony ?? "0"),
+      ceilingHeight: String(amenities.ceilingHeight ?? ""),
+      view: String(amenities.view ?? ""),
+      renovation: l.renovation ?? "",
+      landArea: String(l.landArea ?? ""),
+      streetLine: l.streetLine ?? "",
+      storefront: l.storefront != null ? String(l.storefront) : "",
+      commercialLevel: l.commercialLevel ?? "",
+    };
     setForm({
       title: l.title,
       description: l.description ?? "",
@@ -329,17 +348,6 @@ export default function EmployeeDashboard() {
       address: l.address ?? "",
       price: String(l.price),
       currency: l.currency,
-      bedrooms: String(l.bedrooms),
-      bathrooms: String(l.bathrooms),
-      area: String(l.area),
-      floor: String(l.floor),
-      totalFloors: String(l.totalFloors),
-      rooms: String(amenities.rooms ?? "1"),
-      buildingType: String(amenities.buildingType ?? ""),
-      openBalcony: String(amenities.openBalcony ?? "0"),
-      closedBalcony: String(amenities.closedBalcony ?? "0"),
-      ceilingHeight: String(amenities.ceilingHeight ?? ""),
-      view: String(amenities.view ?? ""),
       ownerName: String(amenities.ownerName ?? ""),
       ownerPhone: String(amenities.ownerPhone ?? ""),
       imageUrls: images,
@@ -349,6 +357,7 @@ export default function EmployeeDashboard() {
         )
       ) as AmenityMap,
       status: l.status,
+      typeFields: tf,
     });
     setEditId(l.id);
     setMode("edit");
@@ -390,6 +399,7 @@ export default function EmployeeDashboard() {
     e.preventDefault();
     setSaving(true);
     setSubmitError("");
+    const tf = form.typeFields;
     const builtAddress = [form.street, form.buildingNumber].filter(Boolean).join(", ") || form.address || null;
     const payload = {
       title: form.title,
@@ -400,22 +410,27 @@ export default function EmployeeDashboard() {
       address: builtAddress,
       price: Number(form.price) || 0,
       currency: form.currency,
-      bedrooms: Number(form.bedrooms) || 0,
-      bathrooms: Number(form.bathrooms) || 0,
-      area: Number(form.area) || 0,
-      floor: Number(form.floor) || 0,
-      totalFloors: Number(form.totalFloors) || 0,
+      bedrooms: Number(tf.bedrooms) || 0,
+      bathrooms: Number(tf.bathrooms) || 0,
+      area: Number(tf.area) || 0,
+      floor: Number(tf.floor) || 0,
+      totalFloors: Number(tf.totalFloors) || 0,
+      landArea: Number(tf.landArea) || 0,
+      renovation: tf.renovation || null,
+      streetLine: tf.streetLine || null,
+      storefront: tf.storefront === "true" ? true : tf.storefront === "false" ? false : null,
+      commercialLevel: tf.commercialLevel || null,
       images: form.imageUrls,
       amenities: {
         ...form.amenities,
-        rooms: Number(form.rooms) || 1,
+        rooms: Number(tf.rooms) || 1,
         ...(form.street && { street: form.street }),
         ...(form.buildingNumber && { buildingNumber: form.buildingNumber }),
-        ...(form.buildingType && { buildingType: form.buildingType }),
-        openBalcony: Number(form.openBalcony) || 0,
-        closedBalcony: Number(form.closedBalcony) || 0,
-        ...(form.ceilingHeight && { ceilingHeight: form.ceilingHeight }),
-        ...(form.view && { view: form.view }),
+        ...(tf.buildingType && { buildingType: tf.buildingType }),
+        openBalcony: Number(tf.openBalcony) || 0,
+        closedBalcony: Number(tf.closedBalcony) || 0,
+        ...(tf.ceilingHeight && { ceilingHeight: tf.ceilingHeight }),
+        ...(tf.view && { view: tf.view }),
         ...(form.ownerName && { ownerName: form.ownerName }),
         ...(form.ownerPhone && { ownerPhone: form.ownerPhone }),
       },
@@ -711,122 +726,25 @@ export default function EmployeeDashboard() {
           {/* Right column */}
           <div className="space-y-4">
 
-            {/* Bedrooms / Bathrooms / Area */}
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className={labelCls}>Bedrooms / Ննջ.</label>
-                <input type="number" min="0" className={inputCls} value={form.bedrooms}
-                  onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} />
-              </div>
-              <div>
-                <label className={labelCls}>Bathrooms / Լ/Ս</label>
-                <input type="number" min="0" className={inputCls} value={form.bathrooms}
-                  onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} />
-              </div>
-              <div>
-                <label className={labelCls}>Area m² / Մ²</label>
-                <input type="number" min="0" className={inputCls} value={form.area}
-                  onChange={(e) => setForm({ ...form, area: e.target.value })} />
-              </div>
-            </div>
-
-            {/* Floor / Total Floors */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Floor / Հարկ</label>
-                <input type="number" min="0" className={inputCls} value={form.floor}
-                  onChange={(e) => setForm({ ...form, floor: e.target.value })} />
-              </div>
-              <div>
-                <label className={labelCls}>Total Floors / Ընդ. հարկ</label>
-                <input type="number" min="0" className={inputCls} value={form.totalFloors}
-                  onChange={(e) => setForm({ ...form, totalFloors: e.target.value })} />
-              </div>
-            </div>
-
-            {/* Rooms / Building Type */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Rooms / Սենյակ</label>
-                <select className={inputCls} value={form.rooms}
-                  onChange={(e) => setForm({ ...form, rooms: e.target.value })}>
-                  {["1","2","3","4","5","6","6+"].map(v => (
-                    <option key={v} value={v}>{v} {v === "1" ? "room / սենյակ" : "rooms / սենյակ"}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>Building Type / Կառ. Տ.</label>
-                <select className={inputCls} value={form.buildingType}
-                  onChange={(e) => setForm({ ...form, buildingType: e.target.value })}>
-                  <option value="">— Select / Ընտրել —</option>
-                  <option value="panel">Panel / Պանել</option>
-                  <option value="newBuilding">New Building / Նոր կառ.</option>
-                  <option value="stone">Stone / Քար</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Balconies */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Open Balcony / Բաց պատ.</label>
-                <select className={inputCls} value={form.openBalcony}
-                  onChange={(e) => setForm({ ...form, openBalcony: e.target.value })}>
-                  <option value="0">None / Չկա</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>Closed Balcony / Փակ պատ.</label>
-                <select className={inputCls} value={form.closedBalcony}
-                  onChange={(e) => setForm({ ...form, closedBalcony: e.target.value })}>
-                  <option value="0">None / Չկա</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Ceiling Height / View */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Ceiling Height / Առ. բ.</label>
-                <select className={inputCls} value={form.ceilingHeight}
-                  onChange={(e) => setForm({ ...form, ceilingHeight: e.target.value })}>
-                  <option value="">— Select / Ընտրել —</option>
-                  <option value="2.6">2.6 m</option>
-                  <option value="2.8">2.8 m</option>
-                  <option value="3.0">3.0 m</option>
-                  <option value="3.2">3.2 m</option>
-                  <option value="3.2+">3.2+ m</option>
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>View / Տեսարան</label>
-                <select className={inputCls} value={form.view}
-                  onChange={(e) => setForm({ ...form, view: e.target.value })}>
-                  <option value="">— Select / Ընտրել —</option>
-                  <option value="ararat">Ararat / Արարատ</option>
-                  <option value="city">City / Քաղաք</option>
-                  <option value="garden">Garden / Այգի</option>
-                  <option value="street">Street / Փողոց</option>
-                </select>
-              </div>
-            </div>
+            {/* Type-specific fields */}
+            <PropertyTypeFields
+              type={form.type}
+              fields={form.typeFields}
+              onChange={(patch) => setForm((f) => ({ ...f, typeFields: { ...f.typeFields, ...patch } }))}
+            />
 
             {/* Status */}
             <div>
-              <label className={labelCls}>Status / Կարգ.</label>
+              <label className={labelCls}>Status</label>
               <select className={inputCls} value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                <option value="available">Available / Հասanimus</option>
-                <option value="sold">Sold / Վաճառված</option>
-                <option value="rented">Rented / Վարձ</option>
+                <option value="available">Available</option>
+                <option value="active">Active</option>
+                <option value="sold">Sold</option>
+                <option value="rented">Rented</option>
+                <option value="archived">Archived</option>
               </select>
             </div>
-
             {/* Photo upload */}
             <div>
               <label className={labelCls}>Photos / Լուսանկարներ</label>
