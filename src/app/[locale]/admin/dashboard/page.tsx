@@ -3,9 +3,11 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
+import Image from "next/image";
 import {
   Users, LayoutDashboard, Building2,
   UserCheck, UserCog, Eye, EyeOff, Plus, X, Upload, ExternalLink, RefreshCw,
+  MapPin, BedDouble, Bath, Ruler, Layers, TreePine,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/utils";
@@ -31,6 +33,15 @@ interface DbListing {
   status: string;
   isPublished: boolean;
   createdAt: string;
+  images: string;
+  amenities: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  floor: number;
+  totalFloors: number;
+  landArea: number | null;
+  listingCode: number | null;
   createdBy: { username: string };
 }
 
@@ -102,6 +113,161 @@ const STATUS_COLORS: Record<string, string> = {
   rented:    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
   archived:  "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
+
+interface AdminCardProps {
+  listing: DbListing;
+  locale: string;
+  toggling: boolean;
+  updatingStatus: boolean;
+  onPublishToggle: () => void;
+  onStatusChange: (status: string) => void;
+  onViewMatches: () => void;
+}
+
+function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPublishToggle, onStatusChange, onViewMatches }: AdminCardProps) {
+  const tTypes = useTranslations("propertyTypes");
+  const tDistricts = useTranslations("districts");
+
+  const imgs: string[] = (() => { try { return JSON.parse(l.images); } catch { return []; } })();
+  const thumb = imgs[0] ?? null;
+  const displayCode = l.listingCode ? String(l.listingCode).padStart(4, "0") : null;
+
+  const hasFloor = ["apartment", "office", "studio", "penthouse"].includes(l.type);
+  const isHouse  = ["house", "villa"].includes(l.type);
+  const isLand   = l.type === "land";
+
+  return (
+    <div className="card group flex flex-col overflow-hidden">
+      {/* Photo */}
+      <div className="relative h-48 w-full shrink-0 overflow-hidden bg-primary-50 dark:bg-primary-800/30">
+        {thumb ? (
+          <Image
+            src={thumb}
+            alt={l.title}
+            fill
+            unoptimized
+            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <Building2 className="h-10 w-10 text-primary-200 dark:text-primary-600" />
+          </div>
+        )}
+
+        {/* Top-left: status + draft badge */}
+        <div className="absolute left-3 top-3 flex flex-col gap-1">
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}>
+            {l.status}
+          </span>
+          {!l.isPublished && (
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+              Draft
+            </span>
+          )}
+        </div>
+
+        {/* Top-right: listing code */}
+        {displayCode && (
+          <span className="absolute right-3 top-3 rounded bg-black/60 px-2 py-0.5 font-mono text-xs text-white">
+            #{displayCode}
+          </span>
+        )}
+
+        {/* Bottom: type + purpose */}
+        <span className="absolute bottom-3 left-3 rounded-full bg-primary-900/75 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
+          {tTypes(l.type)} · {l.purpose === "rent" ? "Rent" : "Sale"}
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="flex flex-1 flex-col p-4">
+        <p className="text-lg font-bold text-gold-600">
+          {formatPrice(l.price, l.purpose as "sale" | "rent", l.currency)}
+        </p>
+        <h3 className="mt-0.5 line-clamp-1 font-serif text-sm font-semibold text-primary-900 dark:text-white">
+          {l.title}
+        </h3>
+        <p className="mt-0.5 flex items-center gap-1 text-xs text-primary-500 dark:text-white/50">
+          <MapPin className="h-3 w-3" /> {tDistricts(l.district)}
+        </p>
+
+        {/* Specs row */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-primary-600 dark:text-white/60">
+          {l.area > 0 && (
+            <span className="flex items-center gap-1">
+              <Ruler className="h-3.5 w-3.5 text-gold-500" /> {l.area} m²
+            </span>
+          )}
+          {!isLand && l.bedrooms > 0 && (
+            <span className="flex items-center gap-1">
+              <BedDouble className="h-3.5 w-3.5 text-gold-500" /> {l.bedrooms}
+            </span>
+          )}
+          {!isLand && l.bathrooms > 0 && (
+            <span className="flex items-center gap-1">
+              <Bath className="h-3.5 w-3.5 text-gold-500" /> {l.bathrooms}
+            </span>
+          )}
+          {hasFloor && l.floor > 0 && (
+            <span className="flex items-center gap-1">
+              <Layers className="h-3.5 w-3.5 text-gold-500" /> {l.floor}/{l.totalFloors}
+            </span>
+          )}
+          {isHouse && (l.landArea ?? 0) > 0 && (
+            <span className="flex items-center gap-1">
+              <TreePine className="h-3.5 w-3.5 text-gold-500" /> {l.landArea} m²
+            </span>
+          )}
+          <span className="ml-auto text-primary-400 dark:text-white/30">
+            {l.createdBy.username}
+          </span>
+        </div>
+
+        {/* Status select */}
+        <select
+          value={l.status}
+          disabled={updatingStatus}
+          onChange={(e) => onStatusChange(e.target.value)}
+          className={`mt-3 w-full cursor-pointer rounded-lg border-0 px-3 py-1.5 text-xs font-semibold focus:outline-none disabled:opacity-50 ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}
+        >
+          {STATUS_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+
+        {/* Actions */}
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <a
+            href={`/${locale}/admin/listing/${l.id}`}
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-primary-900 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-800 dark:bg-white/10 dark:hover:bg-white/20"
+          >
+            <ExternalLink className="h-3.5 w-3.5" /> View / Edit
+          </a>
+          <button
+            onClick={onPublishToggle}
+            disabled={toggling}
+            className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition disabled:opacity-50 ${
+              l.isPublished
+                ? "bg-green-100 text-green-700 hover:bg-red-50 hover:text-red-600 dark:bg-green-900/30 dark:text-green-400"
+                : "bg-amber-100 text-amber-700 hover:bg-green-100 hover:text-green-600 dark:bg-amber-900/20 dark:text-amber-400"
+            }`}
+          >
+            {l.isPublished
+              ? <><Eye className="h-3.5 w-3.5" /> Published</>
+              : <><EyeOff className="h-3.5 w-3.5" /> Draft</>}
+          </button>
+          <button
+            onClick={onViewMatches}
+            className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl border border-gold-300 px-3 py-1.5 text-xs font-medium text-gold-700 transition hover:bg-gold-50 dark:border-gold-600/40 dark:text-gold-400 dark:hover:bg-gold-900/10"
+          >
+            <Users className="h-3.5 w-3.5" /> Matching Clients
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DashboardContent() {
   const router = useRouter();
@@ -552,7 +718,7 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Listings table */}
+      {/* Listings */}
       {dbListings.length > 0 && (
         <section className="mt-10">
           <div className="flex items-center justify-between">
@@ -561,8 +727,8 @@ function DashboardContent() {
             </h2>
             <span className="text-sm text-primary-400 dark:text-white/40">
               {(() => {
-                const filtered = dbListings.filter(l => {
-                  const f = staffFilters;
+                const f = staffFilters;
+                const n = dbListings.filter(l => {
                   if (f.district && l.district !== f.district) return false;
                   if (f.type && l.type !== f.type) return false;
                   if (f.purpose && l.purpose !== f.purpose) return false;
@@ -570,88 +736,56 @@ function DashboardContent() {
                   if (f.priceMax && l.price > Number(f.priceMax)) return false;
                   if (f.status && l.status !== f.status) return false;
                   return true;
-                });
-                return `${filtered.length} of ${dbListings.length}`;
+                }).length;
+                return `${n} of ${dbListings.length}`;
               })()}
             </span>
           </div>
+
           <StaffFilterBar
             filters={staffFilters}
             onChange={setStaffFilters}
             onReset={() => setStaffFilters(emptyStaffFilters)}
             showStatus
           />
-          <div className="card mt-4 overflow-x-auto p-0">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-primary-100 dark:border-white/10">
-                <tr className="text-primary-500 dark:text-white/60">
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Price</th>
-                  <th className="px-4 py-3">District</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">By</th>
-                  <th className="px-4 py-3">Publish</th>
-                  <th className="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {dbListings.filter(l => {
-                  const f = staffFilters;
-                  if (f.district && l.district !== f.district) return false;
-                  if (f.type && l.type !== f.type) return false;
-                  if (f.purpose && l.purpose !== f.purpose) return false;
-                  if (f.priceMin && l.price < Number(f.priceMin)) return false;
-                  if (f.priceMax && l.price > Number(f.priceMax)) return false;
-                  if (f.status && l.status !== f.status) return false;
-                  return true;
-                }).map((l) => (
-                  <tr key={l.id} className="border-b border-primary-50 dark:border-white/5">
-                    <td className="px-4 py-3 font-medium text-primary-800 dark:text-white">{l.title}</td>
-                    <td className="px-4 py-3">
-                      {formatPrice(l.price, l.purpose as "sale" | "rent", l.currency)}
-                    </td>
-                    <td className="px-4 py-3 capitalize">{l.district}</td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={l.status}
-                        disabled={updatingStatus === l.id}
-                        onChange={(e) => changeStatus(l, e.target.value)}
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium border-0 cursor-pointer focus:outline-none disabled:opacity-50 ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}
-                      >
-                        {STATUS_OPTIONS.map((o) => (
-                          <option key={o.value} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-4 py-3 text-primary-500 dark:text-white/60">{l.createdBy.username}</td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => togglePublish(l)}
-                        disabled={toggling === l.id}
-                        title={l.isPublished ? "Unpublish" : "Publish to website"}
-                        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition disabled:opacity-50 ${
-                          l.isPublished
-                            ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-primary-100 text-primary-500 hover:bg-gold-100 hover:text-gold-700 dark:bg-white/10 dark:text-white/50"
-                        }`}
-                      >
-                        {l.isPublished ? <><Eye className="h-3 w-3" /> Published</> : <><EyeOff className="h-3 w-3" /> Draft</>}
-                      </button>
-                    </td>
-                    <td className="px-4 py-3">
-                      <a
-                        href={`/${locale}/admin/listing/${l.id}`}
-                        title="View full listing"
-                        className="flex items-center gap-1 rounded-lg border border-primary-200 px-2.5 py-1 text-xs font-medium text-primary-600 hover:border-gold-400 hover:text-gold-600 dark:border-white/15 dark:text-white/60 dark:hover:border-gold-400 dark:hover:text-gold-400"
-                      >
-                        <ExternalLink className="h-3 w-3" /> View
-                      </a>
-                    </td>
-                  </tr>
+
+          {(() => {
+            const f = staffFilters;
+            const filtered = dbListings.filter(l => {
+              if (f.district && l.district !== f.district) return false;
+              if (f.type && l.type !== f.type) return false;
+              if (f.purpose && l.purpose !== f.purpose) return false;
+              if (f.priceMin && l.price < Number(f.priceMin)) return false;
+              if (f.priceMax && l.price > Number(f.priceMax)) return false;
+              if (f.status && l.status !== f.status) return false;
+              return true;
+            });
+
+            if (filtered.length === 0) {
+              return (
+                <p className="mt-10 text-center text-sm text-primary-500 dark:text-white/50">
+                  No listings match your filters.
+                </p>
+              );
+            }
+
+            return (
+              <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filtered.map((l) => (
+                  <AdminListingCard
+                    key={l.id}
+                    listing={l}
+                    locale={locale}
+                    toggling={toggling === l.id}
+                    updatingStatus={updatingStatus === l.id}
+                    onPublishToggle={() => togglePublish(l)}
+                    onStatusChange={(s) => changeStatus(l, s)}
+                    onViewMatches={() => setMatchesFor(l.id)}
+                  />
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            );
+          })()}
         </section>
       )}
 
