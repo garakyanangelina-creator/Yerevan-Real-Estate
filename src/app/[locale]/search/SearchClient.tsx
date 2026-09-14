@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import FilterPanel, { emptyFilters, type Filters } from "@/components/search/FilterPanel";
 import PropertyCard from "@/components/property/PropertyCard";
 import EmptyState from "@/components/common/EmptyState";
+import { matchesFilters, filtersFromParams, filtersToParams } from "@/lib/filterListings";
 import type { PropertyFetchErrorCode, PublicProperty } from "@/types/property";
 
 type SortKey = "newest" | "priceLow" | "priceHigh" | "popular";
@@ -20,39 +22,30 @@ export default function SearchClient({
   const t = useTranslations("search");
   const tCommon = useTranslations("common");
   const params = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
+  // Initialise ALL filter fields from URL — this is the fix for priceMin/priceMax
+  // being sent by QuickSearchBar but previously ignored by SearchClient.
   const [filters, setFilters] = useState<Filters>({
     ...emptyFilters,
-    q: params.get("q") ?? "",
-    type: (params.get("type") as Filters["type"]) ?? "",
-    purpose: (params.get("purpose") as Filters["purpose"]) ?? "",
-    district: (params.get("district") as Filters["district"]) ?? "",
+    ...filtersFromParams(params),
   });
   const [sort, setSort] = useState<SortKey>("newest");
 
+  // Sync filter state back to URL so the address bar is always bookmarkable/shareable
+  // and QuickSearchBar → FilterPanel round-trip is seamless.
+  const applyFilters = useCallback(
+    (next: Filters) => {
+      setFilters(next);
+      const qs = filtersToParams(next).toString();
+      router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+    },
+    [router, pathname]
+  );
+
   const results = useMemo(() => {
-    let list = initialProperties.filter((p) => {
-      if (filters.q && !`${p.title} ${p.description} ${p.district}`.toLowerCase().includes(filters.q.toLowerCase())) return false;
-      if (filters.type && p.type !== filters.type) return false;
-      if (filters.purpose && p.purpose !== filters.purpose) return false;
-      if (filters.district && p.district !== filters.district) return false;
-      if (filters.priceMin && p.price < Number(filters.priceMin)) return false;
-      if (filters.priceMax && p.price > Number(filters.priceMax)) return false;
-      if (filters.bedrooms) {
-        const min = Number(filters.bedrooms);
-        if (min >= 4 ? p.bedrooms < 4 : p.bedrooms !== min) return false;
-      }
-      if (filters.bathrooms) {
-        const min = Number(filters.bathrooms);
-        if (min >= 3 ? p.bathrooms < 3 : p.bathrooms !== min) return false;
-      }
-      if (filters.areaMin && p.area < Number(filters.areaMin)) return false;
-      if (filters.floor && p.floor !== Number(filters.floor)) return false;
-      for (const [key, value] of Object.entries(filters.amenities)) {
-        if (value && !p.amenities[key as keyof typeof p.amenities]) return false;
-      }
-      return true;
-    });
+    let list = initialProperties.filter((p) => matchesFilters(p, filters));
 
     switch (sort) {
       case "priceLow":
@@ -80,7 +73,11 @@ export default function SearchClient({
       </h1>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[320px_1fr]">
-        <FilterPanel filters={filters} onChange={setFilters} onReset={() => setFilters(emptyFilters)} />
+        <FilterPanel
+          filters={filters}
+          onChange={applyFilters}
+          onReset={() => applyFilters(emptyFilters)}
+        />
 
         <div>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -103,11 +100,17 @@ export default function SearchClient({
             <div className="mt-10">
               <EmptyState
                 title={tCommon("fetchErrorTitle")}
-                message={initialError === "config" ? tCommon("fetchErrorConfig") : tCommon("fetchErrorNetwork")}
+                message={
+                  initialError === "config"
+                    ? tCommon("fetchErrorConfig")
+                    : tCommon("fetchErrorNetwork")
+                }
               />
             </div>
           ) : results.length === 0 ? (
-            <p className="mt-10 text-center text-primary-500 dark:text-white/60">{t("noResults")}</p>
+            <p className="mt-10 text-center text-primary-500 dark:text-white/60">
+              {t("noResults")}
+            </p>
           ) : (
             <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {results.map((p) => (

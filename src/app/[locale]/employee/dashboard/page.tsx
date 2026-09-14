@@ -6,11 +6,17 @@ import { useRouter } from "@/i18n/routing";
 import {
   Plus, Pencil, Trash2, LogOut,
   Building2, CheckCircle2, XCircle, Upload, X,
-  BedDouble, Bath, Ruler, Phone, Link2, Check, Eye,
+  BedDouble, Bath, Ruler, Phone, Link2, Check, Eye, RefreshCw,
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
+import { transliterateQuery } from "@/lib/transliterate";
+import StaffFilterBar, {
+  emptyStaffFilters,
+  applyStaffFilters,
+  type StaffFilters,
+} from "@/components/staff/StaffFilterBar";
 import { compressImage } from "@/lib/compressImage";
 
 interface Listing {
@@ -239,6 +245,8 @@ export default function EmployeeDashboard() {
   const [accTab, setAccTab] = useState<"password" | "username">("password");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [staffFilters, setStaffFilters] = useState<StaffFilters>(emptyStaffFilters);
   const fileRef = useRef<HTMLInputElement>(null);
   const [streetQuery, setStreetQuery] = useState("");
   const [streetSuggestions, setStreetSuggestions] = useState<string[]>([]);
@@ -247,7 +255,7 @@ export default function EmployeeDashboard() {
   useEffect(() => {
     if (!streetQuery) { setStreetSuggestions([]); return; }
     const streets = streetsByDistrict[form.district] ?? [];
-    const q = streetQuery.toLowerCase();
+    const q = transliterateQuery(streetQuery);
     const filtered = q.length <= 2
       ? streets.filter((s) => s.toLowerCase().startsWith(q))
       : streets.filter((s) => s.toLowerCase().includes(q));
@@ -263,6 +271,24 @@ export default function EmployeeDashboard() {
 
   function closeStreetSuggestionsDelayed() {
     setTimeout(() => setStreetSuggestions([]), 150);
+  }
+
+  function retryStreet() {
+    const q = streetQuery.trim();
+    if (!q) return;
+    // Re-trigger the useEffect by briefly blanking then restoring the query
+    setStreetQuery("");
+    setTimeout(() => setStreetQuery(q), 50);
+  }
+
+  function resetForm() {
+    if (!confirm("Reset the form? Your entered data will be cleared.")) return;
+    setForm(emptyForm());
+    setStreetQuery("");
+    setStreetSuggestions([]);
+    setSubmitError("");
+    setUploadError("");
+    setEditId(null);
   }
 
   async function fetchListings() {
@@ -363,6 +389,7 @@ export default function EmployeeDashboard() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setSubmitError("");
     const builtAddress = [form.street, form.buildingNumber].filter(Boolean).join(", ") || form.address || null;
     const payload = {
       title: form.title,
@@ -397,15 +424,23 @@ export default function EmployeeDashboard() {
 
     const url = editId ? `/api/employee/listings/${editId}` : "/api/employee/listings";
     const method = editId ? "PATCH" : "POST";
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    setSaving(false);
-    if (res.ok) {
-      setMode("list");
-      await fetchListings();
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setMode("list");
+        await fetchListings();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setSubmitError(d.error ?? `Server error (${res.status}). Tap "Try Again" to retry.`);
+      }
+    } catch {
+      setSubmitError("Network error — check your connection and tap \"Try Again\".");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -577,15 +612,27 @@ export default function EmployeeDashboard() {
 
             {/* Street autocomplete */}
             <div ref={streetDropRef} className="relative">
-              <label className={labelCls}>Street / Փoclocc</label>
-              <input
-                className={inputCls}
-                placeholder="Type street name... e.g. Komitas Ave"
-                value={streetQuery}
-                autoComplete="off"
-                onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
-                onBlur={closeStreetSuggestionsDelayed}
-              />
+              <label className={labelCls}>Street / Փողոց</label>
+              <div className="relative">
+                <input
+                  className={inputCls}
+                  placeholder="Type street name... e.g. Komitas Ave"
+                  value={streetQuery}
+                  autoComplete="off"
+                  onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
+                  onBlur={closeStreetSuggestionsDelayed}
+                />
+                {streetQuery && (
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setStreetQuery(""); setForm({ ...form, street: "" }); setStreetSuggestions([]); }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-primary-400 hover:text-primary-700 dark:text-white/40 dark:hover:text-white"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
               {streetSuggestions.length > 0 && (
                 <div
                   className="absolute z-20 mt-1 w-full overflow-y-auto rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800"
@@ -599,6 +646,15 @@ export default function EmployeeDashboard() {
                       {s}
                     </button>
                   ))}
+                </div>
+              )}
+              {streetQuery.length >= 2 && streetSuggestions.length === 0 && (
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
+                  <button type="button" onClick={retryStreet}
+                    className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
+                    <RefreshCw className="h-3 w-3" /> Retry
+                  </button>
                 </div>
               )}
             </div>
@@ -829,13 +885,35 @@ export default function EmployeeDashboard() {
           </div>
 
           {/* Submit */}
-          <div className="lg:col-span-2 flex justify-end gap-3 border-t border-primary-100 pt-6 dark:border-white/10">
-            <button type="button" onClick={() => setMode("list")} className="btn-outline">
-              Cancel / Չեղ.
-            </button>
-            <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
-              {saving ? "Saving…" : mode === "create" ? "Create Listing / Ստ. հայt" : "Save Changes / Պah. փ."}
-            </button>
+          <div className="lg:col-span-2 space-y-3 border-t border-primary-100 pt-6 dark:border-white/10">
+            {submitError && (
+              <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800/40 dark:bg-red-900/20">
+                <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                <div className="flex-1">
+                  <p className="text-sm text-red-700 dark:text-red-400">{submitError}</p>
+                  <button
+                    type="submit"
+                    className="mt-2 rounded-lg bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                  >
+                    Try Again / Կրկին փորձել
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="flex flex-wrap justify-between gap-3">
+              <button type="button" onClick={resetForm}
+                className="flex items-center gap-1.5 rounded-xl border border-primary-200 px-3 py-2 text-xs text-primary-500 hover:border-red-300 hover:text-red-500 dark:border-white/15 dark:text-white/40">
+                <RefreshCw className="h-3.5 w-3.5" /> Reset form
+              </button>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setMode("list")} className="btn-outline">
+                  Cancel / Չեղ.
+                </button>
+                <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
+                  {saving ? "Saving…" : mode === "create" ? "Create Listing / Ստ. հայt" : "Save Changes / Պah. փ."}
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
@@ -857,6 +935,9 @@ export default function EmployeeDashboard() {
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={startCreate} className="btn-primary gap-2 text-sm">
             <Plus className="h-4 w-4" /> Add Listing
+          </button>
+          <button onClick={() => { setLoading(true); fetchListings(); }} className="btn-outline gap-1.5 text-sm" title="Reload listings">
+            <RefreshCw className="h-4 w-4" />
           </button>
           <button onClick={() => setMode("password")} className="btn-outline text-sm">
             Account
@@ -884,15 +965,21 @@ export default function EmployeeDashboard() {
         ))}
       </div>
 
-      {/* Search */}
-      <div className="mt-6">
+      {/* Search + Filter bar */}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <input
           value={codeSearch}
           onChange={(e) => setCodeSearch(e.target.value)}
-          placeholder="Search listings by title or code…"
-          className="w-full max-w-sm rounded-xl border border-primary-100 px-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
+          placeholder="Search by title or code…"
+          className="w-full max-w-xs rounded-xl border border-primary-100 px-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
         />
       </div>
+      <StaffFilterBar
+        filters={staffFilters}
+        onChange={setStaffFilters}
+        onReset={() => setStaffFilters(emptyStaffFilters)}
+        showStatus
+      />
 
       {/* Cards */}
       {loading ? (
@@ -909,13 +996,15 @@ export default function EmployeeDashboard() {
         </div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {listings
-            .filter(l => {
+          {applyStaffFilters(
+            listings.filter(l => {
               if (!codeSearch) return true;
               const q = codeSearch.toLowerCase();
               const code = l.listingCode ? String(l.listingCode).padStart(4, "0") : "";
               return l.title.toLowerCase().includes(q) || code.includes(q);
-            })
+            }),
+            staffFilters
+          )
             .map((l) => {
               const images = (() => { try { return JSON.parse(l.images ?? "[]") as string[]; } catch { return [] as string[]; } })();
               const amenities = (() => { try { return JSON.parse(l.amenities ?? "{}") as AmenityMap; } catch { return {} as AmenityMap; } })();
@@ -952,3 +1041,4 @@ export default function EmployeeDashboard() {
     </div>
   );
 }
+

@@ -5,13 +5,18 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import {
   Users, LayoutDashboard, Building2,
-  UserCheck, UserCog, Eye, EyeOff, Plus, X, Upload, ExternalLink,
+  UserCheck, UserCog, Eye, EyeOff, Plus, X, Upload, ExternalLink, RefreshCw,
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import AdminNav from "@/components/admin/AdminNav";
 import MatchingClientsModal from "@/components/admin/MatchingClientsModal";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
+import { transliterateQuery } from "@/lib/transliterate";
+import StaffFilterBar, {
+  emptyStaffFilters,
+  type StaffFilters,
+} from "@/components/staff/StaffFilterBar";
 import { compressImage } from "@/lib/compressImage";
 
 interface DbListing {
@@ -19,6 +24,7 @@ interface DbListing {
   title: string;
   price: number;
   currency: string;
+  type: string;
   purpose: string;
   district: string;
   status: string;
@@ -114,6 +120,7 @@ function DashboardContent() {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [staffFilters, setStaffFilters] = useState<StaffFilters>(emptyStaffFilters);
   const [uploading, setUploading] = useState(false);
   const [streetQuery, setStreetQuery] = useState("");
   const [streetSuggestions, setStreetSuggestions] = useState<string[]>([]);
@@ -127,7 +134,7 @@ function DashboardContent() {
   useEffect(() => {
     if (!streetQuery) { setStreetSuggestions([]); return; }
     const streets = streetsByDistrict[form.district] ?? [];
-    const q = streetQuery.toLowerCase();
+    const q = transliterateQuery(streetQuery);
     const filtered = q.length <= 2
       ? streets.filter((s) => s.toLowerCase().startsWith(q))
       : streets.filter((s) => s.toLowerCase().includes(q));
@@ -216,6 +223,7 @@ function DashboardContent() {
   async function handleUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploading(true);
+    setSaveError("");
     const uploaded: string[] = [];
     for (const rawFile of Array.from(files)) {
       const file = await compressImage(rawFile);
@@ -223,9 +231,15 @@ function DashboardContent() {
       fd.append("file", file);
       try {
         const res = await fetch("/api/employee/upload", { method: "POST", body: fd });
-        const data = await res.json();
-        if (res.ok && data.url) uploaded.push(data.url);
-      } catch {}
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.url) {
+          uploaded.push(data.url);
+        } else {
+          setSaveError(`Upload failed: ${data.error ?? res.status}. Try again.`);
+        }
+      } catch {
+        setSaveError("Upload error — check your connection and try again.");
+      }
     }
     if (uploaded.length > 0) setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, ...uploaded] }));
     setUploading(false);
@@ -260,22 +274,27 @@ function DashboardContent() {
         ...(form.ownerPhone && { ownerPhone: form.ownerPhone }),
       },
     };
-    const res = await fetch("/api/employee/listings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    setSaving(false);
-    if (res.ok) {
-      setShowCreate(false);
-      setForm(emptyForm());
-      setStreetQuery("");
-      const listingsRes = await fetch("/api/employee/listings");
-      const data = await listingsRes.json();
-      setDbListings(data.listings ?? []);
-    } else {
-      const d = await res.json();
-      setSaveError(d.error ?? "Failed to create listing.");
+    try {
+      const res = await fetch("/api/employee/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setShowCreate(false);
+        setForm(emptyForm());
+        setStreetQuery("");
+        const listingsRes = await fetch("/api/employee/listings");
+        const data = await listingsRes.json();
+        setDbListings(data.listings ?? []);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setSaveError(d.error ?? `Server error (${res.status}). Try again.`);
+      }
+    } catch {
+      setSaveError("Network error — check your connection and try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -385,9 +404,21 @@ function DashboardContent() {
               {/* Street autocomplete */}
               <div ref={streetRef} className="relative">
                 <label className={labelCls}>Street / Փողոց</label>
-                <input className={inputCls} placeholder="Type street name…" value={streetQuery} autoComplete="off"
-                  onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
-                  onBlur={closeStreetSuggestionsDelayed} />
+                <div className="relative">
+                  <input className={inputCls} placeholder="Type street name…" value={streetQuery} autoComplete="off"
+                    onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
+                    onBlur={closeStreetSuggestionsDelayed} />
+                  {streetQuery && (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => { setStreetQuery(""); setForm({ ...form, street: "" }); setStreetSuggestions([]); }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-primary-400 hover:text-primary-700 dark:text-white/40 dark:hover:text-white"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
                 {streetSuggestions.length > 0 && (
                   <div
                     className="absolute z-20 mt-1 w-full overflow-y-auto rounded-xl border border-primary-100 bg-white shadow-lg dark:border-white/10 dark:bg-primary-800"
@@ -401,6 +432,16 @@ function DashboardContent() {
                         {s}
                       </button>
                     ))}
+                  </div>
+                )}
+                {streetQuery.length >= 2 && streetSuggestions.length === 0 && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
+                    <button type="button"
+                      onClick={() => { const q = streetQuery; setStreetQuery(""); setTimeout(() => setStreetQuery(q), 50); }}
+                      className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
+                      <RefreshCw className="h-3 w-3" /> Retry
+                    </button>
                   </div>
                 )}
               </div>
@@ -507,10 +548,33 @@ function DashboardContent() {
       {/* Listings table */}
       {dbListings.length > 0 && (
         <section className="mt-10">
-          <h2 className="mb-4 font-serif text-xl font-semibold text-primary-900 dark:text-white">
-            All Listings
-          </h2>
-          <div className="card overflow-x-auto p-0">
+          <div className="flex items-center justify-between">
+            <h2 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">
+              All Listings
+            </h2>
+            <span className="text-sm text-primary-400 dark:text-white/40">
+              {(() => {
+                const filtered = dbListings.filter(l => {
+                  const f = staffFilters;
+                  if (f.district && l.district !== f.district) return false;
+                  if (f.type && l.type !== f.type) return false;
+                  if (f.purpose && l.purpose !== f.purpose) return false;
+                  if (f.priceMin && l.price < Number(f.priceMin)) return false;
+                  if (f.priceMax && l.price > Number(f.priceMax)) return false;
+                  if (f.status && l.status !== f.status) return false;
+                  return true;
+                });
+                return `${filtered.length} of ${dbListings.length}`;
+              })()}
+            </span>
+          </div>
+          <StaffFilterBar
+            filters={staffFilters}
+            onChange={setStaffFilters}
+            onReset={() => setStaffFilters(emptyStaffFilters)}
+            showStatus
+          />
+          <div className="card mt-4 overflow-x-auto p-0">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-primary-100 dark:border-white/10">
                 <tr className="text-primary-500 dark:text-white/60">
@@ -524,7 +588,16 @@ function DashboardContent() {
                 </tr>
               </thead>
               <tbody>
-                {dbListings.map((l) => (
+                {dbListings.filter(l => {
+                  const f = staffFilters;
+                  if (f.district && l.district !== f.district) return false;
+                  if (f.type && l.type !== f.type) return false;
+                  if (f.purpose && l.purpose !== f.purpose) return false;
+                  if (f.priceMin && l.price < Number(f.priceMin)) return false;
+                  if (f.priceMax && l.price > Number(f.priceMax)) return false;
+                  if (f.status && l.status !== f.status) return false;
+                  return true;
+                }).map((l) => (
                   <tr key={l.id} className="border-b border-primary-50 dark:border-white/5">
                     <td className="px-4 py-3 font-medium text-primary-800 dark:text-white">{l.title}</td>
                     <td className="px-4 py-3">

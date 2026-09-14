@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { Lock, UploadCloud, X } from "lucide-react";
+import { Lock, UploadCloud, X, RefreshCw } from "lucide-react";
 import { districts } from "@/lib/mock-data";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
+import { transliterateQuery } from "@/lib/transliterate";
 import { compressImage } from "@/lib/compressImage";
 
 const inputCls = "w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm outline-none focus:border-gold-400 dark:border-white/10 dark:bg-primary-800 dark:text-white";
@@ -41,7 +42,7 @@ export default function SubmitForm() {
   useEffect(() => {
     if (!streetQuery || streetQuery.length < 1) { setStreetSuggestions([]); return; }
     const streets = streetsByDistrict[form.district] ?? [];
-    const q = streetQuery.toLowerCase();
+    const q = transliterateQuery(streetQuery);
     // For short queries use startsWith so typing "A" shows A-streets, not every street containing "a"
     const filtered = q.length <= 2
       ? streets.filter((s) => s.toLowerCase().startsWith(q))
@@ -173,14 +174,26 @@ export default function SubmitForm() {
       {/* Street autocomplete */}
       <div ref={streetRef} className="relative">
         <label className={labelCls}>Street / Փողոց</label>
-        <input
-          placeholder="Type street name… / Մուտq. փողոց..."
-          value={streetQuery}
-          onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
-          className={inputCls}
-          autoComplete="off"
-          onBlur={closeStreetSuggestionsDelayed}
-        />
+        <div className="relative">
+          <input
+            placeholder="Type street name… / Մուտq. փողոց..."
+            value={streetQuery}
+            onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
+            className={inputCls}
+            autoComplete="off"
+            onBlur={closeStreetSuggestionsDelayed}
+          />
+          {streetQuery && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => { setStreetQuery(""); setForm({ ...form, street: "" }); setStreetSuggestions([]); }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-primary-400 hover:text-primary-700 dark:text-white/40 dark:hover:text-white"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
         {streetSuggestions.length > 0 && (
           <div
             className="absolute z-20 mt-1 w-full overflow-y-auto rounded-xl border border-primary-100 bg-white shadow-soft dark:border-white/10 dark:bg-primary-800"
@@ -197,6 +210,16 @@ export default function SubmitForm() {
                 {s}
               </button>
             ))}
+          </div>
+        )}
+        {streetQuery.length >= 2 && streetSuggestions.length === 0 && (
+          <div className="mt-1 flex items-center gap-2">
+            <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
+            <button type="button"
+              onClick={() => { const q = streetQuery; setStreetQuery(""); setTimeout(() => setStreetQuery(q), 50); }}
+              className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
+              <RefreshCw className="h-3 w-3" /> Retry
+            </button>
           </div>
         )}
       </div>
@@ -356,7 +379,15 @@ export default function SubmitForm() {
         )}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800/40 dark:bg-red-900/20">
+          <p className="flex-1 text-sm text-red-700 dark:text-red-400">{error}</p>
+          <button type="submit"
+            className="shrink-0 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">
+            Try again
+          </button>
+        </div>
+      )}
 
       <button type="submit" disabled={submitting || uploadingPhotos} className="btn-gold w-full disabled:opacity-60">
         {submitting ? "Submitting…" : t("submitBtn")}
