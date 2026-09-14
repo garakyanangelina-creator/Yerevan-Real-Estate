@@ -61,6 +61,7 @@ export default async function PropertyPage({
   const tPurpose = await getTranslations("purpose");
   const tDistricts = await getTranslations("districts");
   const tAmenities = await getTranslations("search");
+  const tL = await getTranslations("listing");
 
   const similar = await getSimilarPublicProperties(property);
 
@@ -120,7 +121,7 @@ export default async function PropertyPage({
                   <Ruler className="h-4 w-4" /> {property.area} m²
                 </span>
                 <span className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" /> {t("floorLabel")} {property.floor}/{property.totalFloors}
+                  <Building2 className="h-4 w-4" /> {tL("floor")} {property.floor}/{property.totalFloors}
                 </span>
               </>
             )}
@@ -130,12 +131,12 @@ export default async function PropertyPage({
               <>
                 {property.area > 0 && (
                   <span className="flex items-center gap-2">
-                    <Ruler className="h-4 w-4" /> House {property.area} m²
+                    <Ruler className="h-4 w-4" /> {tL("houseLabel")} {property.area} m²
                   </span>
                 )}
                 {(property.landArea ?? 0) > 0 && (
                   <span className="flex items-center gap-2">
-                    <TreePine className="h-4 w-4" /> Land {property.landArea} m²
+                    <TreePine className="h-4 w-4" /> {tL("landLabel")} {property.landArea} m²
                   </span>
                 )}
                 <span className="flex items-center gap-2">
@@ -146,7 +147,7 @@ export default async function PropertyPage({
                 </span>
                 {property.totalFloors > 0 && (
                   <span className="flex items-center gap-2">
-                    <Layers className="h-4 w-4" /> {property.totalFloors} {property.totalFloors === 1 ? "story" : "stories"}
+                    <Layers className="h-4 w-4" /> {property.totalFloors} {tL("storiesPlural")}
                   </span>
                 )}
               </>
@@ -162,21 +163,21 @@ export default async function PropertyPage({
                 )}
                 {property.streetLine && (
                   <span className="flex items-center gap-2">
-                    <AlignJustify className="h-4 w-4" /> {property.streetLine === "first" ? "First line" : "Second line"}
+                    <AlignJustify className="h-4 w-4" /> {property.streetLine === "first" ? tL("firstLine") : tL("secondLine")}
                   </span>
                 )}
                 {property.commercialLevel && (
                   <span className="flex items-center gap-2">
                     <Building2 className="h-4 w-4" /> {
-                      property.commercialLevel === "basement" ? "Basement" :
-                      property.commercialLevel === "semi-basement" ? "Semi-basement" :
-                      property.commercialLevel === "ground" ? "Ground floor" : "Upper floor"
+                      property.commercialLevel === "basement" ? tL("basement") :
+                      property.commercialLevel === "semi-basement" ? tL("semiBasement") :
+                      property.commercialLevel === "ground" ? tL("groundFloor") : tL("upperFloor")
                     }
                   </span>
                 )}
                 {property.storefront != null && (
                   <span className="flex items-center gap-2">
-                    <Store className="h-4 w-4" /> {property.storefront ? "Has storefront" : "No storefront"}
+                    <Store className="h-4 w-4" /> {property.storefront ? tL("hasStorefront") : tL("noStorefront")}
                   </span>
                 )}
               </>
@@ -192,7 +193,7 @@ export default async function PropertyPage({
                 )}
                 {property.area > 0 && (
                   <span className="flex items-center gap-2">
-                    <Ruler className="h-4 w-4" /> Building {property.area} m²
+                    <Ruler className="h-4 w-4" /> {tL("buildingLabel")} {property.area} m²
                   </span>
                 )}
               </>
@@ -202,10 +203,23 @@ export default async function PropertyPage({
             {property.renovation && (
               <span className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> {
-                  property.renovation === "new" ? "New" :
-                  property.renovation === "euro" ? "Euro renovation" :
-                  property.renovation === "good" ? "Good condition" :
-                  property.renovation === "cosmetic" ? "Cosmetic renovation" : "Needs renovation"
+                  property.renovation === "new" ? tL("renovNew") :
+                  property.renovation === "euro" ? tL("renovEuro") :
+                  property.renovation === "good" ? tL("renovGood") :
+                  property.renovation === "cosmetic" ? tL("renovCosmetic") : tL("renovOld")
+                }
+              </span>
+            )}
+
+            {/* View — shown when available */}
+            {property.amenities.view && (
+              <span className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" /> {
+                  property.amenities.view === "ararat" ? tL("viewArarat") :
+                  property.amenities.view === "city" ? tL("viewCity") :
+                  property.amenities.view === "garden" ? tL("viewGarden") :
+                  property.amenities.view === "street" ? tL("viewStreet") :
+                  tL("viewCourtyard")
                 }
               </span>
             )}

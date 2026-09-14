@@ -7,7 +7,7 @@ import {
   Users, LayoutDashboard, Building2,
   UserCheck, UserCog, Eye, EyeOff, Plus, X, Upload, ExternalLink, RefreshCw,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import AdminNav from "@/components/admin/AdminNav";
 import MatchingClientsModal from "@/components/admin/MatchingClientsModal";
@@ -108,6 +108,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
 
   const locale = useLocale();
+  const tL = useTranslations("listing");
   const [role, setRole] = useState<string | null>(null);
   const [dbListings, setDbListings] = useState<DbListing[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -493,7 +494,7 @@ function DashboardContent() {
               {/* Owner Contacts */}
               <div>
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-                  Owner Contacts / Սեփ. կապ (staff only)
+                  {tL("ownerContacts")}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>

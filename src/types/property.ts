@@ -15,6 +15,8 @@ export type District =
   | "nubarashen"
   | "other";
 
+export type ViewType = "ararat" | "city" | "garden" | "street" | "courtyard";
+
 export interface PropertyAmenities {
   parking: boolean;
   balcony: boolean;
@@ -24,6 +26,7 @@ export interface PropertyAmenities {
   elevator: boolean;
   ac: boolean;
   heating: boolean;
+  view?: ViewType;
 }
 
 export type CommercialLevel = "basement" | "semi-basement" | "ground" | "upper";

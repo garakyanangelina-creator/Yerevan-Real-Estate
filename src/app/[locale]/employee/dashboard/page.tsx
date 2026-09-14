@@ -8,7 +8,7 @@ import {
   Building2, CheckCircle2, XCircle, Upload, X,
   BedDouble, Bath, Ruler, Phone, Link2, Check, Eye, RefreshCw,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import { streetsByDistrict } from "@/lib/yerevan-streets";
 import { transliterateQuery } from "@/lib/transliterate";
@@ -229,6 +229,7 @@ function emptyForm() {
 export default function EmployeeDashboard() {
   const router = useRouter();
   const locale = useLocale();
+  const tL = useTranslations("listing");
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<FormMode>("list");
@@ -703,7 +704,7 @@ export default function EmployeeDashboard() {
             {/* Owner contacts — visible only to employees/admins */}
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-700/40 dark:bg-amber-900/20">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-                Owner Contacts / Սեփականատիրոջ կապ (only visible to staff)
+                {tL("ownerContacts")}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div>

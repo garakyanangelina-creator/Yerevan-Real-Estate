@@ -12,6 +12,7 @@ import {
   type PublicProperty,
   type Purpose,
   type Renovation,
+  type ViewType,
   type StreetLine,
 } from "@/types/property";
 
@@ -46,6 +47,7 @@ type DbPropertyRow = {
 
 function parseAmenities(raw: string): PropertyAmenities {
   const a = (() => { try { return JSON.parse(raw); } catch { return {}; } })();
+  const VALID_VIEWS = new Set(["ararat", "city", "garden", "street", "courtyard"]);
   return {
     parking: Boolean(a.parking),
     balcony: Boolean(a.balcony || a.openBalcony || a.closedBalcony),
@@ -55,6 +57,7 @@ function parseAmenities(raw: string): PropertyAmenities {
     elevator: Boolean(a.elevator),
     ac: Boolean(a.ac),
     heating: Boolean(a.heating),
+    ...(a.view && VALID_VIEWS.has(a.view) ? { view: a.view as ViewType } : {}),
   };
 }
 
