@@ -17,14 +17,24 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
   const { property } = await getPublicPropertyById(id);
   if (!property) return {};
+  const base = "https://yerevanreal.com";
   return {
     title: property.title,
     description: property.description,
+    alternates: {
+      canonical: `${base}/${locale}/property/${id}`,
+      languages: {
+        "en": `${base}/en/property/${id}`,
+        "ru": `${base}/ru/property/${id}`,
+        "hy": `${base}/hy/property/${id}`,
+        "x-default": `${base}/en/property/${id}`,
+      },
+    },
     openGraph: {
       title: property.title,
       description: property.description,
