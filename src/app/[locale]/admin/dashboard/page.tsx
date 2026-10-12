@@ -124,6 +124,8 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
   const tPurpose = useTranslations("purpose");
   const tAdmin = useTranslations("admin");
   const tStatus = useTranslations("status");
+  const STATUS_KEYS = ["active", "available", "sold", "rented", "archived"] as const;
+  type StatusKey = typeof STATUS_KEYS[number];
 
   const imgs: string[] = (() => { try { return JSON.parse(l.images); } catch { return []; } })();
   const thumb = imgs[0] ?? null;
@@ -155,7 +157,7 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
         {/* Top-left: status + draft badge */}
         <div className="absolute left-3 top-3 flex flex-col gap-1">
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}>
-            {tStatus.has(l.status) ? tStatus(l.status as never) : l.status}
+            {STATUS_KEYS.includes(l.status as StatusKey) ? tStatus(l.status as StatusKey) : l.status}
           </span>
           {!l.isPublished && (
             <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
@@ -229,7 +231,7 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
           className={`mt-3 w-full cursor-pointer rounded-lg border-0 px-3 py-1.5 text-xs font-semibold focus:outline-none disabled:opacity-50 ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}
         >
           {STATUS_OPTION_KEYS.map((v) => (
-            <option key={v} value={v}>{tStatus.has(v) ? tStatus(v as never) : v}</option>
+            <option key={v} value={v}>{tStatus(v)}</option>
           ))}
         </select>
 
