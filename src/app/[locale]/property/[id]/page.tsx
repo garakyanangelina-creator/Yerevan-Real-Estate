@@ -10,9 +10,7 @@ import { getPublicPropertyById, getSimilarPublicProperties } from "@/services/pr
 import { formatPrice } from "@/lib/utils";
 import { BedDouble, Bath, Ruler, Building2, MapPin, TreePine, Layers, Store, AlignJustify } from "lucide-react";
 
-// Listings are fetched live from Apify per request, so there's no fixed set of
-// ids to pre-render at build time.
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,

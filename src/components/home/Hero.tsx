@@ -1,11 +1,9 @@
-"use client";
-
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import QuickSearchBar from "@/components/search/QuickSearchBar";
 
-export default function Hero() {
-  const t = useTranslations("hero");
+export default async function Hero() {
+  const t = await getTranslations("hero");
 
   return (
     <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden sm:min-h-[680px]">

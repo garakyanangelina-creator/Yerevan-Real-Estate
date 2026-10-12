@@ -50,9 +50,8 @@ export default function PropertyCard({ property }: { property: PublicProperty })
           src={coverImage}
           alt={property.title}
           fill
-          unoptimized
           className="object-cover transition duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 33vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {/* Type badge */}
         <span className="absolute left-3 top-3 rounded-full bg-primary-900/75 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">

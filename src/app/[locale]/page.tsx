@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 import Hero from "@/components/home/Hero";
 import DistrictGrid from "@/components/home/DistrictGrid";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -69,12 +70,15 @@ export default async function HomePage() {
             </h2>
             <p className="mt-3 text-sm text-primary-600 dark:text-white/70 sm:mt-4 sm:text-base">{t("aboutText")}</p>
           </div>
-          <img
-            src="/yerevan-city.jpg"
-            alt="Yerevan city at sunset"
-            className="w-full rounded-2xl object-cover shadow-soft"
-            style={{ height: "clamp(200px, 40vw, 320px)" }}
-          />
+          <div className="relative w-full rounded-2xl overflow-hidden shadow-soft" style={{ height: "clamp(200px, 40vw, 320px)" }}>
+            <Image
+              src="/yerevan-city.jpg"
+              alt="Yerevan city at sunset"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
         </div>
       </section>
 

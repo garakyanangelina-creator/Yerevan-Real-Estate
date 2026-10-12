@@ -46,6 +46,8 @@ const nextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "*.supabase.co" },
     ],
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400,
     // Only the local placeholder-property.svg uses SVG; it's static, not user-uploaded.
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
@@ -59,6 +61,18 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/_next/static/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/images/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
+      {
+        source: "/:file(.*\\.(?:jpg|jpeg|png|webp|avif|svg|ico|gif))",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },
     ];
   },
