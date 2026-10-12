@@ -52,7 +52,11 @@
     "house": "Дом",
     "commercial": "Коммерция",
     "office": "Офис",
-    "land": "Земля"
+    "land": "Земля",
+    "studio": "Студия",
+    "penthouse": "Пентхаус",
+    "villa": "Вилла",
+    "duplex": "Дуплекс"
   },
   "purpose": {
     "rent": "Аренда",
@@ -155,6 +159,13 @@
     "phoneSales": "Отдел продаж / WhatsApp",
     "phoneDirector": "Управляющий директор / WhatsApp"
   },
+  "status": {
+    "active": "Активен",
+    "available": "Доступен",
+    "sold": "Продан",
+    "rented": "Сдан",
+    "archived": "Архивирован"
+  },
   "admin": {
     "loginTitle": "Вход для администратора",
     "username": "Логин",
@@ -178,7 +189,11 @@
     "viewPhone": "Показать телефон",
     "stats": "Статистика",
     "clients": "Клиенты",
-    "notifications": "Уведомления"
+    "notifications": "Уведомления",
+    "draft": "Черновик",
+    "published": "Опубликовано",
+    "viewEdit": "Просмотр / Редактировать",
+    "matchingClients": "Подходящие клиенты"
   },
   "clients": {
     "title": "Клиенты",

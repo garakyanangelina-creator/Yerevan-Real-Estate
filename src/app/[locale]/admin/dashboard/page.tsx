@@ -98,13 +98,7 @@ function StatCard({ icon: Icon, label, value, sub }: {
   );
 }
 
-const STATUS_OPTIONS = [
-  { value: "active",    label: "Active" },
-  { value: "available", label: "Available" },
-  { value: "sold",      label: "Sold" },
-  { value: "rented",    label: "Rented" },
-  { value: "archived",  label: "Archived" },
-];
+const STATUS_OPTION_KEYS = ["active", "available", "sold", "rented", "archived"] as const;
 
 const STATUS_COLORS: Record<string, string> = {
   active:    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
@@ -127,6 +121,9 @@ interface AdminCardProps {
 function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPublishToggle, onStatusChange, onViewMatches }: AdminCardProps) {
   const tTypes = useTranslations("propertyTypes");
   const tDistricts = useTranslations("districts");
+  const tPurpose = useTranslations("purpose");
+  const tAdmin = useTranslations("admin");
+  const tStatus = useTranslations("status");
 
   const imgs: string[] = (() => { try { return JSON.parse(l.images); } catch { return []; } })();
   const thumb = imgs[0] ?? null;
@@ -158,11 +155,11 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
         {/* Top-left: status + draft badge */}
         <div className="absolute left-3 top-3 flex flex-col gap-1">
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}>
-            {l.status}
+            {tStatus.has(l.status) ? tStatus(l.status as never) : l.status}
           </span>
           {!l.isPublished && (
             <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-              Draft
+              {tAdmin("draft")}
             </span>
           )}
         </div>
@@ -176,7 +173,7 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
 
         {/* Bottom: type + purpose */}
         <span className="absolute bottom-3 left-3 rounded-full bg-primary-900/75 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
-          {tTypes(l.type)} · {l.purpose === "rent" ? "Rent" : "Sale"}
+          {tTypes(l.type)} · {tPurpose(l.purpose as "rent" | "sale")}
         </span>
       </div>
 
@@ -231,8 +228,8 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
           onChange={(e) => onStatusChange(e.target.value)}
           className={`mt-3 w-full cursor-pointer rounded-lg border-0 px-3 py-1.5 text-xs font-semibold focus:outline-none disabled:opacity-50 ${STATUS_COLORS[l.status] ?? STATUS_COLORS.available}`}
         >
-          {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+          {STATUS_OPTION_KEYS.map((v) => (
+            <option key={v} value={v}>{tStatus.has(v) ? tStatus(v as never) : v}</option>
           ))}
         </select>
 
@@ -242,7 +239,7 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
             href={`/${locale}/admin/listing/${l.id}`}
             className="flex items-center justify-center gap-1.5 rounded-xl bg-primary-900 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-800 dark:bg-white/10 dark:hover:bg-white/20"
           >
-            <ExternalLink className="h-3.5 w-3.5" /> View / Edit
+            <ExternalLink className="h-3.5 w-3.5" /> {tAdmin("viewEdit")}
           </a>
           <button
             onClick={onPublishToggle}
@@ -254,14 +251,14 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
             }`}
           >
             {l.isPublished
-              ? <><Eye className="h-3.5 w-3.5" /> Published</>
-              : <><EyeOff className="h-3.5 w-3.5" /> Draft</>}
+              ? <><Eye className="h-3.5 w-3.5" /> {tAdmin("published")}</>
+              : <><EyeOff className="h-3.5 w-3.5" /> {tAdmin("draft")}</>}
           </button>
           <button
             onClick={onViewMatches}
             className="col-span-2 flex items-center justify-center gap-1.5 rounded-xl border border-gold-300 px-3 py-1.5 text-xs font-medium text-gold-700 transition hover:bg-gold-50 dark:border-gold-600/40 dark:text-gold-400 dark:hover:bg-gold-900/10"
           >
-            <Users className="h-3.5 w-3.5" /> Matching Clients
+            <Users className="h-3.5 w-3.5" /> {tAdmin("matchingClients")}
           </button>
         </div>
       </div>

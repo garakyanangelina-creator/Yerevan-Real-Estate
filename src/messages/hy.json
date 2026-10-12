@@ -52,7 +52,11 @@
     "house": "Տուն",
     "commercial": "Կոմերցիոն",
     "office": "Գրասենյակ",
-    "land": "Հողատարածք"
+    "land": "Հողատարածք",
+    "studio": "Ստուդիո",
+    "penthouse": "Պենթհաուս",
+    "villa": "Վիլլա",
+    "duplex": "Դուպլեքս"
   },
   "purpose": {
     "rent": "Վարձակալություն",
@@ -155,6 +159,13 @@
     "phoneSales": "Վաճառքի բաժին / WhatsApp",
     "phoneDirector": "Գործադիր տնօրեն / WhatsApp"
   },
+  "status": {
+    "active": "Ակտիվ",
+    "available": "Հասանելի",
+    "sold": "Վաճառված",
+    "rented": "Վարձակալված",
+    "archived": "Արխիվացված"
+  },
   "admin": {
     "loginTitle": "Ադմինիստրատորի մուտք",
     "username": "Օգտանուն",
@@ -178,7 +189,11 @@
     "viewPhone": "Տեսնել հեռախոսահամարը",
     "stats": "Վիճակագրություն",
     "clients": "Հաճախորդներ",
-    "notifications": "Ծանուցումներ"
+    "notifications": "Ծանուցումներ",
+    "draft": "Սևագիր",
+    "published": "Հրապարակված",
+    "viewEdit": "Դիտել / Խմբագրել",
+    "matchingClients": "Համապատասխան հաճախորդներ"
   },
   "clients": {
     "title": "Հաճախորդներ",

@@ -52,7 +52,11 @@
     "house": "House",
     "commercial": "Commercial",
     "office": "Office",
-    "land": "Land"
+    "land": "Land",
+    "studio": "Studio",
+    "penthouse": "Penthouse",
+    "villa": "Villa",
+    "duplex": "Duplex"
   },
   "purpose": {
     "rent": "Rent",
@@ -155,6 +159,13 @@
     "phoneSales": "Sales Department / WhatsApp",
     "phoneDirector": "Managing Director / WhatsApp"
   },
+  "status": {
+    "active": "Active",
+    "available": "Available",
+    "sold": "Sold",
+    "rented": "Rented",
+    "archived": "Archived"
+  },
   "admin": {
     "loginTitle": "Administrator Login",
     "username": "Username",
@@ -178,7 +189,11 @@
     "viewPhone": "View Phone Number",
     "stats": "Statistics",
     "clients": "Clients",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "draft": "Draft",
+    "published": "Published",
+    "viewEdit": "View / Edit",
+    "matchingClients": "Matching Clients"
   },
   "clients": {
     "title": "Clients",
