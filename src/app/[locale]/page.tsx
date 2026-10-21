@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Hero from "@/components/home/Hero";
