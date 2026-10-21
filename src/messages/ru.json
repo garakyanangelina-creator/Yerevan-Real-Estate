@@ -343,5 +343,33 @@
     "fetchErrorConfig": "Источник данных о недвижимости пока не настроен. Загляните позже.",
     "fetchErrorNetwork": "Не удалось загрузить актуальные объявления. Попробуйте чуть позже.",
     "noProperties": "На данный момент нет доступных объектов."
+  },
+  "staff": {
+    "allDistricts": "Все районы",
+    "allTypes": "Все типы",
+    "saleAndRent": "Продажа и аренда",
+    "forSale": "Продажа",
+    "forRent": "Аренда",
+    "anyRooms": "Любые комнаты",
+    "studio": "Студия",
+    "bedroom1": "1 комната",
+    "bedroom2": "2 комнаты",
+    "bedroom3": "3 комнаты",
+    "bedroom4plus": "4+ комнат",
+    "priceMin": "Цена от",
+    "priceMax": "Цена до",
+    "allStatuses": "Все статусы",
+    "available": "Доступно",
+    "active": "Активно",
+    "sold": "Продано",
+    "rented": "Сдано",
+    "archived": "Архив",
+    "clearFilters": "Сбросить фильтры",
+    "apartment": "Квартира",
+    "house": "Дом",
+    "commercial": "Коммерческая",
+    "office": "Офис",
+    "land": "Земля",
+    "other": "Другое"
   }
 }

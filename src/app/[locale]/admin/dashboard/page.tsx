@@ -42,6 +42,9 @@ interface DbListing {
   totalFloors: number;
   landArea: number | null;
   listingCode: number | null;
+  titleEn: string | null;
+  titleRu: string | null;
+  titleHy: string | null;
   createdBy: { username: string };
 }
 
@@ -185,7 +188,7 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
           {formatPrice(l.price, l.purpose as "sale" | "rent", l.currency)}
         </p>
         <h3 className="mt-0.5 line-clamp-1 font-serif text-sm font-semibold text-primary-900 dark:text-white">
-          {l.title}
+          {(locale === "ru" && l.titleRu) || (locale === "en" && l.titleEn) || (locale === "hy" && l.titleHy) || l.title}
         </h3>
         <p className="mt-0.5 flex items-center gap-1 text-xs text-primary-500 dark:text-white/50">
           <MapPin className="h-3 w-3" /> {tDistricts(l.district)}

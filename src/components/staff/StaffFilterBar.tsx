@@ -1,11 +1,6 @@
 "use client";
 
-/**
- * Compact horizontal filter bar for Employee / Admin / Super-Admin listing views.
- * Uses the same district slugs as the rest of the system — no hardcoded district
- * names; the districts[] array from mock-data is the single source of truth.
- */
-
+import { useTranslations } from "next-intl";
 import { districts } from "@/lib/mock-data";
 
 export interface StaffFilters {
@@ -28,14 +23,6 @@ export const emptyStaffFilters: StaffFilters = {
   status: "",
 };
 
-const DISTRICT_LABELS: Record<string, string> = {
-  kentron: "Kentron", arabkir: "Arabkir", davtashen: "Davtashen",
-  ajapnyak: "Ajapnyak", shengavit: "Shengavit", "kanaker-zeytun": "Kanaker-Zeytun",
-  "nor-nork": "Nor Nork", "malatia-sebastia": "Malatia-Sebastia", avan: "Avan",
-  erebuni: "Erebuni", "nork-marash": "Nork-Marash", nubarashen: "Nubarashen",
-  other: "Other",
-};
-
 const selectCls =
   "rounded-lg border border-primary-100 bg-white px-2.5 py-2 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white";
 const inputCls =
@@ -52,6 +39,9 @@ export default function StaffFilterBar({
   onReset: () => void;
   showStatus?: boolean;
 }) {
+  const t = useTranslations("staff");
+  const td = useTranslations("districts");
+
   function set<K extends keyof StaffFilters>(key: K, value: string) {
     onChange({ ...filters, [key]: value });
   }
@@ -60,46 +50,46 @@ export default function StaffFilterBar({
 
   return (
     <div className="mt-4 flex flex-wrap items-end gap-2 rounded-xl border border-primary-100 bg-primary-50 p-3 dark:border-white/10 dark:bg-primary-800/40">
-      {/* District — uses canonical slug list, same as listing creation form */}
+      {/* District */}
       <select value={filters.district} onChange={(e) => set("district", e.target.value)} className={selectCls}>
-        <option value="">All districts</option>
+        <option value="">{t("allDistricts")}</option>
         {[...districts, "other"].map((d) => (
-          <option key={d} value={d}>{DISTRICT_LABELS[d] ?? d}</option>
+          <option key={d} value={d}>{td(d as Parameters<typeof td>[0])}</option>
         ))}
       </select>
 
       {/* Property type */}
       <select value={filters.type} onChange={(e) => set("type", e.target.value)} className={selectCls}>
-        <option value="">All types</option>
-        <option value="apartment">Apartment</option>
-        <option value="house">House</option>
-        <option value="commercial">Commercial</option>
-        <option value="office">Office</option>
-        <option value="land">Land</option>
+        <option value="">{t("allTypes")}</option>
+        <option value="apartment">{t("apartment")}</option>
+        <option value="house">{t("house")}</option>
+        <option value="commercial">{t("commercial")}</option>
+        <option value="office">{t("office")}</option>
+        <option value="land">{t("land")}</option>
       </select>
 
       {/* Sale / Rent */}
       <select value={filters.purpose} onChange={(e) => set("purpose", e.target.value)} className={selectCls}>
-        <option value="">Sale & Rent</option>
-        <option value="sale">For Sale</option>
-        <option value="rent">For Rent</option>
+        <option value="">{t("saleAndRent")}</option>
+        <option value="sale">{t("forSale")}</option>
+        <option value="rent">{t("forRent")}</option>
       </select>
 
       {/* Bedrooms */}
       <select value={filters.bedrooms} onChange={(e) => set("bedrooms", e.target.value)} className={selectCls}>
-        <option value="">Any rooms</option>
-        <option value="0">Studio</option>
-        <option value="1">1 bedroom</option>
-        <option value="2">2 bedrooms</option>
-        <option value="3">3 bedrooms</option>
-        <option value="4">4+ bedrooms</option>
+        <option value="">{t("anyRooms")}</option>
+        <option value="0">{t("studio")}</option>
+        <option value="1">{t("bedroom1")}</option>
+        <option value="2">{t("bedroom2")}</option>
+        <option value="3">{t("bedroom3")}</option>
+        <option value="4">{t("bedroom4plus")}</option>
       </select>
 
       {/* Price range */}
       <input
         type="number"
         min="0"
-        placeholder="Price min"
+        placeholder={t("priceMin")}
         value={filters.priceMin}
         onChange={(e) => set("priceMin", e.target.value)}
         className={inputCls}
@@ -107,21 +97,21 @@ export default function StaffFilterBar({
       <input
         type="number"
         min="0"
-        placeholder="Price max"
+        placeholder={t("priceMax")}
         value={filters.priceMax}
         onChange={(e) => set("priceMax", e.target.value)}
         className={inputCls}
       />
 
-      {/* Status (optional — hide for employees if not needed) */}
+      {/* Status */}
       {showStatus && (
         <select value={filters.status} onChange={(e) => set("status", e.target.value)} className={selectCls}>
-          <option value="">All statuses</option>
-          <option value="available">Available</option>
-          <option value="active">Active</option>
-          <option value="sold">Sold</option>
-          <option value="rented">Rented</option>
-          <option value="archived">Archived</option>
+          <option value="">{t("allStatuses")}</option>
+          <option value="available">{t("available")}</option>
+          <option value="active">{t("active")}</option>
+          <option value="sold">{t("sold")}</option>
+          <option value="rented">{t("rented")}</option>
+          <option value="archived">{t("archived")}</option>
         </select>
       )}
 
@@ -132,7 +122,7 @@ export default function StaffFilterBar({
           onClick={onReset}
           className="rounded-lg border border-primary-200 px-3 py-2 text-xs font-medium text-primary-500 hover:border-red-300 hover:text-red-500 dark:border-white/20 dark:text-white/50"
         >
-          ✕ Clear filters
+          ✕ {t("clearFilters")}
         </button>
       )}
     </div>

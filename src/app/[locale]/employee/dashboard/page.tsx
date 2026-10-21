@@ -45,6 +45,10 @@ interface Listing {
   status: string;
   isPublished: boolean;
   listingCode?: number | null;
+  displayCode?: number | null;
+  titleEn?: string | null;
+  titleRu?: string | null;
+  titleHy?: string | null;
   createdAt: string;
 }
 
@@ -69,6 +73,7 @@ interface CardProps {
   bedrooms: number; bathrooms: number; area: number;
   images: string[]; ownerName: string; ownerPhone: string;
   displayCode: string | null; locale: string;
+  titleEn?: string | null; titleRu?: string | null; titleHy?: string | null;
   onEdit: () => void; onDelete: () => void; deleting: boolean;
 }
 
@@ -122,7 +127,9 @@ function EmployeeListingCard(p: CardProps) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-lg font-bold text-gold-600">{formatPrice(p.price, p.purpose as "sale"|"rent", p.currency)}</p>
-            <h3 className="mt-0.5 line-clamp-2 font-serif text-sm font-semibold text-primary-900 dark:text-white">{p.title}</h3>
+            <h3 className="mt-0.5 line-clamp-2 font-serif text-sm font-semibold text-primary-900 dark:text-white">
+              {(p.locale === "ru" && p.titleRu) || (p.locale === "en" && p.titleEn) || (p.locale === "hy" && p.titleHy) || p.title}
+            </h3>
             <p className="mt-0.5 flex items-center gap-1 text-xs text-primary-500 dark:text-white/50">
               <span className="h-1.5 w-1.5 rounded-full bg-gold-500" />
               {DISTRICT_SHORT[p.district] ?? p.district}
@@ -949,6 +956,9 @@ export default function EmployeeDashboard() {
                   ownerPhone={ownerPhone}
                   displayCode={displayCode}
                   locale={locale}
+                  titleEn={l.titleEn}
+                  titleRu={l.titleRu}
+                  titleHy={l.titleHy}
                   onEdit={() => startEdit(l)}
                   onDelete={() => handleDelete(l.id, l.title)}
                   deleting={deleting === l.id}

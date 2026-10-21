@@ -343,5 +343,33 @@
     "fetchErrorConfig": "Our property data source isn't configured yet. Please check back soon.",
     "fetchErrorNetwork": "We couldn't load live listings right now. Please try again shortly.",
     "noProperties": "No properties are available at the moment."
+  },
+  "staff": {
+    "allDistricts": "All districts",
+    "allTypes": "All types",
+    "saleAndRent": "Sale & Rent",
+    "forSale": "For Sale",
+    "forRent": "For Rent",
+    "anyRooms": "Any rooms",
+    "studio": "Studio",
+    "bedroom1": "1 bedroom",
+    "bedroom2": "2 bedrooms",
+    "bedroom3": "3 bedrooms",
+    "bedroom4plus": "4+ bedrooms",
+    "priceMin": "Price min",
+    "priceMax": "Price max",
+    "allStatuses": "All statuses",
+    "available": "Available",
+    "active": "Active",
+    "sold": "Sold",
+    "rented": "Rented",
+    "archived": "Archived",
+    "clearFilters": "Clear filters",
+    "apartment": "Apartment",
+    "house": "House",
+    "commercial": "Commercial",
+    "office": "Office",
+    "land": "Land",
+    "other": "Other"
   }
 }
