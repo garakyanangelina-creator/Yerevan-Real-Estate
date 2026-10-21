@@ -111,6 +111,46 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   }
 
+  // ?codes=0550,0566 — force-retranslate specific listing codes (title + description)
+  if (params.get("codes")) {
+    await ensureDatabase();
+    const codes = (params.get("codes") ?? "").split(",").map((c) => parseInt(c.trim(), 10)).filter(Boolean);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const listings = await (prisma.dbProperty as any).findMany({
+      where: { listingCode: { in: codes } },
+      select: { id: true, title: true, description: true, listingCode: true },
+    });
+    const results: Record<string, string> = {};
+    for (const listing of listings) {
+      try {
+        const sourceLang = detectLocale(listing.title);
+        const [titleT, descT] = await Promise.all([
+          translateToAllLocales(listing.title, sourceLang),
+          listing.description ? translateToAllLocales(listing.description.slice(0, 800), sourceLang) : Promise.resolve(null),
+        ]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const data: Record<string, any> = {};
+        if (titleT.en !== null) data.titleEn = titleT.en;
+        if (titleT.ru !== null) data.titleRu = titleT.ru;
+        if (titleT.hy !== null) data.titleHy = titleT.hy;
+        if (descT) {
+          if (descT.en !== null) data.descriptionEn = descT.en;
+          if (descT.ru !== null) data.descriptionRu = descT.ru;
+          if (descT.hy !== null) data.descriptionHy = descT.hy;
+        }
+        if (Object.keys(data).length > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (prisma.dbProperty as any).update({ where: { id: listing.id }, data });
+        }
+        results[listing.listingCode] = "ok";
+        await new Promise((r) => setTimeout(r, 1500));
+      } catch {
+        results[listing.listingCode] = "failed";
+      }
+    }
+    return NextResponse.json({ results });
+  }
+
   // ?check=true — show translation status without translating
   if (params.get("check") === "true") {
     await ensureDatabase();
