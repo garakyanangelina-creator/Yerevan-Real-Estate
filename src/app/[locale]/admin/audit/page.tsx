@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ClipboardList, ChevronLeft, ChevronRight, RefreshCw, Shield } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 
@@ -30,29 +31,23 @@ const ACTION_COLORS: Record<string, string> = {
   "account.password_change": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
 };
 
-function actionLabel(action: string): string {
-  const map: Record<string, string> = {
-    "login": "Login",
-    "logout": "Logout",
-    "login.2fa_required": "2FA Required",
-    "login.2fa_success": "2FA Passed",
-    "login.2fa_failed": "2FA Failed",
-    "listing.create": "Created Listing",
-    "listing.update": "Updated Listing",
-    "listing.delete": "Deleted Listing",
-    "listing.publish": "Published",
-    "listing.unpublish": "Unpublished",
-    "user.create": "Created User",
-    "user.update": "Updated User",
-    "user.delete": "Deleted User",
-    "user.deactivate": "Deactivated User",
-    "account.password_change": "Changed Password",
-    "account.username_change": "Changed Username",
-    "account.2fa_enable": "Enabled 2FA",
-    "account.2fa_disable": "Disabled 2FA",
-  };
-  return map[action] ?? action;
-}
+const ACTION_LABEL_KEYS: Record<string, string> = {
+  "login": "login",
+  "logout": "logout",
+  "listing.create": "listingCreate",
+  "listing.update": "listingUpdate",
+  "listing.delete": "listingDelete",
+  "listing.publish": "listingPublish",
+  "listing.unpublish": "listingUnpublish",
+  "user.create": "userCreate",
+  "user.update": "userUpdate",
+  "user.delete": "userDelete",
+  "user.deactivate": "userDeactivate",
+  "account.password_change": "passwordChange",
+  "account.username_change": "usernameChange",
+  "account.2fa_enable": "twoFaEnable",
+  "account.2fa_disable": "twoFaDisable",
+};
 
 function roleColor(role: string): string {
   if (role === "super_admin") return "text-gold-600 dark:text-gold-400";
@@ -61,6 +56,7 @@ function roleColor(role: string): string {
 }
 
 export default function AuditLogPage() {
+  const tA = useTranslations("audit");
   const [logs, setLogs] = useState<AuditEntry[]>([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -150,7 +146,7 @@ export default function AuditLogPage() {
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${ACTION_COLORS[log.action] ?? "bg-primary-100 text-primary-600 dark:bg-white/10 dark:text-white/60"}`}>
-                            {actionLabel(log.action)}
+                            {ACTION_LABEL_KEYS[log.action] ? tA(ACTION_LABEL_KEYS[log.action]) : log.action}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-primary-600 dark:text-white/70 max-w-[200px] truncate">

@@ -3,12 +3,14 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { Lock, Smartphone } from "lucide-react";
 
 type Step = "credentials" | "totp";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations("login");
   const [step, setStep] = useState<Step>("credentials");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,12 +35,12 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.status === 429) {
-        setError(data.error ?? "Too many attempts. Try again later.");
+        setError(data.error ?? t("tooManyAttempts"));
         return;
       }
 
       if (!res.ok) {
-        setError(data.error ?? "Invalid username or password");
+        setError(data.error ?? t("invalidCredentials"));
         return;
       }
 
@@ -55,10 +57,10 @@ export default function LoginPage() {
           router.push("/admin/dashboard");
         }
       } else {
-        setError(data.error ?? "Login failed");
+        setError(data.error ?? t("loginFailed"));
       }
     } catch {
-      setError("Connection error. Please try again.");
+      setError(t("connectionError"));
     } finally {
       setSubmitting(false);
     }
@@ -70,12 +72,12 @@ export default function LoginPage() {
         <div className="flex flex-col items-center gap-3">
           <Image src="/logo-new.png" alt="Yerevan Real Estate" width={56} height={56} className="rounded-xl" />
           <h1 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">
-            {step === "totp" ? "Two-Factor Auth" : "Staff Login"}
+            {step === "totp" ? t("twoFactorTitle") : t("title")}
           </h1>
           <p className="text-center text-xs text-primary-500 dark:text-white/60">
             {step === "totp"
-              ? "Enter the 6-digit code from your authenticator app"
-              : "Super Admin · Admin · Employee"}
+              ? t("twoFactorDesc")
+              : t("rolesSubtitle")}
           </p>
         </div>
 
@@ -84,7 +86,7 @@ export default function LoginPage() {
             <input
               required
               autoComplete="username"
-              placeholder="Username"
+              placeholder={t("usernamePlaceholder")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
@@ -93,7 +95,7 @@ export default function LoginPage() {
               required
               type="password"
               autoComplete="current-password"
-              placeholder="Password"
+              placeholder={t("passwordPlaceholder")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-primary-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
@@ -125,7 +127,7 @@ export default function LoginPage() {
               onClick={() => { setStep("credentials"); setTotpCode(""); setError(null); }}
               className="w-full text-xs text-primary-400 hover:text-primary-600 dark:text-white/40 dark:hover:text-white/70 transition"
             >
-              ← Back to login
+              {t("backToLogin")}
             </button>
           </div>
         )}
@@ -143,8 +145,8 @@ export default function LoginPage() {
           className="btn-primary w-full disabled:opacity-60"
         >
           {submitting
-            ? step === "totp" ? "Verifying…" : "Signing in…"
-            : step === "totp" ? "Verify Code" : "Sign In"}
+            ? step === "totp" ? t("verifying") : t("signingIn")
+            : step === "totp" ? t("verifyCode") : t("signIn")}
         </button>
       </form>
     </div>

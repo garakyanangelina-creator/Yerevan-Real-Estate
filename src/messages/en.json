@@ -591,5 +591,53 @@
     "noListingsMatch": "No listings match",
     "published": "Published",
     "draft": "Draft"
+  },
+  "login": {
+    "title": "Staff Login",
+    "twoFactorTitle": "Two-Factor Auth",
+    "rolesSubtitle": "Super Admin · Admin · Employee",
+    "twoFactorDesc": "Enter the 6-digit code from your authenticator app",
+    "usernamePlaceholder": "Username",
+    "passwordPlaceholder": "Password",
+    "signIn": "Sign In",
+    "verifyCode": "Verify Code",
+    "signingIn": "Signing in…",
+    "verifying": "Verifying…",
+    "backToLogin": "← Back to login",
+    "tooManyAttempts": "Too many attempts. Try again later.",
+    "invalidCredentials": "Invalid username or password",
+    "loginFailed": "Login failed",
+    "connectionError": "Connection error. Please try again."
+  },
+  "users": {
+    "roleSuperAdmin": "Super Admin",
+    "roleAdmin": "Admin",
+    "roleEmployee": "Employee",
+    "active": "Active",
+    "inactive": "Inactive",
+    "editTitle": "Edit / Reset Password",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "delete": "Delete"
+  },
+  "audit": {
+    "login": "Login",
+    "logout": "Logout",
+    "listingCreate": "Created Listing",
+    "listingUpdate": "Updated Listing",
+    "listingDelete": "Deleted Listing",
+    "listingPublish": "Published",
+    "listingUnpublish": "Unpublished",
+    "userCreate": "Created User",
+    "userUpdate": "Updated User",
+    "userDelete": "Deleted User",
+    "userDeactivate": "Deactivated User",
+    "passwordChange": "Changed Password",
+    "usernameChange": "Changed Username",
+    "twoFaEnable": "Enabled 2FA",
+    "twoFaDisable": "Disabled 2FA"
+  },
+  "contacts": {
+    "markAsRead": "Mark as read"
   }
 }

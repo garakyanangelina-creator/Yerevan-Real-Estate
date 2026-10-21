@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Mail, Phone, MessageSquare, CheckCheck } from "lucide-react";
 
 interface ContactRequest {
@@ -15,6 +16,7 @@ interface ContactRequest {
 }
 
 export default function ContactsPage() {
+  const t = useTranslations("contacts");
   const [contacts, setContacts] = useState<ContactRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -91,7 +93,7 @@ export default function ContactsPage() {
                 {!c.isRead && (
                   <button
                     onClick={() => markRead(c.id)}
-                    title="Mark as read"
+                    title={t("markAsRead")}
                     className="shrink-0 rounded-lg border border-primary-100 p-2 text-primary-400 hover:border-gold-400 hover:text-gold-600 dark:border-white/10"
                   >
                     <CheckCheck className="h-4 w-4" />

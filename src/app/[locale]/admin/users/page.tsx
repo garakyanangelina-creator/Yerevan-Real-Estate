@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { UserPlus, Pencil, Trash2, ShieldAlert, UserCheck, UserCog, Power } from "lucide-react";
 import AdminNav from "@/components/admin/AdminNav";
 import UserFormModal from "@/components/admin/UserFormModal";
@@ -15,14 +16,14 @@ interface UserRow {
   createdAt: string;
 }
 
-const ROLE_LABELS: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  super_admin: { label: "Super Admin", icon: ShieldAlert, color: "text-red-500" },
-  admin: { label: "Admin", icon: UserCog, color: "text-gold-600" },
-  employee: { label: "Employee", icon: UserCheck, color: "text-primary-600 dark:text-white/70" },
-};
-
 export default function UsersPage() {
   const router = useRouter();
+  const tU = useTranslations("users");
+  const ROLE_LABELS: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+    super_admin: { label: tU("roleSuperAdmin"), icon: ShieldAlert, color: "text-red-500" },
+    admin: { label: tU("roleAdmin"), icon: UserCog, color: "text-gold-600" },
+    employee: { label: tU("roleEmployee"), icon: UserCheck, color: "text-primary-600 dark:text-white/70" },
+  };
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ mode: "create" | "edit"; user?: UserRow } | null>(null);
@@ -119,7 +120,7 @@ export default function UsersPage() {
                           ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                           : "bg-primary-100 text-primary-500 dark:bg-primary-700/30 dark:text-white/40"
                       }`}>
-                        {user.isActive ? "Active" : "Inactive"}
+                        {user.isActive ? tU("active") : tU("inactive")}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-primary-400 dark:text-white/40">
@@ -129,14 +130,14 @@ export default function UsersPage() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setModal({ mode: "edit", user })}
-                          title="Edit / Reset Password"
+                          title={tU("editTitle")}
                           className="rounded p-1.5 text-primary-500 hover:bg-primary-50 hover:text-primary-800 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleToggleActive(user)}
-                          title={user.isActive ? "Deactivate" : "Activate"}
+                          title={user.isActive ? tU("deactivate") : tU("activate")}
                           className="rounded p-1.5 text-primary-500 hover:bg-primary-50 dark:text-white/50 dark:hover:bg-white/10"
                         >
                           <Power className={`h-4 w-4 ${user.isActive ? "text-green-500" : "text-primary-400"}`} />
@@ -144,7 +145,7 @@ export default function UsersPage() {
                         <button
                           onClick={() => handleDelete(user)}
                           disabled={deleting === user.id}
-                          title="Delete"
+                          title={tU("delete")}
                           className="rounded p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:hover:bg-red-900/20"
                         >
                           <Trash2 className="h-4 w-4" />

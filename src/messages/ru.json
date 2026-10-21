@@ -591,5 +591,53 @@
     "noListingsMatch": "Нет совпадающих объявлений",
     "published": "Опубликовано",
     "draft": "Черновик"
+  },
+  "login": {
+    "title": "Вход для сотрудников",
+    "twoFactorTitle": "Двухфакторная аутентификация",
+    "rolesSubtitle": "Глав. админ · Админ · Сотрудник",
+    "twoFactorDesc": "Введите 6-значный код из приложения",
+    "usernamePlaceholder": "Логин",
+    "passwordPlaceholder": "Пароль",
+    "signIn": "Войти",
+    "verifyCode": "Проверить код",
+    "signingIn": "Вход…",
+    "verifying": "Проверка…",
+    "backToLogin": "← Назад",
+    "tooManyAttempts": "Слишком много попыток.",
+    "invalidCredentials": "Неверный логин или пароль",
+    "loginFailed": "Ошибка входа",
+    "connectionError": "Ошибка соединения"
+  },
+  "users": {
+    "roleSuperAdmin": "Глав. админ",
+    "roleAdmin": "Админ",
+    "roleEmployee": "Сотрудник",
+    "active": "Активный",
+    "inactive": "Неактивный",
+    "editTitle": "Редактировать",
+    "deactivate": "Деактивировать",
+    "activate": "Активировать",
+    "delete": "Удалить"
+  },
+  "audit": {
+    "login": "Вход",
+    "logout": "Выход",
+    "listingCreate": "Создание объявления",
+    "listingUpdate": "Изменение объявления",
+    "listingDelete": "Удаление объявления",
+    "listingPublish": "Опубликовано",
+    "listingUnpublish": "Снято",
+    "userCreate": "Создание пользователя",
+    "userUpdate": "Изменение пользователя",
+    "userDelete": "Удаление пользователя",
+    "userDeactivate": "Деактивация",
+    "passwordChange": "Смена пароля",
+    "usernameChange": "Смена логина",
+    "twoFaEnable": "2FA включёно",
+    "twoFaDisable": "2FA отключено"
+  },
+  "contacts": {
+    "markAsRead": "Отметить как прочитанное"
   }
 }
