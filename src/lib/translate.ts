@@ -20,7 +20,8 @@ async function callMyMemory(text: string, from: string, to: string): Promise<str
   if (!res.ok) throw new Error(`MyMemory HTTP ${res.status}`);
   const json = await res.json();
   const translated: string = json?.responseData?.translatedText ?? "";
-  if (!translated || json?.responseStatus === 429) throw new Error("MyMemory quota or empty");
+  if (!translated || json?.responseStatus === 429 || json?.quotaFinished === true)
+    throw new Error("MyMemory quota or empty");
   return translated;
 }
 

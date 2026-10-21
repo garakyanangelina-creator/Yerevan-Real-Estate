@@ -52,7 +52,7 @@ async function runBackfill(force: boolean) {
         await (prisma.dbProperty as any).update({ where: { id: listing.id }, data });
       }
       translated++;
-      await new Promise((r) => setTimeout(r, 300));
+      await new Promise((r) => setTimeout(r, 800));
     } catch {
       failed++;
     }
