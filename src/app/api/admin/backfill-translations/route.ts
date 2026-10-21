@@ -55,12 +55,13 @@ async function runBackfill(force: boolean) {
   return { translated, skipped, failed, total: listings.length };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await getSession();
   if (!session || session.role === "employee") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const result = await runBackfill(false);
+  const force = new URL(request.url).searchParams.get("force") === "true";
+  const result = await runBackfill(force);
   return NextResponse.json(result);
 }
 
