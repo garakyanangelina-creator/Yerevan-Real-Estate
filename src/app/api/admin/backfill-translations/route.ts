@@ -136,6 +136,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ cleared, total: rows.length });
   }
 
+  // ?clearDesc=0575 — null out description translations for a specific listing so it falls back
+  if (params.get("clearDesc")) {
+    await ensureDatabase();
+    const code = parseInt(params.get("clearDesc") ?? "", 10);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const listing = await (prisma.dbProperty as any).findFirst({ where: { listingCode: code }, select: { id: true } });
+    if (!listing) return NextResponse.json({ error: "not found" });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (prisma.dbProperty as any).update({ where: { id: listing.id }, data: { descriptionEn: null, descriptionRu: null, descriptionHy: null } });
+    return NextResponse.json({ cleared: code });
+  }
+
   // ?inspect=0575 — show stored translations for a single listing code
   if (params.get("inspect")) {
     await ensureDatabase();
