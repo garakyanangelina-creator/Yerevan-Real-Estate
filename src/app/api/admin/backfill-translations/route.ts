@@ -16,8 +16,6 @@ async function runBackfill(force: boolean) {
   let failed = 0;
 
   for (const listing of listings) {
-    // Skip only if all three locales are populated AND different from the original title
-    // (same value = translation failed and stored the source text as fallback)
     const allPopulated = listing.titleEn && listing.titleRu && listing.titleHy;
     const anyBad =
       listing.titleEn === listing.title ||
@@ -30,10 +28,8 @@ async function runBackfill(force: boolean) {
 
     try {
       const sourceLang = detectLocale(listing.title);
-      // Translate titles only — descriptions are long and exhaust the free quota
       const titleT = await translateToAllLocales(listing.title, sourceLang);
 
-      // Build update data — only include fields that were actually translated (non-null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data: Record<string, any> = {};
       if (titleT.en !== null) data.titleEn = titleT.en;
@@ -54,6 +50,52 @@ async function runBackfill(force: boolean) {
   return { translated, skipped, failed, total: listings.length };
 }
 
+// Translate descriptions in small batches to stay within daily API quota
+async function runDescBackfill(limit: number) {
+  await ensureDatabase();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const listings = await (prisma.dbProperty as any).findMany({
+    select: { id: true, title: true, description: true, descriptionEn: true, descriptionRu: true, descriptionHy: true },
+  });
+
+  // Only process listings that have a description but are missing translated descriptions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const todo = listings.filter((l: any) =>
+    l.description && (!l.descriptionRu || l.descriptionRu === l.description)
+  ).slice(0, limit);
+
+  let translated = 0;
+  let skipped = listings.length - todo.length;
+  let failed = 0;
+
+  for (const listing of todo) {
+    try {
+      const sourceLang = detectLocale(listing.title);
+      const desc = listing.description.slice(0, 800); // cap to save quota
+      const descT = await translateToAllLocales(desc, sourceLang);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data: Record<string, any> = {};
+      if (descT.en !== null) data.descriptionEn = descT.en;
+      if (descT.ru !== null) data.descriptionRu = descT.ru;
+      if (descT.hy !== null) data.descriptionHy = descT.hy;
+
+      if (Object.keys(data).length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (prisma.dbProperty as any).update({ where: { id: listing.id }, data });
+      }
+      translated++;
+      await new Promise((r) => setTimeout(r, 1500));
+    } catch {
+      failed++;
+    }
+  }
+
+  const remaining = todo.length - translated - failed;
+  return { translated, skipped, failed, total: listings.length, remaining: Math.max(0, listings.length - skipped - translated) };
+}
+
 export async function GET(request: Request) {
   const session = await getSession();
   if (!session || session.role === "employee") {
@@ -61,6 +103,13 @@ export async function GET(request: Request) {
   }
   const params = new URL(request.url).searchParams;
   const force = params.get("force") === "true";
+
+  // ?desc=true — translate descriptions in small batches (default 5 per call)
+  if (params.get("desc") === "true") {
+    const limit = Math.min(20, parseInt(params.get("limit") ?? "5", 10) || 5);
+    const result = await runDescBackfill(limit);
+    return NextResponse.json(result);
+  }
 
   // ?check=true — show translation status without translating
   if (params.get("check") === "true") {
