@@ -30,10 +30,8 @@ async function runBackfill(force: boolean) {
 
     try {
       const sourceLang = detectLocale(listing.title);
-      const [titleT, descT] = await Promise.all([
-        translateToAllLocales(listing.title, sourceLang),
-        listing.description ? translateToAllLocales(listing.description, sourceLang) : Promise.resolve(null),
-      ]);
+      // Translate titles only — descriptions are long and exhaust the free quota
+      const titleT = await translateToAllLocales(listing.title, sourceLang);
 
       // Build update data — only include fields that were actually translated (non-null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,18 +39,13 @@ async function runBackfill(force: boolean) {
       if (titleT.en !== null) data.titleEn = titleT.en;
       if (titleT.ru !== null) data.titleRu = titleT.ru;
       if (titleT.hy !== null) data.titleHy = titleT.hy;
-      if (descT) {
-        if (descT.en !== null) data.descriptionEn = descT.en;
-        if (descT.ru !== null) data.descriptionRu = descT.ru;
-        if (descT.hy !== null) data.descriptionHy = descT.hy;
-      }
 
       if (Object.keys(data).length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (prisma.dbProperty as any).update({ where: { id: listing.id }, data });
       }
       translated++;
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 1200));
     } catch {
       failed++;
     }
