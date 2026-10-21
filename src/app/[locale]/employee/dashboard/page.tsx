@@ -585,7 +585,7 @@ export default function EmployeeDashboard() {
             </span>
           </div>
           <button onClick={() => setMode("list")} className="btn-outline text-sm">
-            ← Back
+            ← {tEP("back")}
           </button>
         </div>
 
