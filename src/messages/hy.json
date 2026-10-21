@@ -1,12 +1,19 @@
 {
   "nav": {
+    "home": "Գлхавор",
+    "search": "Орноом",
+    "buy": "Гнел",
+    "rent": "Варцакалел",
+    "commercial": "Комерцион",
+    "submit": "Тегадрел хайтараррутюн",
+    "contact": "Кап",
+    "admin": "Админ",
     "dashboard": "Վահanakak",
     "clients": "Հaджordnerr",
     "contacts": "Kaap",
     "users": "Ogtaterrer",
     "auditLog": "Matyan",
-    "superAdmin": "Glkh. Admin",
-    "admin": "Adminishtratorr"
+    "superAdmin": "Glkh. Admin"
   },
   "hero": {
     "title": "Գտեք ձեր տեղը Երևանում",

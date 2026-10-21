@@ -1,12 +1,19 @@
 {
   "nav": {
+    "home": "Home",
+    "search": "Search",
+    "buy": "Buy",
+    "rent": "Rent",
+    "commercial": "Commercial",
+    "submit": "List Your Property",
+    "contact": "Contact",
+    "admin": "Admin",
     "dashboard": "Dashboard",
     "clients": "Clients",
     "contacts": "Contacts",
     "users": "Users",
     "auditLog": "Audit Log",
-    "superAdmin": "Super Admin",
-    "admin": "Admin"
+    "superAdmin": "Super Admin"
   },
   "hero": {
     "title": "Find Your Place in Yerevan",

@@ -509,23 +509,23 @@ function DashboardContent() {
       <div className="mt-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h1 className="font-serif text-3xl font-semibold text-primary-900 dark:text-white">
-            Dashboard
+            {tNav("dashboard")}
           </h1>
           <span className="rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gold-700 dark:bg-gold-900/30 dark:text-gold-300">
-            {role === "super_admin" ? "Super Admin" : "Admin"}
+            {role === "super_admin" ? tNav("superAdmin") : tNav("admin")}
           </span>
         </div>
         <button
           onClick={() => { setShowCreate(true); setForm(emptyForm()); setStreetQuery(""); setSaveError(""); }}
           className="flex items-center gap-2 rounded-xl bg-gold-500 px-4 py-2 text-sm font-semibold text-primary-900 shadow-sm hover:bg-gold-400 transition"
         >
-          <Plus className="h-4 w-4" /> New Listing
+          <Plus className="h-4 w-4" /> {tF("newListing")}
         </button>
       </div>
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Building2} label={tAdmin("properties")} value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} published`} />
+        <StatCard icon={Building2} label={tAdmin("properties")} value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} ${tAdmin("published")}`} />
         {role === "super_admin" && (
           <>
             <StatCard icon={UserCog} label={tNav("admin")} value={adminCount} />
@@ -540,7 +540,7 @@ function DashboardContent() {
           <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl dark:bg-primary-900">
             <div className="flex items-center justify-between border-b border-primary-100 px-6 py-4 dark:border-white/10">
               <h2 className="font-serif text-lg font-semibold text-primary-900 dark:text-white">
-                New Listing / Նոր հայտ
+                {tF("newListing")}
               </h2>
               <button onClick={() => setShowCreate(false)} className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-100 dark:hover:bg-white/10">
                 <X className="h-5 w-5" />
@@ -733,7 +733,7 @@ function DashboardContent() {
         <section className="mt-10">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">
-              All Listings
+              {tF("allListings")}
             </h2>
             <span className="text-sm text-primary-400 dark:text-white/40">
               {(() => {
