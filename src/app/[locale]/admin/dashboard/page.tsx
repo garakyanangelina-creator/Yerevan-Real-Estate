@@ -126,6 +126,8 @@ function AdminListingCard({ listing: l, locale, toggling, updatingStatus, onPubl
   const tDistricts = useTranslations("districts");
   const tPurpose = useTranslations("purpose");
   const tAdmin = useTranslations("admin");
+  const tF = useTranslations("listingForm");
+  const tNav = useTranslations("nav");
   const tStatus = useTranslations("status");
   const STATUS_KEYS = ["active", "available", "sold", "rented", "archived"] as const;
   type StatusKey = typeof STATUS_KEYS[number];
@@ -277,6 +279,12 @@ function DashboardContent() {
 
   const locale = useLocale();
   const tL = useTranslations("listing");
+  const tAdmin = useTranslations("admin");
+  const tF = useTranslations("listingForm");
+  const tNav = useTranslations("nav");
+  const tTypes = useTranslations("propertyTypes");
+  const tPurpose = useTranslations("purpose");
+  const tDistricts = useTranslations("districts");
   const [role, setRole] = useState<string | null>(null);
   const [dbListings, setDbListings] = useState<DbListing[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -517,11 +525,11 @@ function DashboardContent() {
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Building2} label="Total Listings" value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} published`} />
+        <StatCard icon={Building2} label={tAdmin("properties")} value={dbListings.length} sub={`${dbListings.filter(l => l.isPublished).length} published`} />
         {role === "super_admin" && (
           <>
-            <StatCard icon={UserCog} label="Admins" value={adminCount} />
-            <StatCard icon={UserCheck} label="Employees" value={employeeCount} />
+            <StatCard icon={UserCog} label={tNav("admin")} value={adminCount} />
+            <StatCard icon={UserCheck} label={tNav("users")} value={employeeCount} />
           </>
         )}
       </div>
@@ -542,14 +550,14 @@ function DashboardContent() {
               {/* Title */}
               <div>
                 <label className={labelCls}>Title / Վերնագիր *</label>
-                <input required className={inputCls} placeholder="e.g. 3-room apartment in Kentron"
+                <input required className={inputCls} placeholder={tF("titlePlaceholder")}
                   value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               </div>
 
               {/* Description */}
               <div>
                 <label className={labelCls}>Description / Նկարագրություն</label>
-                <textarea rows={3} className={inputCls} placeholder="Describe the property…"
+                <textarea rows={3} className={inputCls} placeholder={tF("descriptionPlaceholder")}
                   value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
 
@@ -587,7 +595,7 @@ function DashboardContent() {
               <div ref={streetRef} className="relative">
                 <label className={labelCls}>Street / Փողոց</label>
                 <div className="relative">
-                  <input className={inputCls} placeholder="Type street name…" value={streetQuery} autoComplete="off"
+                  <input className={inputCls} placeholder={tF("streetPlaceholder")} value={streetQuery} autoComplete="off"
                     onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
                     onBlur={closeStreetSuggestionsDelayed} />
                   {streetQuery && (
@@ -622,7 +630,7 @@ function DashboardContent() {
                     <button type="button"
                       onClick={() => { const q = streetQuery; setStreetQuery(""); setTimeout(() => setStreetQuery(q), 50); }}
                       className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
-                      <RefreshCw className="h-3 w-3" /> Retry
+                      <RefreshCw className="h-3 w-3" />{tF("retry")}
                     </button>
                   </div>
                 )}
@@ -631,7 +639,7 @@ function DashboardContent() {
               {/* Building number */}
               <div>
                 <label className={labelCls}>Building No. / Շ. համար</label>
-                <input className={inputCls} placeholder="e.g. 12, 7a"
+                <input className={inputCls} placeholder={tF("buildingPlaceholder")}
                   value={form.buildingNumber} onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} />
               </div>
 
@@ -688,7 +696,7 @@ function DashboardContent() {
                 <label className={labelCls}>Photos / Լուսանկարներ</label>
                 <label className="flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-primary-200 p-4 text-sm text-primary-500 dark:border-white/15 hover:border-gold-400 transition">
                   <Upload className="h-5 w-5" />
-                  {uploading ? "Uploading…" : "Upload photos"}
+                  {uploading ? tF("uploading") : tF("upload")}
                   <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
                     onChange={(e) => handleUpload(e.target.files)} />
                 </label>
@@ -712,7 +720,7 @@ function DashboardContent() {
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowCreate(false)} className="btn-outline flex-1">Cancel</button>
                 <button type="submit" disabled={saving || uploading} className="flex-1 rounded-xl bg-gold-500 px-4 py-2.5 text-sm font-semibold text-primary-900 hover:bg-gold-400 disabled:opacity-60 transition">
-                  {saving ? "Creating…" : "Create & Publish"}
+                  {saving ? tF("creating") : tF("createPublish")}
                 </button>
               </div>
             </form>

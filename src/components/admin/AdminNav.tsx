@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, LogOut, Users, LayoutDashboard, ShieldAlert, KeyRound, X, MessageSquare, Shield, ClipboardList, QrCode, ShieldCheck, ShieldOff } from "lucide-react";
 import { Link, useRouter } from "@/i18n/routing";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface AdminNotification {
   id: string;
@@ -24,6 +25,10 @@ export default function AdminNav({
   role: "super_admin" | "admin" | string;
 }) {
   const router = useRouter();
+  const tNav = useTranslations("nav");
+  const tN = useTranslations("notifications");
+  const tS = useTranslations("settings");
+  const tAdmin = useTranslations("admin");
 
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -33,16 +38,13 @@ export default function AdminNav({
   const [showSettings, setShowSettings] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"password" | "username" | "2fa">("password");
 
-  // Password/username form state
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [unForm, setUnForm] = useState({ newUsername: "", password: "" });
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // 2FA state
   const [twoFaEnabled, setTwoFaEnabled] = useState<boolean | null>(null);
   const [qrUri, setQrUri] = useState<string | null>(null);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrSecret, setQrSecret] = useState<string | null>(null);
   const [totpCode, setTotpCode] = useState("");
   const [disableForm, setDisableForm] = useState({ password: "", code: "" });
@@ -51,29 +53,29 @@ export default function AdminNav({
 
   async function changePassword() {
     clearMsg();
-    if (pwForm.next !== pwForm.confirm) { setMsg({ text: "Passwords don't match", ok: false }); return; }
-    if (pwForm.next.length < 8) { setMsg({ text: "Min 8 characters", ok: false }); return; }
+    if (pwForm.next !== pwForm.confirm) { setMsg({ text: tS("passwordsNoMatch"), ok: false }); return; }
+    if (pwForm.next.length < 8) { setMsg({ text: tS("minChars"), ok: false }); return; }
     setLoading(true);
     const res = await fetch("/api/auth/change-password", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
     });
     setLoading(false);
-    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setMsg({ text: "Password changed.", ok: true }); }
-    else { const d = await res.json(); setMsg({ text: d.error ?? "Error", ok: false }); }
+    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setMsg({ text: tS("passwordChanged"), ok: true }); }
+    else { const d = await res.json(); setMsg({ text: d.error ?? tS("error"), ok: false }); }
   }
 
   async function changeUsername() {
     clearMsg();
-    if (!unForm.newUsername.trim() || !unForm.password) { setMsg({ text: "All fields required", ok: false }); return; }
+    if (!unForm.newUsername.trim() || !unForm.password) { setMsg({ text: tS("allRequired"), ok: false }); return; }
     setLoading(true);
     const res = await fetch("/api/auth/change-username", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ newUsername: unForm.newUsername.trim(), password: unForm.password }),
     });
     setLoading(false);
-    if (res.ok) { setUnForm({ newUsername: "", password: "" }); setMsg({ text: "Username changed.", ok: true }); }
-    else { const d = await res.json(); setMsg({ text: d.error ?? "Error", ok: false }); }
+    if (res.ok) { setUnForm({ newUsername: "", password: "" }); setMsg({ text: tS("usernameChanged"), ok: true }); }
+    else { const d = await res.json(); setMsg({ text: d.error ?? tS("error"), ok: false }); }
   }
 
   async function load2FaStatus() {
@@ -89,18 +91,11 @@ export default function AdminNav({
     try {
       const res = await fetch("/api/auth/2fa/setup");
       const data = await res.json();
-      if (res.ok) {
-        setQrUri(data.uri);
-        setQrDataUrl(null);
-        setQrSecret(data.secret);
-      } else {
-        setMsg({ text: data.error ?? "Setup failed (unknown)", ok: false });
-      }
+      if (res.ok) { setQrUri(data.uri); setQrSecret(data.secret); }
+      else { setMsg({ text: data.error ?? tS("error"), ok: false }); }
     } catch {
-      setMsg({ text: "Network error, please try again", ok: false });
-    } finally {
-      setLoading(false);
-    }
+      setMsg({ text: tS("networkError"), ok: false });
+    } finally { setLoading(false); }
   }
 
   async function verify2Fa() {
@@ -111,12 +106,12 @@ export default function AdminNav({
     });
     setLoading(false);
     if (res.ok) {
-      setMsg({ text: "2FA enabled! Your account is now protected.", ok: true });
+      setMsg({ text: tS("twoFaEnabledMsg"), ok: true });
       setQrUri(null); setQrSecret(null); setTotpCode("");
       setTwoFaEnabled(true);
     } else {
       const d = await res.json();
-      setMsg({ text: d.error ?? "Invalid code", ok: false });
+      setMsg({ text: d.error ?? tS("error"), ok: false });
     }
   }
 
@@ -128,12 +123,12 @@ export default function AdminNav({
     });
     setLoading(false);
     if (res.ok) {
-      setMsg({ text: "2FA disabled.", ok: true });
+      setMsg({ text: tS("twoFaDisabledMsg"), ok: true });
       setDisableForm({ password: "", code: "" });
       setTwoFaEnabled(false);
     } else {
       const d = await res.json();
-      setMsg({ text: d.error ?? "Error", ok: false });
+      setMsg({ text: d.error ?? tS("error"), ok: false });
     }
   }
 
@@ -211,23 +206,23 @@ export default function AdminNav({
   return (
     <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
       <nav className="flex items-center gap-5 flex-wrap">
-        {navLink("/admin/dashboard", "dashboard", LayoutDashboard, "Dashboard")}
-        {navLink("/admin/clients", "clients", Users, "Clients")}
-        {navLink("/admin/contacts", "contacts", MessageSquare, "Contacts")}
-        {role === "super_admin" && navLink("/admin/users", "users", ShieldAlert, "Users")}
-        {navLink("/admin/audit", "audit", ClipboardList, "Audit Log")}
+        {navLink("/admin/dashboard", "dashboard", LayoutDashboard, tNav("dashboard"))}
+        {navLink("/admin/clients", "clients", Users, tNav("clients"))}
+        {navLink("/admin/contacts", "contacts", MessageSquare, tNav("contacts"))}
+        {role === "super_admin" && navLink("/admin/users", "users", ShieldAlert, tNav("users"))}
+        {navLink("/admin/audit", "audit", ClipboardList, tNav("auditLog"))}
       </nav>
 
       <div className="flex items-center gap-2">
         <span className="hidden rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-500 dark:bg-white/10 dark:text-white/60 sm:block">
-          {role === "super_admin" ? "Super Admin" : "Admin"}
+          {role === "super_admin" ? tNav("superAdmin") : tNav("admin")}
         </span>
 
         {/* Notification bell */}
         <div className="relative" ref={panelRef}>
           <button
             onClick={() => setNotifOpen((v) => !v)}
-            aria-label="Notifications"
+            aria-label={tN("title")}
             className="relative rounded-full border border-primary-200 p-2 text-primary-700 transition hover:bg-primary-50 dark:border-white/20 dark:text-white dark:hover:bg-white/10"
           >
             <Bell className="h-4 w-4" />
@@ -240,21 +235,21 @@ export default function AdminNav({
           {notifOpen && (
             <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-primary-100 bg-white shadow-soft dark:border-white/10 dark:bg-primary-800">
               <div className="flex items-center justify-between border-b border-primary-100 px-4 py-2 dark:border-white/10">
-                <span className="text-sm font-semibold text-primary-900 dark:text-white">Notifications</span>
+                <span className="text-sm font-semibold text-primary-900 dark:text-white">{tN("title")}</span>
                 {unreadCount > 0 && (
-                  <button onClick={markAllRead} className="text-xs text-gold-600 hover:underline">Mark all read</button>
+                  <button onClick={markAllRead} className="text-xs text-gold-600 hover:underline">{tN("markAllRead")}</button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <p className="p-4 text-center text-sm text-primary-500 dark:text-white/60">No notifications</p>
+                  <p className="p-4 text-center text-sm text-primary-500 dark:text-white/60">{tN("empty")}</p>
                 ) : (
                   notifications.map((n) => (
                     <button key={n.id} onClick={() => viewMatches(n)}
                       className={`block w-full border-b border-primary-50 px-4 py-3 text-left text-sm hover:bg-primary-50 dark:border-white/5 dark:hover:bg-white/5 ${n.isRead ? "text-primary-500 dark:text-white/50" : "font-medium text-primary-900 dark:text-white"}`}
                     >
                       <p className="line-clamp-1">{n.propertyTitle}</p>
-                      <p className="mt-0.5 text-xs text-gold-600">{n.matchCount} matching clients</p>
+                      <p className="mt-0.5 text-xs text-gold-600">{n.matchCount} {tN("matchingClients")}</p>
                     </button>
                   ))
                 )}
@@ -264,10 +259,10 @@ export default function AdminNav({
         </div>
 
         <button onClick={() => openSettings("password")} className="btn-outline gap-2 text-sm">
-          <KeyRound className="h-4 w-4" /> Settings
+          <KeyRound className="h-4 w-4" /> {tS("title")}
         </button>
         <button onClick={logout} className="btn-outline gap-2 text-sm">
-          <LogOut className="h-4 w-4" /> Sign Out
+          <LogOut className="h-4 w-4" /> {tAdmin("logout")}
         </button>
       </div>
 
@@ -276,7 +271,7 @@ export default function AdminNav({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-primary-800 max-h-[90vh] overflow-y-auto">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-serif text-lg font-semibold text-primary-900 dark:text-white">Account Settings</h2>
+              <h2 className="font-serif text-lg font-semibold text-primary-900 dark:text-white">{tS("title")}</h2>
               <button onClick={() => { setShowSettings(false); clearMsg(); setQrUri(null); setQrSecret(null); }}
                 className="text-primary-400 hover:text-primary-700 dark:text-white/50 dark:hover:text-white">
                 <X className="h-5 w-5" />
@@ -284,9 +279,9 @@ export default function AdminNav({
             </div>
 
             <div className="mb-4 flex gap-2">
-              {tabBtn("password", "Password")}
-              {tabBtn("username", "Username")}
-              {tabBtn("2fa", "2FA")}
+              {tabBtn("password", tS("passwordTab"))}
+              {tabBtn("username", tS("usernameTab"))}
+              {tabBtn("2fa", tS("twoFaTab"))}
             </div>
 
             {msg && (
@@ -297,25 +292,25 @@ export default function AdminNav({
 
             {settingsTab === "password" && (
               <div className="space-y-3">
-                <input type="password" placeholder="Current password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className={inputCls} />
-                <input type="password" placeholder="New password (min 8 chars)" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} className={inputCls} />
-                <input type="password" placeholder="Confirm new password" value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className={inputCls} />
-                <button onClick={changePassword} disabled={loading} className="btn-primary w-full">{loading ? "Saving…" : "Save Password"}</button>
+                <input type="password" placeholder={tS("currentPassword")} value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} className={inputCls} />
+                <input type="password" placeholder={tS("newPassword")} value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} className={inputCls} />
+                <input type="password" placeholder={tS("confirmPassword")} value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} className={inputCls} />
+                <button onClick={changePassword} disabled={loading} className="btn-primary w-full">{loading ? tS("saving") : tS("savePassword")}</button>
               </div>
             )}
 
             {settingsTab === "username" && (
               <div className="space-y-3">
-                <input type="text" placeholder="New username" value={unForm.newUsername} onChange={e => setUnForm(f => ({ ...f, newUsername: e.target.value }))} className={inputCls} autoComplete="off" />
-                <input type="password" placeholder="Confirm with your password" value={unForm.password} onChange={e => setUnForm(f => ({ ...f, password: e.target.value }))} className={inputCls} />
-                <button onClick={changeUsername} disabled={loading} className="btn-primary w-full">{loading ? "Saving…" : "Save Username"}</button>
+                <input type="text" placeholder={tS("newUsername")} value={unForm.newUsername} onChange={e => setUnForm(f => ({ ...f, newUsername: e.target.value }))} className={inputCls} autoComplete="off" />
+                <input type="password" placeholder={tS("confirmWithPassword")} value={unForm.password} onChange={e => setUnForm(f => ({ ...f, password: e.target.value }))} className={inputCls} />
+                <button onClick={changeUsername} disabled={loading} className="btn-primary w-full">{loading ? tS("saving") : tS("saveUsername")}</button>
               </div>
             )}
 
             {settingsTab === "2fa" && (
               <div className="space-y-4">
                 {twoFaEnabled === null && (
-                  <p className="text-sm text-primary-500 dark:text-white/60">Loading…</p>
+                  <p className="text-sm text-primary-500 dark:text-white/60">{tS("loading")}</p>
                 )}
 
                 {twoFaEnabled === false && !qrUri && (
@@ -323,24 +318,20 @@ export default function AdminNav({
                     <div className="rounded-lg bg-primary-50 p-3 dark:bg-white/10">
                       <div className="flex items-center gap-2 mb-1">
                         <Shield className="h-4 w-4 text-gold-500" />
-                        <span className="text-sm font-semibold text-primary-900 dark:text-white">Two-Factor Authentication</span>
+                        <span className="text-sm font-semibold text-primary-900 dark:text-white">{tS("twoFaTitle")}</span>
                       </div>
-                      <p className="text-xs text-primary-500 dark:text-white/60">
-                        Add an extra layer of security. After enabling, you&apos;ll need your phone to log in.
-                      </p>
+                      <p className="text-xs text-primary-500 dark:text-white/60">{tS("twoFaDesc")}</p>
                     </div>
                     <button onClick={start2FaSetup} disabled={loading} className="btn-primary w-full gap-2">
-                      <QrCode className="h-4 w-4" /> {loading ? "Loading…" : "Enable 2FA"}
+                      <QrCode className="h-4 w-4" /> {loading ? tS("loading") : tS("enable2fa")}
                     </button>
                   </div>
                 )}
 
                 {twoFaEnabled === false && qrUri && (
                   <div className="space-y-3">
-                    <p className="text-sm font-medium text-primary-900 dark:text-white">
-                      1. Install <strong>Google Authenticator</strong> or <strong>Authy</strong> on your phone.
-                    </p>
-                    <p className="text-sm text-primary-600 dark:text-white/70">2. Scan this QR code:</p>
+                    <p className="text-sm font-medium text-primary-900 dark:text-white">1. {tS("step1")}</p>
+                    <p className="text-sm text-primary-600 dark:text-white/70">{tS("step2")}</p>
                     <div className="flex justify-center rounded-xl bg-white p-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -352,22 +343,18 @@ export default function AdminNav({
                     </div>
                     {qrSecret && (
                       <div className="rounded-lg bg-primary-50 p-2 dark:bg-white/10">
-                        <p className="text-xs text-primary-500 dark:text-white/50 mb-1">Manual entry key:</p>
+                        <p className="text-xs text-primary-500 dark:text-white/50 mb-1">{tS("manualKey")}</p>
                         <p className="font-mono text-xs break-all text-primary-800 dark:text-white select-all">{qrSecret}</p>
                       </div>
                     )}
-                    <p className="text-sm text-primary-600 dark:text-white/70">3. Enter the 6-digit code:</p>
+                    <p className="text-sm text-primary-600 dark:text-white/70">{tS("step3")}</p>
                     <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="000000"
-                      maxLength={6}
-                      value={totpCode}
-                      onChange={e => setTotpCode(e.target.value.replace(/\D/g, ""))}
+                      type="text" inputMode="numeric" placeholder="000000" maxLength={6}
+                      value={totpCode} onChange={e => setTotpCode(e.target.value.replace(/\D/g, ""))}
                       className={inputCls + " text-center tracking-widest text-lg"}
                     />
                     <button onClick={verify2Fa} disabled={loading || totpCode.length !== 6} className="btn-primary w-full gap-2">
-                      <ShieldCheck className="h-4 w-4" /> {loading ? "Verifying…" : "Activate 2FA"}
+                      <ShieldCheck className="h-4 w-4" /> {loading ? tS("verifying") : tS("activate2fa")}
                     </button>
                   </div>
                 )}
@@ -377,15 +364,15 @@ export default function AdminNav({
                     <div className="rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400" />
-                        <span className="text-sm font-semibold text-green-700 dark:text-green-400">2FA is Active</span>
+                        <span className="text-sm font-semibold text-green-700 dark:text-green-400">{tS("twoFaActive")}</span>
                       </div>
-                      <p className="mt-1 text-xs text-green-600 dark:text-green-500">Your account requires an authenticator code to log in.</p>
+                      <p className="mt-1 text-xs text-green-600 dark:text-green-500">{tS("twoFaActiveDesc")}</p>
                     </div>
-                    <p className="text-sm font-medium text-primary-800 dark:text-white">To disable 2FA:</p>
-                    <input type="password" placeholder="Your password" value={disableForm.password} onChange={e => setDisableForm(f => ({ ...f, password: e.target.value }))} className={inputCls} />
-                    <input type="text" inputMode="numeric" placeholder="Authenticator code" maxLength={6} value={disableForm.code} onChange={e => setDisableForm(f => ({ ...f, code: e.target.value.replace(/\D/g, "") }))} className={inputCls + " tracking-widest"} />
+                    <p className="text-sm font-medium text-primary-800 dark:text-white">{tS("toDisable2fa")}</p>
+                    <input type="password" placeholder={tS("yourPassword")} value={disableForm.password} onChange={e => setDisableForm(f => ({ ...f, password: e.target.value }))} className={inputCls} />
+                    <input type="text" inputMode="numeric" placeholder={tS("authCode")} maxLength={6} value={disableForm.code} onChange={e => setDisableForm(f => ({ ...f, code: e.target.value.replace(/\D/g, "") }))} className={inputCls + " tracking-widest"} />
                     <button onClick={disable2Fa} disabled={loading} className="w-full rounded-lg border border-red-400 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 flex items-center justify-center gap-2">
-                      <ShieldOff className="h-4 w-4" /> {loading ? "Disabling…" : "Disable 2FA"}
+                      <ShieldOff className="h-4 w-4" /> {loading ? tS("disabling") : tS("disable2fa")}
                     </button>
                   </div>
                 )}

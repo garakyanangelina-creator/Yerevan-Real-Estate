@@ -6,14 +6,20 @@ import {
   BedDouble, Bath, Ruler, Building2, MapPin, Phone, User,
   Lock, Home, ArrowLeft, Pencil, Trash2, Eye, EyeOff, Link2, Check,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import Gallery from "@/components/property/Gallery";
 
 export interface StaffListing {
   id: string;
   title: string;
+  titleEn?: string | null;
+  titleRu?: string | null;
+  titleHy?: string | null;
   description: string | null;
+  descriptionEn?: string | null;
+  descriptionRu?: string | null;
+  descriptionHy?: string | null;
   type: string;
   purpose: string;
   district: string;
@@ -43,18 +49,6 @@ interface Props {
   role: string;
 }
 
-const DISTRICT_LABELS: Record<string, string> = {
-  kentron: "Kentron", arabkir: "Arabkir", davtashen: "Davtashen",
-  ajapnyak: "Ajapnyak", shengavit: "Shengavit", "kanaker-zeytun": "Kanaker-Zeytun",
-  "nor-nork": "Nor Nork", "malatia-sebastia": "Malatia-Sebastia", avan: "Avan",
-  erebuni: "Erebuni", "nork-marash": "Nork-Marash", nubarashen: "Nubarashen", other: "Other",
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  apartment: "Apartment", house: "House", commercial: "Commercial",
-  office: "Office", land: "Land",
-};
-
 const STATUS_COLORS: Record<string, string> = {
   active:    "bg-green-100 text-green-700",
   available: "bg-green-100 text-green-700",
@@ -66,6 +60,11 @@ const STATUS_COLORS: Record<string, string> = {
 export default function StaffListingView({ listing, backHref, onEdit, onDelete, role }: Props) {
   const locale = useLocale();
   const router = useRouter();
+  const t = useTranslations("staffView");
+  const tTypes = useTranslations("propertyTypes");
+  const tDistricts = useTranslations("districts");
+  const tPurpose = useTranslations("purpose");
+  const tStatus = useTranslations("status");
   const [copied, setCopied] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [isPublished, setIsPublished] = useState(listing.isPublished);
@@ -74,13 +73,25 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
     ? String(listing.listingCode).padStart(4, "0")
     : null;
 
+  const localeTitle =
+    (locale === "ru" && listing.titleRu) ||
+    (locale === "en" && listing.titleEn) ||
+    (locale === "hy" && listing.titleHy) ||
+    listing.title;
+
+  const localeDesc =
+    (locale === "ru" && listing.descriptionRu) ||
+    (locale === "en" && listing.descriptionEn) ||
+    (locale === "hy" && listing.descriptionHy) ||
+    listing.description;
+
   const a = listing.amenities;
   const ownerName   = String(a.ownerName   ?? "").trim();
   const ownerPhone  = String(a.ownerPhone  ?? "").trim();
   const street      = String(a.street      ?? "").trim();
   const buildingNum = String(a.buildingNumber ?? "").trim();
   const fullAddress = [street, buildingNum].filter(Boolean).join(", ") || listing.address || "";
-  const rooms       = a.rooms       ? `${a.rooms} rooms`      : null;
+  const rooms       = a.rooms ? String(a.rooms) : null;
   const buildingType= String(a.buildingType ?? "").trim();
   const openBalcony = Number(a.openBalcony  ?? 0);
   const closedBal   = Number(a.closedBalcony ?? 0);
@@ -114,6 +125,12 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
     setPublishing(false);
   }
 
+  const bedsLabel = listing.bedrooms === 0
+    ? t("studio")
+    : `${listing.bedrooms} ${listing.bedrooms === 1 ? t("beds") : t("bedsPlural")}`;
+
+  const bathsLabel = `${listing.bathrooms} ${listing.bathrooms === 1 ? t("baths") : t("bathsPlural")}`;
+
   return (
     <div className="container-page py-8">
       {/* Top nav */}
@@ -122,10 +139,9 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
           onClick={() => router.push(backHref as "/")}
           className="flex items-center gap-2 text-sm font-medium text-primary-500 hover:text-primary-900 dark:text-white/60 dark:hover:text-white"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to listings
+          <ArrowLeft className="h-4 w-4" /> {t("backToListings")}
         </button>
         <div className="flex flex-wrap items-center gap-2">
-          {/* Publish toggle — admins only */}
           {(role === "admin" || role === "super_admin") && (
             <button
               onClick={togglePublish}
@@ -136,19 +152,21 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
                   : "bg-primary-100 text-primary-600 hover:bg-gold-100 hover:text-gold-700"
               }`}
             >
-              {isPublished ? <><Eye className="h-3.5 w-3.5" /> Published</> : <><EyeOff className="h-3.5 w-3.5" /> Draft</>}
+              {isPublished
+                ? <><Eye className="h-3.5 w-3.5" /> {t("published")}</>
+                : <><EyeOff className="h-3.5 w-3.5" /> {t("draft")}</>}
             </button>
           )}
           {onEdit && (
             <button onClick={onEdit}
               className="flex items-center gap-1.5 rounded-xl border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 hover:border-gold-400 hover:text-gold-600 dark:border-white/15 dark:bg-transparent dark:text-white/80 dark:hover:border-gold-400">
-              <Pencil className="h-3.5 w-3.5" /> Edit
+              <Pencil className="h-3.5 w-3.5" /> {t("edit")}
             </button>
           )}
           {onDelete && (
             <button onClick={onDelete}
               className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 dark:border-red-800/40 dark:bg-transparent dark:text-red-400">
-              <Trash2 className="h-3.5 w-3.5" /> Delete
+              <Trash2 className="h-3.5 w-3.5" /> {t("delete")}
             </button>
           )}
         </div>
@@ -156,7 +174,7 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
 
       {/* Photo gallery */}
       {listing.images.length > 0 ? (
-        <Gallery images={listing.images} title={listing.title} />
+        <Gallery images={listing.images} title={localeTitle} />
       ) : (
         <div className="flex h-64 items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-800/30">
           <Building2 className="h-16 w-16 text-primary-200" />
@@ -175,83 +193,74 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
                 </span>
               )}
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_COLORS[listing.status] ?? STATUS_COLORS.available}`}>
-                {listing.status}
+                {tStatus(listing.status as Parameters<typeof tStatus>[0])}
               </span>
               {listing.featured && (
                 <span className="rounded-full bg-gold-100 px-2.5 py-0.5 text-xs font-semibold text-gold-700 dark:bg-gold-900/30 dark:text-gold-400">
-                  Featured
+                  {t("featured")}
                 </span>
               )}
               {!isPublished && (
                 <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-900/30 dark:text-red-400">
-                  Unpublished
+                  {t("unpublished")}
                 </span>
               )}
             </div>
             <h1 className="font-serif text-3xl font-semibold text-primary-900 dark:text-white">
-              {listing.title}
+              {localeTitle}
             </h1>
             <p className="mt-1.5 flex items-center gap-1.5 text-primary-500 dark:text-white/60">
               <MapPin className="h-4 w-4" />
-              {DISTRICT_LABELS[listing.district] ?? listing.district}, Yerevan
+              {tDistricts(listing.district as Parameters<typeof tDistricts>[0])}, {t("yerevan")}
             </p>
           </div>
 
           {/* Stats bar */}
           <div className="flex flex-wrap gap-6 rounded-xl bg-primary-50 p-5 text-sm text-primary-700 dark:bg-primary-800/40 dark:text-white/80">
-            <span className="flex items-center gap-2">
-              <BedDouble className="h-4 w-4 text-gold-500" />
-              {listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bed${listing.bedrooms !== 1 ? "s" : ""}`}
-            </span>
-            <span className="flex items-center gap-2">
-              <Bath className="h-4 w-4 text-gold-500" />
-              {listing.bathrooms} bath{listing.bathrooms !== 1 ? "s" : ""}
-            </span>
-            <span className="flex items-center gap-2">
-              <Ruler className="h-4 w-4 text-gold-500" />
-              {listing.area} m²
-            </span>
+            <span className="flex items-center gap-2"><BedDouble className="h-4 w-4 text-gold-500" />{bedsLabel}</span>
+            <span className="flex items-center gap-2"><Bath className="h-4 w-4 text-gold-500" />{bathsLabel}</span>
+            <span className="flex items-center gap-2"><Ruler className="h-4 w-4 text-gold-500" />{listing.area} m²</span>
             {listing.floor > 0 && (
               <span className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-gold-500" />
-                Floor {listing.floor}/{listing.totalFloors}
+                {t("floor")} {listing.floor}/{listing.totalFloors}
               </span>
             )}
             <span className="flex items-center gap-2">
               <Home className="h-4 w-4 text-gold-500" />
-              {TYPE_LABELS[listing.type] ?? listing.type}
+              {tTypes(listing.type as Parameters<typeof tTypes>[0])}
             </span>
           </div>
 
           {/* Description */}
-          {listing.description && (
+          {localeDesc && (
             <section>
-              <h2 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">Description</h2>
-              <p className="mt-3 leading-relaxed text-primary-600 dark:text-white/70">{listing.description}</p>
+              <h2 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">{t("description")}</h2>
+              <p className="mt-3 leading-relaxed text-primary-600 dark:text-white/70">{localeDesc}</p>
             </section>
           )}
 
           {/* Extra details */}
           {(rooms || buildingType || openBalcony > 0 || closedBal > 0 || ceilingH || view) && (
             <section>
-              <h2 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">Details</h2>
+              <h2 className="font-serif text-xl font-semibold text-primary-900 dark:text-white">{t("details")}</h2>
               <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm sm:grid-cols-3">
-                {rooms       && <><dt className="text-primary-400">Rooms</dt><dd className="font-medium text-primary-800 dark:text-white">{rooms}</dd></>}
-                {buildingType && <><dt className="text-primary-400">Building</dt><dd className="font-medium text-primary-800 dark:text-white capitalize">{buildingType}</dd></>}
-                {openBalcony > 0 && <><dt className="text-primary-400">Open Balcony</dt><dd className="font-medium text-primary-800 dark:text-white">{openBalcony}</dd></>}
-                {closedBal > 0   && <><dt className="text-primary-400">Closed Balcony</dt><dd className="font-medium text-primary-800 dark:text-white">{closedBal}</dd></>}
-                {ceilingH    && <><dt className="text-primary-400">Ceiling</dt><dd className="font-medium text-primary-800 dark:text-white">{ceilingH} m</dd></>}
-                {view        && <><dt className="text-primary-400">View</dt><dd className="font-medium text-primary-800 dark:text-white capitalize">{view}</dd></>}
+                {rooms       && <><dt className="text-primary-400">{t("rooms")}</dt><dd className="font-medium text-primary-800 dark:text-white">{rooms}</dd></>}
+                {buildingType && <><dt className="text-primary-400">{t("building")}</dt><dd className="font-medium text-primary-800 dark:text-white capitalize">{buildingType}</dd></>}
+                {openBalcony > 0 && <><dt className="text-primary-400">{t("openBalcony")}</dt><dd className="font-medium text-primary-800 dark:text-white">{openBalcony}</dd></>}
+                {closedBal > 0   && <><dt className="text-primary-400">{t("closedBalcony")}</dt><dd className="font-medium text-primary-800 dark:text-white">{closedBal}</dd></>}
+                {ceilingH    && <><dt className="text-primary-400">{t("ceiling")}</dt><dd className="font-medium text-primary-800 dark:text-white">{ceilingH} m</dd></>}
+                {view        && <><dt className="text-primary-400">{t("view")}</dt><dd className="font-medium text-primary-800 dark:text-white capitalize">{view}</dd></>}
               </dl>
             </section>
           )}
 
-          {/* ── INTERNAL INFORMATION ─────────────────────────────── */}
+          {/* INTERNAL INFORMATION */}
           <section className="rounded-2xl border-2 border-amber-300/60 bg-amber-50 p-6 dark:border-amber-700/40 dark:bg-amber-900/10">
             <div className="mb-4 flex items-center gap-2">
               <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
               <h2 className="font-serif text-lg font-semibold text-amber-800 dark:text-amber-300">
-                Internal Information — Staff Only
+                {t("internalInfo")}
               </h2>
             </div>
             {hasPrivateInfo ? (
@@ -260,7 +269,7 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
                   <div className="flex items-start gap-2">
                     <User className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <div>
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Owner</dt>
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">{t("owner")}</dt>
                       <dd className="font-medium text-primary-900 dark:text-white">{ownerName}</dd>
                     </div>
                   </div>
@@ -269,7 +278,7 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
                   <div className="flex items-start gap-2">
                     <Phone className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <div>
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Phone</dt>
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">{t("phone")}</dt>
                       <dd>
                         <a href={`tel:${ownerPhone}`} className="font-medium text-primary-900 hover:text-gold-600 dark:text-white dark:hover:text-gold-400">
                           {ownerPhone}
@@ -282,20 +291,23 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
                   <div className="flex items-start gap-2 sm:col-span-2">
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <div>
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Exact Address</dt>
-                      <dd className="font-medium text-primary-900 dark:text-white">{fullAddress}, {DISTRICT_LABELS[listing.district] ?? listing.district}, Yerevan</dd>
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">{t("exactAddress")}</dt>
+                      <dd className="font-medium text-primary-900 dark:text-white">
+                        {fullAddress}, {tDistricts(listing.district as Parameters<typeof tDistricts>[0])}, {t("yerevan")}
+                      </dd>
                     </div>
                   </div>
                 )}
               </dl>
             ) : (
-              <p className="text-sm text-amber-700/60 dark:text-amber-400/50">No private information stored for this listing.</p>
+              <p className="text-sm text-amber-700/60 dark:text-amber-400/50">{t("noPrivateInfo")}</p>
             )}
 
-            {/* Created by */}
             <div className="mt-4 border-t border-amber-200/60 pt-4 dark:border-amber-700/30">
               <p className="text-xs text-amber-600/70 dark:text-amber-400/50">
-                Created by <strong>{listing.createdBy.username}</strong> on {new Date(listing.createdAt).toLocaleDateString()}
+                {t("createdBy")} <strong>{listing.createdBy.username}</strong>
+                {t("on") ? ` ${t("on")} ` : " "}
+                {new Date(listing.createdAt).toLocaleDateString()}
               </p>
             </div>
           </section>
@@ -303,21 +315,19 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
 
         {/* Sidebar */}
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          {/* Price card */}
           <div className="card p-5">
             <p className="text-3xl font-bold text-gold-600">
               {formatPrice(listing.price, listing.purpose as "sale" | "rent", listing.currency)}
             </p>
             <p className="mt-1 text-sm capitalize text-primary-500 dark:text-white/60">
-              For {listing.purpose} · {TYPE_LABELS[listing.type] ?? listing.type}
+              {t("forPurpose") ? `${t("forPurpose")} ` : ""}{tPurpose(listing.purpose as "sale" | "rent")} · {tTypes(listing.type as Parameters<typeof tTypes>[0])}
             </p>
           </div>
 
-          {/* Copy Link — primary CTA for employees */}
           {displayCode ? (
             <div className="card p-5">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-primary-400 dark:text-white/40">
-                Share with client
+                {t("shareWithClient")}
               </p>
               <button
                 onClick={copyLink}
@@ -327,33 +337,28 @@ export default function StaffListingView({ listing, backHref, onEdit, onDelete, 
                     : "bg-gold-500 text-primary-900 hover:bg-gold-400"
                 }`}
               >
-                {copied ? (
-                  <><Check className="h-4 w-4" /> Link copied! Send to client</>
-                ) : (
-                  <><Link2 className="h-4 w-4" /> Copy public link</>
-                )}
+                {copied
+                  ? <><Check className="h-4 w-4" /> {t("linkCopied")}</>
+                  : <><Link2 className="h-4 w-4" /> {t("copyLink")}</>}
               </button>
               <p className="mt-2 text-center text-xs text-primary-400 dark:text-white/30">
-                Client sees public version only — no private info
+                {t("clientSeesPublic")}
               </p>
-              {displayCode && (
-                <p className="mt-1 text-center font-mono text-xs text-primary-300 dark:text-white/20">
-                  /listing/{displayCode}
-                </p>
-              )}
+              <p className="mt-1 text-center font-mono text-xs text-primary-300 dark:text-white/20">
+                /listing/{displayCode}
+              </p>
             </div>
           ) : (
             <div className="card p-5 text-center">
-              <p className="text-xs text-primary-400">Listing code not yet assigned — re-save to generate.</p>
+              <p className="text-xs text-primary-400">{t("noListingCode")}</p>
             </div>
           )}
 
-          {/* Quick owner contacts in sidebar */}
           {(ownerName || ownerPhone) && (
             <div className="card border border-amber-200/60 bg-amber-50 p-5 dark:border-amber-700/40 dark:bg-amber-900/10">
               <div className="mb-3 flex items-center gap-1.5">
                 <Lock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
-                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">Owner contact</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">{t("ownerContact")}</p>
               </div>
               {ownerName  && <p className="text-sm font-medium text-primary-900 dark:text-white">{ownerName}</p>}
               {ownerPhone && (

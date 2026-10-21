@@ -237,6 +237,13 @@ export default function EmployeeDashboard() {
   const router = useRouter();
   const locale = useLocale();
   const tL = useTranslations("listing");
+  const tEP = useTranslations("employeePortal");
+  const tF = useTranslations("listingForm");
+  const tTypes = useTranslations("propertyTypes");
+  const tPurpose = useTranslations("purpose");
+  const tDistricts = useTranslations("districts");
+  const tStatus = useTranslations("status");
+  const tSettings = useTranslations("settings");
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<FormMode>("list");
@@ -290,7 +297,7 @@ export default function EmployeeDashboard() {
   }
 
   function resetForm() {
-    if (!confirm("Reset the form? Your entered data will be cleared.")) return;
+    if (!confirm(tEP("resetConfirm"))) return;
     setForm(emptyForm());
     setStreetQuery("");
     setStreetSuggestions([]);
@@ -468,7 +475,7 @@ export default function EmployeeDashboard() {
   }
 
   async function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    if (!confirm(tEP("deleteConfirm"))) return;
     setDeleting(id);
     await fetch(`/api/employee/listings/${id}`, { method: "DELETE" });
     setDeleting(null);
@@ -517,7 +524,7 @@ export default function EmployeeDashboard() {
       <div className="container-page py-10">
         <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
           <span className="font-serif font-semibold text-primary-900 dark:text-white">Account Settings / Հաշվի կարգավորումներ</span>
-          <button onClick={() => setMode("list")} className="btn-outline text-sm">← Back</button>
+          <button onClick={() => setMode("list")} className="btn-outline text-sm">{tEP("back")}</button>
         </div>
         <div className="mt-8 max-w-sm">
           <div className="mb-6 flex gap-2">
@@ -540,7 +547,7 @@ export default function EmployeeDashboard() {
               </div>
               {pwError && <p className="text-sm text-red-600">{pwError}</p>}
               {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
-              <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">{pwSaving ? "Saving…" : "Change Password / Փոխել"}</button>
+              <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">{pwSaving ? tSettings("saving") : tSettings("savePassword")}</button>
             </form>
           )}
           {accTab === "username" && (
@@ -555,7 +562,7 @@ export default function EmployeeDashboard() {
               </div>
               {pwError && <p className="text-sm text-red-600">{pwError}</p>}
               {pwSuccess && <p className="text-sm text-green-600">{pwSuccess}</p>}
-              <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">{pwSaving ? "Saving…" : "Change Username / Փոխել"}</button>
+              <button type="submit" disabled={pwSaving} className="btn-primary w-full disabled:opacity-60">{pwSaving ? tSettings("saving") : tSettings("saveUsername")}</button>
             </form>
           )}
         </div>
@@ -571,7 +578,7 @@ export default function EmployeeDashboard() {
           <div className="flex items-center gap-3">
             <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
             <span className="font-serif font-semibold text-primary-900 dark:text-white">
-              {mode === "create" ? "Add Listing / Ավելացնել հայտ" : "Edit Listing / Խմբագրել հայտ"}
+              {mode === "create" ? tEP("addListingTitle") : tEP("editListingTitle")}
             </span>
           </div>
           <button onClick={() => setMode("list")} className="btn-outline text-sm">
@@ -586,7 +593,7 @@ export default function EmployeeDashboard() {
             {/* Title */}
             <div>
               <label className={labelCls}>Title / Վերնագիր *</label>
-              <input required className={inputCls} placeholder="e.g. 3-room apartment in Kentron"
+              <input required className={inputCls} placeholder={tF("titlePlaceholder")}
                 value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </div>
 
@@ -594,7 +601,7 @@ export default function EmployeeDashboard() {
             <div>
               <label className={labelCls}>Description / Նկարագրություն</label>
               <textarea rows={4} className={inputCls}
-                placeholder="Describe the property… / Նկարագրեք գույքը…"
+                placeholder={tF("descriptionPlaceholder")}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </div>
@@ -628,7 +635,7 @@ export default function EmployeeDashboard() {
               <select className={inputCls} value={form.district}
                 onChange={(e) => { setForm({ ...form, district: e.target.value, street: "", buildingNumber: "" }); setStreetQuery(""); }}>
                 {DISTRICTS.map((d) => (
-                  <option key={d.value} value={d.value}>{d.label}</option>
+                  <option key={d.value} value={d.value}>{tDistricts(d.value as Parameters<typeof tDistricts>[0])}</option>
                 ))}
               </select>
             </div>
@@ -639,7 +646,7 @@ export default function EmployeeDashboard() {
               <div className="relative">
                 <input
                   className={inputCls}
-                  placeholder="Type street name... e.g. Komitas Ave"
+                  placeholder={tF("streetPlaceholder")}
                   value={streetQuery}
                   autoComplete="off"
                   onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
@@ -676,7 +683,7 @@ export default function EmployeeDashboard() {
                   <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
                   <button type="button" onClick={retryStreet}
                     className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
-                    <RefreshCw className="h-3 w-3" /> Retry
+                    <RefreshCw className="h-3 w-3" />{tF("retry")}
                   </button>
                 </div>
               )}
@@ -685,7 +692,7 @@ export default function EmployeeDashboard() {
             {/* Building number */}
             <div>
               <label className={labelCls}>Building No. / Շ. Hamlet.</label>
-              <input className={inputCls} placeholder="e.g. 12, 7a"
+              <input className={inputCls} placeholder={tF("buildingPlaceholder")}
                 value={form.buildingNumber}
                 onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} />
             </div>
@@ -746,11 +753,11 @@ export default function EmployeeDashboard() {
               <label className={labelCls}>Status</label>
               <select className={inputCls} value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                <option value="available">Available</option>
-                <option value="active">Active</option>
-                <option value="sold">Sold</option>
-                <option value="rented">Rented</option>
-                <option value="archived">Archived</option>
+                <option value="available">{tStatus("available")}</option>
+                <option value="active">{tStatus("active")}</option>
+                <option value="sold">{tStatus("sold")}</option>
+                <option value="rented">{tStatus("rented")}</option>
+                <option value="archived">{tStatus("archived")}</option>
               </select>
             </div>
             {/* Photo upload */}
@@ -791,9 +798,9 @@ export default function EmployeeDashboard() {
 
             {/* Amenities */}
             <div>
-              <label className={labelCls}>Amenities / Հարմ.</label>
+              <label className={labelCls}>{tF("amenitiesLabel")}</label>
               <div className="grid grid-cols-2 gap-2">
-                {AMENITY_KEYS.map(({ key, label }) => (
+                {AMENITY_KEYS.map(({ key }) => (
                   <label key={key} className="flex cursor-pointer items-center gap-2 text-sm text-primary-700 dark:text-white/80">
                     <input
                       type="checkbox"
@@ -803,7 +810,7 @@ export default function EmployeeDashboard() {
                       }
                       className="h-4 w-4 accent-gold-500"
                     />
-                    {label}
+                    {tL(key as Parameters<typeof tL>[0])}
                   </label>
                 ))}
               </div>
@@ -854,22 +861,22 @@ export default function EmployeeDashboard() {
         <div className="flex items-center gap-3">
           <Image src="/logo-new.png" alt="" width={36} height={36} className="rounded-lg" />
           <div>
-            <p className="font-serif font-semibold text-primary-900 dark:text-white">Employee Portal</p>
-            <p className="text-xs text-primary-400 dark:text-white/40">My Listings</p>
+            <p className="font-serif font-semibold text-primary-900 dark:text-white">{tEP("title")}</p>
+            <p className="text-xs text-primary-400 dark:text-white/40">{tEP("myListings")}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={startCreate} className="btn-primary gap-2 text-sm">
-            <Plus className="h-4 w-4" /> Add Listing
+            <Plus className="h-4 w-4" /> {tEP("addListing")}
           </button>
           <button onClick={() => { setLoading(true); fetchListings(); }} className="btn-outline gap-1.5 text-sm" title="Reload listings">
             <RefreshCw className="h-4 w-4" />
           </button>
           <button onClick={() => setMode("password")} className="btn-outline text-sm">
-            Account
+            {tEP("account")}
           </button>
           <button onClick={logout} className="btn-outline gap-2 text-sm">
-            <LogOut className="h-4 w-4" /> Sign Out
+            <LogOut className="h-4 w-4" /> {tEP("signOut")}
           </button>
         </div>
       </div>
@@ -877,9 +884,9 @@ export default function EmployeeDashboard() {
       {/* Stats */}
       <div className="mt-6 grid grid-cols-3 gap-4">
         {[
-          { icon: Building2, label: "Total",    value: listings.length },
-          { icon: CheckCircle2, label: "Active", value: listings.filter(l => l.status === "available" || l.status === "active").length },
-          { icon: XCircle, label: "Closed",      value: listings.filter(l => l.status === "sold" || l.status === "rented").length },
+          { icon: Building2, label: tEP("total"),    value: listings.length },
+          { icon: CheckCircle2, label: tEP("active"), value: listings.filter(l => l.status === "available" || l.status === "active").length },
+          { icon: XCircle, label: tEP("closed"),      value: listings.filter(l => l.status === "sold" || l.status === "rented").length },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="card flex items-center gap-3 p-4">
             <Icon className="h-5 w-5 text-gold-500" />
@@ -896,7 +903,7 @@ export default function EmployeeDashboard() {
         <input
           value={codeSearch}
           onChange={(e) => setCodeSearch(e.target.value)}
-          placeholder="Search by title or code…"
+          placeholder={tEP("searchPlaceholder")}
           className="w-full max-w-xs rounded-xl border border-primary-100 px-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none dark:border-white/10 dark:bg-primary-800 dark:text-white"
         />
       </div>
@@ -915,9 +922,9 @@ export default function EmployeeDashboard() {
       ) : listings.length === 0 ? (
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
           <Building2 className="h-12 w-12 text-primary-200" />
-          <p className="text-primary-500 dark:text-white/60">No listings yet.</p>
+          <p className="text-primary-500 dark:text-white/60">{tEP("noListings")}</p>
           <button onClick={startCreate} className="btn-primary gap-2">
-            <Plus className="h-4 w-4" /> Add your first listing
+            <Plus className="h-4 w-4" /> {tEP("addFirst")}
           </button>
         </div>
       ) : (
