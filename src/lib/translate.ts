@@ -24,12 +24,13 @@ async function callMyMemory(text: string, from: string, to: string): Promise<str
   return translated;
 }
 
-/** Translate `text` into all 3 locales. Falls back to the source text on any error. */
+/** Translate `text` into all 3 locales. Returns null for any locale that failed to translate. */
 export async function translateToAllLocales(
   text: string,
   sourceLang: TranslatableLocale
-): Promise<Record<TranslatableLocale, string>> {
-  const result: Record<TranslatableLocale, string> = { en: text, ru: text, hy: text };
+): Promise<Record<TranslatableLocale, string | null>> {
+  const result: Record<TranslatableLocale, string | null> = { en: null, ru: null, hy: null };
+  result[sourceLang] = text; // source language is always set
   if (!text.trim()) return result;
 
   const targets = (["en", "ru", "hy"] as TranslatableLocale[]).filter((l) => l !== sourceLang);
@@ -38,7 +39,7 @@ export async function translateToAllLocales(
       try {
         result[target] = await callMyMemory(text, sourceLang, target);
       } catch {
-        // fallback: keep original text for this locale
+        // result[target] stays null — display will fall back to original title
       }
     })
   );

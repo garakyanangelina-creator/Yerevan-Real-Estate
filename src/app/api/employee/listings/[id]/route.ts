@@ -98,13 +98,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         translateToAllLocales(newTitle, sourceLang),
         newDesc ? translateToAllLocales(newDesc, sourceLang) : Promise.resolve(null),
       ]);
-      data.titleEn = titleT.en;
-      data.titleRu = titleT.ru;
-      data.titleHy = titleT.hy;
+      if (titleT.en !== null) data.titleEn = titleT.en;
+      if (titleT.ru !== null) data.titleRu = titleT.ru;
+      if (titleT.hy !== null) data.titleHy = titleT.hy;
       if (descT) {
-        data.descriptionEn = descT.en;
-        data.descriptionRu = descT.ru;
-        data.descriptionHy = descT.hy;
+        if (descT.en !== null) data.descriptionEn = descT.en;
+        if (descT.ru !== null) data.descriptionRu = descT.ru;
+        if (descT.hy !== null) data.descriptionHy = descT.hy;
       }
     } catch {
       // Translation failure is non-fatal

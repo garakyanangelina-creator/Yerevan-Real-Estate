@@ -16,7 +16,8 @@ async function runBackfill(force: boolean) {
   let failed = 0;
 
   for (const listing of listings) {
-    if (!force && (listing.titleEn || listing.titleRu || listing.titleHy)) {
+    // Skip only if all three locales are populated (truly complete)
+    if (!force && listing.titleEn && listing.titleRu && listing.titleHy) {
       skipped++;
       continue;
     }
@@ -27,16 +28,23 @@ async function runBackfill(force: boolean) {
         translateToAllLocales(listing.title, sourceLang),
         listing.description ? translateToAllLocales(listing.description, sourceLang) : Promise.resolve(null),
       ]);
+
+      // Build update data — only include fields that were actually translated (non-null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (prisma.dbProperty as any).update({
-        where: { id: listing.id },
-        data: {
-          titleEn: titleT.en,
-          titleRu: titleT.ru,
-          titleHy: titleT.hy,
-          ...(descT ? { descriptionEn: descT.en, descriptionRu: descT.ru, descriptionHy: descT.hy } : {}),
-        },
-      });
+      const data: Record<string, any> = {};
+      if (titleT.en !== null) data.titleEn = titleT.en;
+      if (titleT.ru !== null) data.titleRu = titleT.ru;
+      if (titleT.hy !== null) data.titleHy = titleT.hy;
+      if (descT) {
+        if (descT.en !== null) data.descriptionEn = descT.en;
+        if (descT.ru !== null) data.descriptionRu = descT.ru;
+        if (descT.hy !== null) data.descriptionHy = descT.hy;
+      }
+
+      if (Object.keys(data).length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (prisma.dbProperty as any).update({ where: { id: listing.id }, data });
+      }
       translated++;
       await new Promise((r) => setTimeout(r, 300));
     } catch {

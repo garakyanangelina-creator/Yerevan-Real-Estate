@@ -110,15 +110,19 @@ export async function POST(request: Request) {
       desc ? translateToAllLocales(desc, sourceLang) : Promise.resolve(null),
     ]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (prisma.dbProperty as any).update({
-      where: { id: listing.id },
-      data: {
-        titleEn: titleT.en,
-        titleRu: titleT.ru,
-        titleHy: titleT.hy,
-        ...(descT ? { descriptionEn: descT.en, descriptionRu: descT.ru, descriptionHy: descT.hy } : {}),
-      },
-    });
+    const data: Record<string, string | null> = {};
+    if (titleT.en !== null) data.titleEn = titleT.en;
+    if (titleT.ru !== null) data.titleRu = titleT.ru;
+    if (titleT.hy !== null) data.titleHy = titleT.hy;
+    if (descT) {
+      if (descT.en !== null) data.descriptionEn = descT.en;
+      if (descT.ru !== null) data.descriptionRu = descT.ru;
+      if (descT.hy !== null) data.descriptionHy = descT.hy;
+    }
+    if (Object.keys(data).length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (prisma.dbProperty as any).update({ where: { id: listing.id }, data });
+    }
   } catch {
     // Translation failure is non-fatal — listing is already saved
   }
