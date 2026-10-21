@@ -426,7 +426,10 @@
     "minChars": "Минимум 8 символов",
     "allRequired": "Все поля обязательны",
     "networkError": "Ошибка сети, попробуйте снова",
-    "error": "Ошибка"
+    "error": "Ошибка",
+    "twoFaInactive": "2FA не активна",
+    "twoFaSetup": "Настроить 2FA",
+    "twoFaDisable": "Отключить 2FA"
   },
   "userForm": {
     "createTitle": "Создать пользователя",
@@ -446,7 +449,13 @@
     "error": "Произошла ошибка",
     "roleEmployee": "Сотрудник",
     "roleAdmin": "Администратор",
-    "roleSuperAdmin": "Супер Админ"
+    "roleSuperAdmin": "Супер Админ",
+    "editTitle": "Редактировать пользователя",
+    "nameLabel": "Имя",
+    "passwordLabel": "Пароль",
+    "requiredError": "Все поля обязательны",
+    "emailError": "Неверный email",
+    "serverError": "Ошибка сервера"
   },
   "staffView": {
     "backToListings": "К объявлениям",
@@ -484,7 +493,14 @@
     "clientSeesPublic": "Клиент видит только публичную версию — без приватных данных",
     "noListingCode": "Код объявления ещё не присвоен — сохраните повторно.",
     "ownerContact": "Контакт владельца",
-    "yerevan": "Ереван"
+    "yerevan": "Ереван",
+    "editListing": "Редактировать объявление",
+    "ownerInfo": "Информация о владельце",
+    "ownerName": "Имя владельца",
+    "ownerPhone": "Телефон владельца",
+    "listedBy": "Добавлено",
+    "createdAt": "Создано",
+    "propertyDetails": "Детали объекта"
   },
   "employeePortal": {
     "title": "Портал сотрудника",
@@ -506,7 +522,12 @@
     "copiedLink": "Скопировано!",
     "copyLink": "Копировать ссылку",
     "deleteConfirm": "Удалить объявление? Это действие необратимо.",
-    "resetConfirm": "Сбросить форму? Введённые данные будут удалены."
+    "resetConfirm": "Сбросить форму? Введённые данные будут удалены.",
+    "dashboardTitle": "Портал сотрудника",
+    "createListing": "Создать объявление",
+    "editListing": "Редактировать объявление",
+    "copied": "Скопировано!",
+    "accountSettings": "Настройки аккаунта"
   },
   "listingForm": {
     "titleLabel": "Название *",
@@ -559,6 +580,16 @@
     "accountSettings": "Настройки аккаунта",
     "uploadFailed": "Ошибка загрузки. Попробуйте снова.",
     "serverError": "Ошибка сервера. Попробуйте снова.",
-    "networkError": "Ошибка сети. Проверьте соединение."
+    "networkError": "Ошибка сети. Проверьте соединение.",
+    "createAndPublish": "Создать и опубликовать",
+    "selectType": "Выберите тип",
+    "selectPurpose": "Выберите назначение",
+    "selectDistrict": "Выберите район",
+    "selectStatus": "Выберите статус",
+    "uploadPhotos": "Загрузить фото",
+    "markFeatured": "Отметить рекомендуемым",
+    "noListingsMatch": "Нет совпадающих объявлений",
+    "published": "Опубликовано",
+    "draft": "Черновик"
   }
 }

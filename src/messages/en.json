@@ -426,7 +426,10 @@
     "minChars": "Min 8 characters",
     "allRequired": "All fields required",
     "networkError": "Network error, please try again",
-    "error": "Error"
+    "error": "Error",
+    "twoFaInactive": "2FA not active",
+    "twoFaSetup": "Set up 2FA",
+    "twoFaDisable": "Disable 2FA"
   },
   "userForm": {
     "createTitle": "Create New User",
@@ -446,7 +449,13 @@
     "error": "An error occurred",
     "roleEmployee": "Employee",
     "roleAdmin": "Admin",
-    "roleSuperAdmin": "Super Admin"
+    "roleSuperAdmin": "Super Admin",
+    "editTitle": "Edit User",
+    "nameLabel": "Name",
+    "passwordLabel": "Password",
+    "requiredError": "All fields are required",
+    "emailError": "Invalid email",
+    "serverError": "Server error"
   },
   "staffView": {
     "backToListings": "Back to listings",
@@ -484,7 +493,14 @@
     "clientSeesPublic": "Client sees public version only — no private info",
     "noListingCode": "Listing code not yet assigned — re-save to generate.",
     "ownerContact": "Owner contact",
-    "yerevan": "Yerevan"
+    "yerevan": "Yerevan",
+    "editListing": "Edit Listing",
+    "ownerInfo": "Owner Information",
+    "ownerName": "Owner Name",
+    "ownerPhone": "Owner Phone",
+    "listedBy": "Listed by",
+    "createdAt": "Created at",
+    "propertyDetails": "Property Details"
   },
   "employeePortal": {
     "title": "Employee Portal",
@@ -506,7 +522,12 @@
     "copiedLink": "Copied!",
     "copyLink": "Copy link",
     "deleteConfirm": "Delete listing? This cannot be undone.",
-    "resetConfirm": "Reset the form? Your entered data will be cleared."
+    "resetConfirm": "Reset the form? Your entered data will be cleared.",
+    "dashboardTitle": "Employee Portal",
+    "createListing": "Create Listing",
+    "editListing": "Edit Listing",
+    "copied": "Copied!",
+    "accountSettings": "Account Settings"
   },
   "listingForm": {
     "titleLabel": "Title *",
@@ -559,6 +580,16 @@
     "accountSettings": "Account Settings",
     "uploadFailed": "Upload failed. Try again.",
     "serverError": "Server error. Try again.",
-    "networkError": "Network error. Check connection."
+    "networkError": "Network error. Check connection.",
+    "createAndPublish": "Create & Publish",
+    "selectType": "Select type",
+    "selectPurpose": "Select purpose",
+    "selectDistrict": "Select district",
+    "selectStatus": "Select status",
+    "uploadPhotos": "Upload photos",
+    "markFeatured": "Mark as featured",
+    "noListingsMatch": "No listings match",
+    "published": "Published",
+    "draft": "Draft"
   }
 }
