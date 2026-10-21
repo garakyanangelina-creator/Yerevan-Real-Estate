@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Link2, Check } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface Props {
   code: string;
@@ -12,6 +12,7 @@ interface Props {
 
 export default function CopyLinkButton({ code, fullWidth = false }: Props) {
   const locale = useLocale();
+  const t = useTranslations("property");
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -43,9 +44,9 @@ export default function CopyLinkButton({ code, fullWidth = false }: Props) {
         }`}
       >
         {copied ? (
-          <><Check className="h-4 w-4" /> Link copied!</>
+          <><Check className="h-4 w-4" /> {t("copiedLink")}</>
         ) : (
-          <><Link2 className="h-4 w-4" /> Copy link</>
+          <><Link2 className="h-4 w-4" /> {t("copyLink")}</>
         )}
       </button>
     );
@@ -61,9 +62,9 @@ export default function CopyLinkButton({ code, fullWidth = false }: Props) {
       }`}
     >
       {copied ? (
-        <><Check className="h-3 w-3 text-green-500" /> <span className="text-green-600 dark:text-green-400">Copied!</span></>
+        <><Check className="h-3 w-3 text-green-500" /> <span className="text-green-600 dark:text-green-400">{t("copiedLink")}</span></>
       ) : (
-        <><Link2 className="h-3 w-3" /> Copy link</>
+        <><Link2 className="h-3 w-3" /> {t("copyLink")}</>
       )}
     </button>
   );

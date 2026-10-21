@@ -112,7 +112,9 @@
     "purpose": "Цель",
     "areaLabel": "Площадь",
     "floorLabel": "Этаж",
-    "districtLabel": "Район"
+    "districtLabel": "Район",
+    "copyLink": "Копировать ссылку",
+    "copiedLink": "Скопировано!"
   },
   "home": {
     "featured": "Рекомендуемые объекты",

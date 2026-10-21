@@ -112,7 +112,9 @@
     "purpose": "Purpose",
     "areaLabel": "Area",
     "floorLabel": "Floor",
-    "districtLabel": "District"
+    "districtLabel": "District",
+    "copyLink": "Copy link",
+    "copiedLink": "Copied!"
   },
   "home": {
     "featured": "Featured Properties",

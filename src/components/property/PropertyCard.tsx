@@ -89,9 +89,9 @@ export default function PropertyCard({ property }: { property: PublicProperty })
               }`}
             >
               {copied ? (
-                <><Check className="h-3.5 w-3.5" /> Copied!</>
+                <><Check className="h-3.5 w-3.5" /> {t("copiedLink")}</>
               ) : (
-                <><Link2 className="h-3.5 w-3.5" /> Copy Link</>
+                <><Link2 className="h-3.5 w-3.5" /> {t("copyLink")}</>
               )}
             </button>
           </div>
