@@ -66,7 +66,22 @@ export async function GET(request: Request) {
   if (!session || session.role === "employee") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const force = new URL(request.url).searchParams.get("force") === "true";
+  const params = new URL(request.url).searchParams;
+  const force = params.get("force") === "true";
+
+  // ?check=true — show translation status without translating
+  if (params.get("check") === "true") {
+    await ensureDatabase();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = await (prisma.dbProperty as any).findMany({
+      select: { id: true, title: true, titleEn: true, titleRu: true, titleHy: true },
+    });
+    const missing = rows
+      .filter((r: any) => !r.titleRu || r.titleRu === r.title || !r.titleEn || r.titleEn === r.title)
+      .map((r: any) => ({ id: r.id, title: r.title, titleEn: r.titleEn, titleRu: r.titleRu, titleHy: r.titleHy }));
+    return NextResponse.json({ total: rows.length, missingCount: missing.length, missing });
+  }
+
   const result = await runBackfill(force);
   return NextResponse.json(result);
 }
