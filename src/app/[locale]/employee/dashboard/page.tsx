@@ -534,15 +534,15 @@ export default function EmployeeDashboard() {
           {accTab === "password" && (
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
-                <label className={labelCls}>Current Password / Ընթացիկ գաղտնաբառ</label>
+                <label className={labelCls}>{tF("currentPasswordLabel")}</label>
                 <input type="password" required className={inputCls} value={pwForm.current} onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>New Password / Նոր գաղտնաբառ</label>
+                <label className={labelCls}>{tF("newPasswordLabel")}</label>
                 <input type="password" required className={inputCls} value={pwForm.next} onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Confirm New Password / Հաստատել</label>
+                <label className={labelCls}>{tF("confirmPasswordLabel")}</label>
                 <input type="password" required className={inputCls} value={pwForm.confirm} onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} />
               </div>
               {pwError && <p className="text-sm text-red-600">{pwError}</p>}
@@ -553,11 +553,11 @@ export default function EmployeeDashboard() {
           {accTab === "username" && (
             <form onSubmit={handleChangeUsername} className="space-y-4">
               <div>
-                <label className={labelCls}>New Username / Նոր մուտqanun</label>
+                <label className={labelCls}>{tF("newUsernameLabel")}</label>
                 <input type="text" required autoComplete="off" className={inputCls} value={unForm.newUsername} onChange={(e) => setUnForm({ ...unForm, newUsername: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Confirm with Password / Հաստատել գաղտնաբառով</label>
+                <label className={labelCls}>{tF("confirmWithPasswordLabel")}</label>
                 <input type="password" required className={inputCls} value={unForm.password} onChange={(e) => setUnForm({ ...unForm, password: e.target.value })} />
               </div>
               {pwError && <p className="text-sm text-red-600">{pwError}</p>}
@@ -592,14 +592,14 @@ export default function EmployeeDashboard() {
 
             {/* Title */}
             <div>
-              <label className={labelCls}>Title / Վերնագիր *</label>
+              <label className={labelCls}>{tF("titleLabel")}</label>
               <input required className={inputCls} placeholder={tF("titlePlaceholder")}
                 value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </div>
 
             {/* Description */}
             <div>
-              <label className={labelCls}>Description / Նկարագրություն</label>
+              <label className={labelCls}>{tF("descriptionLabel")}</label>
               <textarea rows={4} className={inputCls}
                 placeholder={tF("descriptionPlaceholder")}
                 value={form.description}
@@ -609,29 +609,29 @@ export default function EmployeeDashboard() {
             {/* Type & Purpose */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Type / Տեսակ</label>
+                <label className={labelCls}>{tF("typeLabel")}</label>
                 <select className={inputCls} value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value })}>
-                  <option value="apartment">Apartment / Բնակարան</option>
-                  <option value="house">House / Տուն</option>
-                  <option value="commercial">Commercial / Կոմercial</option>
-                  <option value="office">Office / Գրասենյակ</option>
-                  <option value="land">Land / Հողամաս</option>
+                  <option value="apartment">{tTypes("apartment")}</option>
+                  <option value="house">{tTypes("house")}</option>
+                  <option value="commercial">{tTypes("commercial")}</option>
+                  <option value="office">{tTypes("office")}</option>
+                  <option value="land">{tTypes("land")}</option>
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Purpose / Նպատակ</label>
+                <label className={labelCls}>{tF("purposeLabel")}</label>
                 <select className={inputCls} value={form.purpose}
                   onChange={(e) => setForm({ ...form, purpose: e.target.value })}>
-                  <option value="sale">For Sale / Վաճառք</option>
-                  <option value="rent">For Rent / Վարձ</option>
+                  <option value="sale">{tPurpose("sale")}</option>
+                  <option value="rent">{tPurpose("rent")}</option>
                 </select>
               </div>
             </div>
 
             {/* District */}
             <div>
-              <label className={labelCls}>District / Թաղամաս</label>
+              <label className={labelCls}>{tF("districtLabel")}</label>
               <select className={inputCls} value={form.district}
                 onChange={(e) => { setForm({ ...form, district: e.target.value, street: "", buildingNumber: "" }); setStreetQuery(""); }}>
                 {DISTRICTS.map((d) => (
@@ -642,7 +642,7 @@ export default function EmployeeDashboard() {
 
             {/* Street autocomplete */}
             <div ref={streetDropRef} className="relative">
-              <label className={labelCls}>Street / Փողոց</label>
+              <label className={labelCls}>{tF("streetLabel")}</label>
               <div className="relative">
                 <input
                   className={inputCls}
@@ -680,7 +680,7 @@ export default function EmployeeDashboard() {
               )}
               {streetQuery.length >= 2 && streetSuggestions.length === 0 && (
                 <div className="mt-1 flex items-center gap-2">
-                  <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
+                  <p className="text-xs text-primary-400 dark:text-white/40">{tF("noStreetsFound")}</p>
                   <button type="button" onClick={retryStreet}
                     className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
                     <RefreshCw className="h-3 w-3" />{tF("retry")}
@@ -691,7 +691,7 @@ export default function EmployeeDashboard() {
 
             {/* Building number */}
             <div>
-              <label className={labelCls}>Building No. / Շ. Hamlet.</label>
+              <label className={labelCls}>{tF("buildingLabel")}</label>
               <input className={inputCls} placeholder={tF("buildingPlaceholder")}
                 value={form.buildingNumber}
                 onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} />
@@ -700,12 +700,12 @@ export default function EmployeeDashboard() {
             {/* Price & Currency */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>Price / Գին</label>
+                <label className={labelCls}>{tF("priceLabel")}</label>
                 <input type="number" min="0" className={inputCls} value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })} />
               </div>
               <div>
-                <label className={labelCls}>Currency / Արժույթ</label>
+                <label className={labelCls}>{tF("currencyLabel")}</label>
                 <select className={inputCls} value={form.currency}
                   onChange={(e) => setForm({ ...form, currency: e.target.value })}>
                   <option value="AMD">AMD ֏</option>
@@ -722,13 +722,13 @@ export default function EmployeeDashboard() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Owner Name / Անուն</label>
-                  <input className={inputCls} placeholder="Full name / Անուն ազգանուն"
+                  <label className={labelCls}>{tF("ownerNameLabel")}</label>
+                  <input className={inputCls} placeholder={tF("ownerNamePlaceholder")}
                     value={form.ownerName}
                     onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
                 </div>
                 <div>
-                  <label className={labelCls}>Owner Phone / Հեռ.</label>
+                  <label className={labelCls}>{tF("ownerPhoneLabel")}</label>
                   <input className={inputCls} placeholder="+374 xx xxxxxx"
                     value={form.ownerPhone}
                     onChange={(e) => setForm({ ...form, ownerPhone: e.target.value })} />
@@ -750,7 +750,7 @@ export default function EmployeeDashboard() {
 
             {/* Status */}
             <div>
-              <label className={labelCls}>Status</label>
+              <label className={labelCls}>{tF("statusLabel")}</label>
               <select className={inputCls} value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}>
                 <option value="available">{tStatus("available")}</option>
@@ -762,12 +762,12 @@ export default function EmployeeDashboard() {
             </div>
             {/* Photo upload */}
             <div>
-              <label className={labelCls}>Photos / Լուսանկարներ</label>
+              <label className={labelCls}>{tF("photosLabel")}</label>
               <label
                 className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary-200 py-4 text-sm text-primary-500 transition hover:border-gold-400 hover:text-gold-600 dark:border-white/10 dark:text-white/50 ${uploading ? "opacity-50 pointer-events-none" : ""}`}
               >
                 <Upload className="h-4 w-4" />
-                {uploading ? "Uploading… / Բեռnavia…" : "Click to upload photos / Կտտացնել լուսանկար ավելացնելու"}
+                {uploading ? tF("uploading") : tF("upload")}
                 <input
                   ref={fileRef}
                   type="file"
@@ -828,7 +828,7 @@ export default function EmployeeDashboard() {
                     type="submit"
                     className="mt-2 rounded-lg bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
                   >
-                    Try Again / Կրկին փորձել
+                    {tF("tryAgain")}
                   </button>
                 </div>
               </div>
@@ -836,7 +836,7 @@ export default function EmployeeDashboard() {
             <div className="flex flex-wrap justify-between gap-3">
               <button type="button" onClick={resetForm}
                 className="flex items-center gap-1.5 rounded-xl border border-primary-200 px-3 py-2 text-xs text-primary-500 hover:border-red-300 hover:text-red-500 dark:border-white/15 dark:text-white/40">
-                <RefreshCw className="h-3.5 w-3.5" /> Reset form
+                <RefreshCw className="h-3.5 w-3.5" />{tF("resetForm")}
               </button>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setMode("list")} className="btn-outline">

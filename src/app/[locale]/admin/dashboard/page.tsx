@@ -549,14 +549,14 @@ function DashboardContent() {
             <form onSubmit={handleCreateSubmit} className="space-y-4 p-6">
               {/* Title */}
               <div>
-                <label className={labelCls}>Title / Վերնագիր *</label>
+                <label className={labelCls}>{tF("titleLabel")}</label>
                 <input required className={inputCls} placeholder={tF("titlePlaceholder")}
                   value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               </div>
 
               {/* Description */}
               <div>
-                <label className={labelCls}>Description / Նկարագրություն</label>
+                <label className={labelCls}>{tF("descriptionLabel")}</label>
                 <textarea rows={3} className={inputCls} placeholder={tF("descriptionPlaceholder")}
                   value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
@@ -564,27 +564,27 @@ function DashboardContent() {
               {/* Type & Purpose */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Type / Տեսակ</label>
+                  <label className={labelCls}>{tF("typeLabel")}</label>
                   <select className={inputCls} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-                    <option value="apartment">Apartment / Բնակարան</option>
-                    <option value="house">House / Տուն</option>
-                    <option value="commercial">Commercial / Կոմերցիոն</option>
-                    <option value="office">Office / Գրասենյակ</option>
-                    <option value="land">Land / Հողամաս</option>
+                    <option value="apartment">{tTypes("apartment")}</option>
+                    <option value="house">{tTypes("house")}</option>
+                    <option value="commercial">{tTypes("commercial")}</option>
+                    <option value="office">{tTypes("office")}</option>
+                    <option value="land">{tTypes("land")}</option>
                   </select>
                 </div>
                 <div>
-                  <label className={labelCls}>Purpose / Նպատակ</label>
+                  <label className={labelCls}>{tF("purposeLabel")}</label>
                   <select className={inputCls} value={form.purpose} onChange={(e) => setForm({ ...form, purpose: e.target.value })}>
-                    <option value="sale">For Sale / Վաճառք</option>
-                    <option value="rent">For Rent / Վարձ</option>
+                    <option value="sale">{tPurpose("sale")}</option>
+                    <option value="rent">{tPurpose("rent")}</option>
                   </select>
                 </div>
               </div>
 
               {/* District */}
               <div>
-                <label className={labelCls}>District / Թաղամաս</label>
+                <label className={labelCls}>{tF("districtLabel")}</label>
                 <select className={inputCls} value={form.district}
                   onChange={(e) => { setForm({ ...form, district: e.target.value, street: "" }); setStreetQuery(""); }}>
                   {DISTRICTS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
@@ -593,7 +593,7 @@ function DashboardContent() {
 
               {/* Street autocomplete */}
               <div ref={streetRef} className="relative">
-                <label className={labelCls}>Street / Փողոց</label>
+                <label className={labelCls}>{tF("streetLabel")}</label>
                 <div className="relative">
                   <input className={inputCls} placeholder={tF("streetPlaceholder")} value={streetQuery} autoComplete="off"
                     onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
@@ -626,7 +626,7 @@ function DashboardContent() {
                 )}
                 {streetQuery.length >= 2 && streetSuggestions.length === 0 && (
                   <div className="mt-1 flex items-center gap-2">
-                    <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
+                    <p className="text-xs text-primary-400 dark:text-white/40">{tF("noStreetsFound")}</p>
                     <button type="button"
                       onClick={() => { const q = streetQuery; setStreetQuery(""); setTimeout(() => setStreetQuery(q), 50); }}
                       className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
@@ -638,7 +638,7 @@ function DashboardContent() {
 
               {/* Building number */}
               <div>
-                <label className={labelCls}>Building No. / Շ. համար</label>
+                <label className={labelCls}>{tF("buildingLabel")}</label>
                 <input className={inputCls} placeholder={tF("buildingPlaceholder")}
                   value={form.buildingNumber} onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} />
               </div>
@@ -646,12 +646,12 @@ function DashboardContent() {
               {/* Price & Currency */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <label className={labelCls}>Price / Գին *</label>
+                  <label className={labelCls}>{tF("priceLabel")}</label>
                   <input required type="number" min="0" className={inputCls} value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })} />
                 </div>
                 <div>
-                  <label className={labelCls}>Currency</label>
+                  <label className={labelCls}>{tF("currencyLabel")}</label>
                   <select className={inputCls} value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })}>
                     <option value="AMD">AMD ֏</option>
                     <option value="USD">USD $</option>
@@ -674,11 +674,11 @@ function DashboardContent() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Owner Name / Անուն</label>
+                    <label className={labelCls}>{tF("ownerNameLabel")}</label>
                     <input className={inputCls} value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
                   </div>
                   <div>
-                    <label className={labelCls}>Owner Phone / Հեռ.</label>
+                    <label className={labelCls}>{tF("ownerPhoneLabel")}</label>
                     <input type="tel" className={inputCls} value={form.ownerPhone} onChange={(e) => setForm({ ...form, ownerPhone: e.target.value })} />
                   </div>
                 </div>
@@ -693,7 +693,7 @@ function DashboardContent() {
 
               {/* Photo upload */}
               <div>
-                <label className={labelCls}>Photos / Լուսանկարներ</label>
+                <label className={labelCls}>{tF("photosLabel")}</label>
                 <label className="flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-primary-200 p-4 text-sm text-primary-500 dark:border-white/15 hover:border-gold-400 transition">
                   <Upload className="h-5 w-5" />
                   {uploading ? tF("uploading") : tF("upload")}

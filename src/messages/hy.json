@@ -531,6 +531,13 @@
     "saveChanges": "Pahpanel pokhokhooyoonerry",
     "newListing": "Norr hayaytararootyoon",
     "allListings": "Bollorr hayaytararootyoonnerr",
-    "noResults": "Chfilterrvats hayaytararootyoonnerr chen gtnvell."
+    "noResults": "Chfilterrvats hayaytararootyoonnerr chen gtnvell.",
+    "currentPasswordLabel": "Ընթacik gaghtnabagh",
+    "newPasswordLabel": "Nor gaghtnabagh",
+    "confirmPasswordLabel": "Hastatel nor gaghtnabaghy",
+    "newUsernameLabel": "Nor mutqagir",
+    "confirmWithPasswordLabel": "Hastatel gaghtnabaghy",
+    "resetForm": "Nullavorel jevy",
+    "tryAgain": "Krkin portracel"
   }
 }

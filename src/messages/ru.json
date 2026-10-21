@@ -531,6 +531,13 @@
     "saveChanges": "Сохранить изменения",
     "newListing": "Новое объявление",
     "allListings": "Все объявления",
-    "noResults": "Нет объявлений по выбранным фильтрам."
+    "noResults": "Нет объявлений по выбранным фильтрам.",
+    "currentPasswordLabel": "Текущий пароль",
+    "newPasswordLabel": "Новый пароль",
+    "confirmPasswordLabel": "Подтвердить пароль",
+    "newUsernameLabel": "Новое имя пользователя",
+    "confirmWithPasswordLabel": "Подтвердить паролем",
+    "resetForm": "Сбросить форму",
+    "tryAgain": "Попробовать снова"
   }
 }

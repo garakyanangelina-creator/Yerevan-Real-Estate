@@ -531,6 +531,13 @@
     "saveChanges": "Save Changes",
     "newListing": "New Listing",
     "allListings": "All Listings",
-    "noResults": "No listings match your filters."
+    "noResults": "No listings match your filters.",
+    "currentPasswordLabel": "Current Password",
+    "newPasswordLabel": "New Password",
+    "confirmPasswordLabel": "Confirm New Password",
+    "newUsernameLabel": "New Username",
+    "confirmWithPasswordLabel": "Confirm with Password",
+    "resetForm": "Reset form",
+    "tryAgain": "Try Again"
   }
 }
