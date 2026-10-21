@@ -22,6 +22,8 @@ async function callMyMemory(text: string, from: string, to: string): Promise<str
   const translated: string = json?.responseData?.translatedText ?? "";
   if (!translated || json?.responseStatus === 429 || json?.quotaFinished === true)
     throw new Error("MyMemory quota or empty");
+  // If the API returned the exact source text, it failed silently
+  if (translated === text) throw new Error("MyMemory returned source text unchanged");
   return translated;
 }
 

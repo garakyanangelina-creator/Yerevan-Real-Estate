@@ -111,6 +111,31 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   }
 
+  // ?clearBadDesc=true — null out description translations that equal the original (bad data)
+  if (params.get("clearBadDesc") === "true") {
+    await ensureDatabase();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = await (prisma.dbProperty as any).findMany({
+      select: { id: true, description: true, descriptionEn: true, descriptionRu: true, descriptionHy: true },
+    });
+    let cleared = 0;
+    for (const r of rows) {
+      if (!r.description) continue;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data: Record<string, any> = {};
+      const src = r.description.slice(0, 800);
+      if (r.descriptionEn && (r.descriptionEn === r.description || r.descriptionEn === src)) data.descriptionEn = null;
+      if (r.descriptionRu && (r.descriptionRu === r.description || r.descriptionRu === src)) data.descriptionRu = null;
+      if (r.descriptionHy && (r.descriptionHy === r.description || r.descriptionHy === src)) data.descriptionHy = null;
+      if (Object.keys(data).length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (prisma.dbProperty as any).update({ where: { id: r.id }, data });
+        cleared++;
+      }
+    }
+    return NextResponse.json({ cleared, total: rows.length });
+  }
+
   // ?inspect=0575 — show stored translations for a single listing code
   if (params.get("inspect")) {
     await ensureDatabase();
