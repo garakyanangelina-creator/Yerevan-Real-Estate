@@ -9,12 +9,17 @@ import PropertyCard from "@/components/property/PropertyCard";
 import { Link } from "@/i18n/routing";
 import { getFeaturedProperties, getLatestProperties } from "@/services/propertyService";
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const t = await getTranslations("home");
   const tCommon = await getTranslations("common");
 
   const [{ properties: featured }, { properties: latest }] =
-    await Promise.all([getFeaturedProperties(6), getLatestProperties(6)]);
+    await Promise.all([getFeaturedProperties(6, locale), getLatestProperties(6, locale)]);
 
   return (
     <>

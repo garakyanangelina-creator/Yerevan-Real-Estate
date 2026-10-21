@@ -44,10 +44,10 @@ export async function generateMetadata({
 export default async function PropertyPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id } = await params;
-  const { property, error } = await getPublicPropertyById(id);
+  const { id, locale } = await params;
+  const { property, error } = await getPublicPropertyById(id, locale);
 
   const tCommon = await getTranslations("common");
 
@@ -71,7 +71,7 @@ export default async function PropertyPage({
   const tAmenities = await getTranslations("search");
   const tL = await getTranslations("listing");
 
-  const similar = await getSimilarPublicProperties(property);
+  const similar = await getSimilarPublicProperties(property, 3, locale);
 
   const amenityList = (Object.keys(property.amenities) as (keyof typeof property.amenities)[]).filter(
     (key) => property.amenities[key]

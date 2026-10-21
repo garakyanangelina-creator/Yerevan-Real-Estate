@@ -66,34 +66,34 @@ model ContactRequest {
 // ── Users & Access Control ────────────────────────────────────────────────────
 
 model User {
-  id           String       @id @default(cuid())
-  username     String       @unique
+  id           String   @id @default(cuid())
+  username     String   @unique
   email        String?
   passwordHash String
-  role         String       @default("employee") // super_admin | admin | employee
-  isActive     Boolean      @default(true)
-  totpSecret   String?      // TOTP secret for 2FA (null = 2FA not enabled)
-  totpEnabled  Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  role         String   @default("employee") // super_admin | admin | employee
+  isActive     Boolean  @default(true)
+  totpSecret   String? // TOTP secret for 2FA (null = 2FA not enabled)
+  totpEnabled  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   createdById  String?
 
-  listings     DbProperty[]
-  auditLogs    AuditLog[]
+  listings  DbProperty[]
+  auditLogs AuditLog[]
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
-  userId     String
-  username   String
-  role       String
-  action     String   // e.g. "login", "logout", "listing.create", "listing.delete", "user.create"
-  target     String?  // e.g. listing title, user username
-  targetId   String?
-  ip         String?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  username  String
+  role      String
+  action    String // e.g. "login", "logout", "listing.create", "listing.delete", "user.create"
+  target    String? // e.g. listing title, user username
+  targetId  String?
+  ip        String?
+  createdAt DateTime @default(now())
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
@@ -102,28 +102,34 @@ model AuditLog {
 // ── Employee Property Listings ────────────────────────────────────────────────
 
 model DbProperty {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  type        String   @default("apartment")
-  purpose     String   @default("sale")
-  district    String   @default("other")
-  address     String?
-  price       Float    @default(0)
-  currency    String   @default("AMD")
-  bedrooms    Int      @default(0)
-  bathrooms   Int      @default(0)
-  area        Float    @default(0)
-  floor       Int      @default(0)
-  totalFloors Int      @default(0)
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  type            String   @default("apartment")
+  purpose         String   @default("sale")
+  district        String   @default("other")
+  address         String?
+  price           Float    @default(0)
+  currency        String   @default("AMD")
+  bedrooms        Int      @default(0)
+  bathrooms       Int      @default(0)
+  area            Float    @default(0)
+  floor           Int      @default(0)
+  totalFloors     Int      @default(0)
   images          String   @default("[]") // JSON array of URL strings
   amenities       String   @default("{}") // JSON object
   // Type-specific structured fields
-  landArea        Float    @default(0)   // House: plot/territory area (separate from interior area)
-  renovation      String?               // "new" | "euro" | "good" | "cosmetic" | "old"
-  streetLine      String?               // Commercial: "first" | "second"
-  storefront      Boolean?              // Commercial: has display windows
-  commercialLevel String?               // Commercial: "basement" | "semi-basement" | "ground" | "upper"
+  landArea        Float    @default(0) // House: plot/territory area (separate from interior area)
+  renovation      String? // "new" | "euro" | "good" | "cosmetic" | "old"
+  streetLine      String? // Commercial: "first" | "second"
+  storefront      Boolean? // Commercial: has display windows
+  commercialLevel String? // Commercial: "basement" | "semi-basement" | "ground" | "upper"
+  titleEn         String?
+  titleRu         String?
+  titleHy         String?
+  descriptionEn   String?
+  descriptionRu   String?
+  descriptionHy   String?
   listingCode     Int?     @unique
   status          String   @default("available") // available | active | draft | sold | rented | archived
   isPublished     Boolean  @default(false)
@@ -132,5 +138,5 @@ model DbProperty {
   updatedAt       DateTime @updatedAt
 
   createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdBy   User   @relation(fields: [createdById], references: [id])
 }

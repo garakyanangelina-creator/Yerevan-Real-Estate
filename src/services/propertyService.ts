@@ -22,6 +22,12 @@ type DbPropertyRow = {
   id: string;
   title: string;
   description: string | null;
+  titleEn: string | null;
+  titleRu: string | null;
+  titleHy: string | null;
+  descriptionEn: string | null;
+  descriptionRu: string | null;
+  descriptionHy: string | null;
   type: string;
   purpose: string;
   district: string;
@@ -61,16 +67,27 @@ function parseAmenities(raw: string): PropertyAmenities {
   };
 }
 
-function mapDbRowToPublic(r: DbPropertyRow): PublicProperty {
+function mapDbRowToPublic(r: DbPropertyRow, locale?: string): PublicProperty {
   const images = (() => { try { return JSON.parse(r.images); } catch { return []; } })();
   const coords = districtCenters[r.district as District] ?? districtCenters.other;
   // NOTE: address (street + building number) is intentionally excluded — it is private info.
   // PublicProperty omits `address` so building numbers never reach guest browsers.
+  const title =
+    (locale === "en" && r.titleEn) ||
+    (locale === "ru" && r.titleRu) ||
+    (locale === "hy" && r.titleHy) ||
+    r.title;
+  const description =
+    (locale === "en" && r.descriptionEn) ||
+    (locale === "ru" && r.descriptionRu) ||
+    (locale === "hy" && r.descriptionHy) ||
+    r.description ||
+    "";
   return {
     id: r.id,
     listingCode: r.listingCode ?? undefined,
-    title: r.title,
-    description: r.description ?? "",
+    title,
+    description,
     type: r.type as PropertyType,
     purpose: r.purpose as Purpose,
     district: r.district as District,
@@ -119,40 +136,42 @@ async function getPublishedRows(): Promise<DbPropertyRow[]> {
   }
 }
 
-export async function getPublicProperties(): Promise<PropertyFetchResult<PublicProperty>> {
+export async function getPublicProperties(locale?: string): Promise<PropertyFetchResult<PublicProperty>> {
   const rows = await getPublishedRows();
-  return { properties: rows.map(mapDbRowToPublic), error: null };
+  return { properties: rows.map((r) => mapDbRowToPublic(r, locale)), error: null };
 }
 
-export async function getFeaturedProperties(limit = 6): Promise<PropertyFetchResult<PublicProperty>> {
+export async function getFeaturedProperties(limit = 6, locale?: string): Promise<PropertyFetchResult<PublicProperty>> {
   const rows = await getPublishedRows();
   const featured = rows.filter((r) => r.featured);
   // Fall back to latest published listings when none are marked featured
   const source = featured.length > 0 ? featured : rows;
-  return { properties: source.slice(0, limit).map(mapDbRowToPublic), error: null };
+  return { properties: source.slice(0, limit).map((r) => mapDbRowToPublic(r, locale)), error: null };
 }
 
-export async function getLatestProperties(limit = 6): Promise<PropertyFetchResult<PublicProperty>> {
+export async function getLatestProperties(limit = 6, locale?: string): Promise<PropertyFetchResult<PublicProperty>> {
   const rows = await getPublishedRows();
-  return { properties: rows.slice(0, limit).map(mapDbRowToPublic), error: null };
+  return { properties: rows.slice(0, limit).map((r) => mapDbRowToPublic(r, locale)), error: null };
 }
 
 export async function getPublicPropertyById(
-  id: string
+  id: string,
+  locale?: string
 ): Promise<{ property: PublicProperty | null; error: PropertyFetchErrorCode }> {
   try {
     const { prisma } = await import("@/lib/prisma");
     const row = await prisma.dbProperty.findFirst({
       where: { id, isPublished: true },
     });
-    return { property: row ? mapDbRowToPublic(row as unknown as DbPropertyRow) : null, error: null };
+    return { property: row ? mapDbRowToPublic(row as unknown as DbPropertyRow, locale) : null, error: null };
   } catch {
     return { property: null, error: "network" };
   }
 }
 
 export async function getPublicPropertyByCode(
-  code: string
+  code: string,
+  locale?: string
 ): Promise<{ property: PublicProperty | null; error: PropertyFetchErrorCode }> {
   const numericCode = parseInt(code, 10);
   if (isNaN(numericCode)) return { property: null, error: null };
@@ -162,7 +181,7 @@ export async function getPublicPropertyByCode(
     const row = await (prisma.dbProperty as any).findFirst({
       where: { listingCode: numericCode, isPublished: true },
     });
-    return { property: row ? mapDbRowToPublic(row as DbPropertyRow) : null, error: null };
+    return { property: row ? mapDbRowToPublic(row as DbPropertyRow, locale) : null, error: null };
   } catch {
     return { property: null, error: "network" };
   }
@@ -170,7 +189,8 @@ export async function getPublicPropertyByCode(
 
 export async function getSimilarPublicProperties(
   property: PublicProperty,
-  limit = 3
+  limit = 3,
+  locale?: string
 ): Promise<PublicProperty[]> {
   const rows = await getPublishedRows();
   const others = rows.filter((r) => r.id !== property.id);
@@ -179,7 +199,7 @@ export async function getSimilarPublicProperties(
   const merged = [...sameDistrict, ...sameType].filter(
     (r, i, arr) => arr.findIndex((x) => x.id === r.id) === i
   );
-  return merged.slice(0, limit).map(mapDbRowToPublic);
+  return merged.slice(0, limit).map((r) => mapDbRowToPublic(r, locale));
 }
 
 /**

@@ -3,6 +3,7 @@ import { prisma, ensureDatabase } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { isStreetInDistrict } from "@/lib/yerevan-streets";
 import { writeAuditLog, getIp } from "@/lib/audit";
+import { translateToAllLocales, detectLocale } from "@/lib/translate";
 import {
   ALLOWED_TYPES,
   ALLOWED_PURPOSES,
@@ -99,5 +100,28 @@ export async function POST(request: Request) {
     });
   });
   await writeAuditLog({ session, action: "listing.create", target: title, targetId: listing.id, ip: getIp(request) });
+
+  // Auto-translate title and description to all 3 locales (best-effort)
+  try {
+    const sourceLang = detectLocale(title);
+    const desc = typeof body?.description === "string" ? body.description.trim() : "";
+    const [titleT, descT] = await Promise.all([
+      translateToAllLocales(title, sourceLang),
+      desc ? translateToAllLocales(desc, sourceLang) : Promise.resolve(null),
+    ]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (prisma.dbProperty as any).update({
+      where: { id: listing.id },
+      data: {
+        titleEn: titleT.en,
+        titleRu: titleT.ru,
+        titleHy: titleT.hy,
+        ...(descT ? { descriptionEn: descT.en, descriptionRu: descT.ru, descriptionHy: descT.hy } : {}),
+      },
+    });
+  } catch {
+    // Translation failure is non-fatal — listing is already saved
+  }
+
   return NextResponse.json({ listing }, { status: 201 });
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma, ensureDatabase } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { writeAuditLog, getIp } from "@/lib/audit";
+import { translateToAllLocales, detectLocale } from "@/lib/translate";
 import {
   ALLOWED_TYPES,
   ALLOWED_PURPOSES,
@@ -85,6 +86,29 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (session.role !== "employee") {
     if (body?.isPublished !== undefined) data.isPublished = Boolean(body.isPublished);
     if (body?.featured !== undefined) data.featured = Boolean(body.featured);
+  }
+
+  // Re-translate whenever title or description is being updated
+  if (data.title || data.description !== undefined) {
+    try {
+      const newTitle = (data.title as string | undefined) ?? listing.title;
+      const newDesc = (data.description as string | null | undefined) ?? listing.description ?? "";
+      const sourceLang = detectLocale(newTitle);
+      const [titleT, descT] = await Promise.all([
+        translateToAllLocales(newTitle, sourceLang),
+        newDesc ? translateToAllLocales(newDesc, sourceLang) : Promise.resolve(null),
+      ]);
+      data.titleEn = titleT.en;
+      data.titleRu = titleT.ru;
+      data.titleHy = titleT.hy;
+      if (descT) {
+        data.descriptionEn = descT.en;
+        data.descriptionRu = descT.ru;
+        data.descriptionHy = descT.hy;
+      }
+    } catch {
+      // Translation failure is non-fatal
+    }
   }
 
   const updated = await prisma.dbProperty.update({ where: { id: params.id }, data });

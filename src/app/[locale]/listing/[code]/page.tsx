@@ -16,10 +16,10 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ code: string }>;
+  params: Promise<{ code: string; locale: string }>;
 }): Promise<Metadata> {
-  const { code } = await params;
-  const { property } = await getPublicPropertyByCode(code);
+  const { code, locale } = await params;
+  const { property } = await getPublicPropertyByCode(code, locale);
   if (!property) return {};
   return {
     title: property.title,
@@ -35,10 +35,10 @@ export async function generateMetadata({
 export default async function ListingPage({
   params,
 }: {
-  params: Promise<{ code: string }>;
+  params: Promise<{ code: string; locale: string }>;
 }) {
-  const { code } = await params;
-  const { property, error } = await getPublicPropertyByCode(code);
+  const { code, locale } = await params;
+  const { property, error } = await getPublicPropertyByCode(code, locale);
 
   const tCommon = await getTranslations("common");
 
@@ -61,7 +61,7 @@ export default async function ListingPage({
   const tDistricts = await getTranslations("districts");
   const tAmenities = await getTranslations("search");
 
-  const similar = await getSimilarPublicProperties(property);
+  const similar = await getSimilarPublicProperties(property, 3, locale);
 
   const amenityList = (Object.keys(property.amenities) as (keyof typeof property.amenities)[]).filter(
     (key) => property.amenities[key]

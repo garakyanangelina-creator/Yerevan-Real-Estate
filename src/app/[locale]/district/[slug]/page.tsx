@@ -143,7 +143,7 @@ export default async function DistrictPage({ params }: Props) {
   const name = district[lang as "en" | "ru" | "hy"];
   const description = district.description[lang as "en" | "ru" | "hy"];
 
-  const { properties } = await getPublicProperties();
+  const { properties } = await getPublicProperties(params.locale);
   const filtered = properties.filter((p) => p.district === params.slug);
 
   const headings: Record<string, string> = {
