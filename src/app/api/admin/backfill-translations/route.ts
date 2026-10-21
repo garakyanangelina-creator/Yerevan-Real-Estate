@@ -111,6 +111,18 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   }
 
+  // ?inspect=0575 — show stored translations for a single listing code
+  if (params.get("inspect")) {
+    await ensureDatabase();
+    const code = parseInt(params.get("inspect") ?? "", 10);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const listing = await (prisma.dbProperty as any).findFirst({
+      where: { listingCode: code },
+      select: { listingCode: true, title: true, titleEn: true, titleRu: true, titleHy: true, description: true, descriptionEn: true, descriptionRu: true, descriptionHy: true },
+    });
+    return NextResponse.json(listing ?? { error: "not found" });
+  }
+
   // ?codes=0550,0566 — force-retranslate specific listing codes (title + description)
   if (params.get("codes")) {
     await ensureDatabase();
