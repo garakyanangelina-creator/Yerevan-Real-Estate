@@ -16,8 +16,14 @@ async function runBackfill(force: boolean) {
   let failed = 0;
 
   for (const listing of listings) {
-    // Skip only if all three locales are populated (truly complete)
-    if (!force && listing.titleEn && listing.titleRu && listing.titleHy) {
+    // Skip only if all three locales are populated AND different from the original title
+    // (same value = translation failed and stored the source text as fallback)
+    const allPopulated = listing.titleEn && listing.titleRu && listing.titleHy;
+    const anyBad =
+      listing.titleEn === listing.title ||
+      listing.titleRu === listing.title ||
+      listing.titleHy === listing.title;
+    if (!force && allPopulated && !anyBad) {
       skipped++;
       continue;
     }
