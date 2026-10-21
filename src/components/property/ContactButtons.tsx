@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { MessageCircle, Phone, CalendarCheck } from "lucide-react";
 
-const AGENCY_PHONE = "+374 10 000 000";
-const AGENCY_WHATSAPP = "37400000000";
+const AGENCY_PHONE = "+374 44 222 310";
+const AGENCY_WHATSAPP = "37444222310";
 
 export default function ContactButtons({ propertyId }: { propertyId: string }) {
   const t = useTranslations("property");
