@@ -13,7 +13,10 @@
     "contacts": "Contacts",
     "users": "Users",
     "auditLog": "Audit Log",
-    "superAdmin": "Super Admin"
+    "superAdmin": "Super Admin",
+    "signedInAs": "Signed in as",
+    "dashboardSuffix": "Dashboard",
+    "signOut": "Sign Out"
   },
   "hero": {
     "title": "Find Your Place in Yerevan",
@@ -545,6 +548,17 @@
     "newUsernameLabel": "New Username",
     "confirmWithPasswordLabel": "Confirm with Password",
     "resetForm": "Reset form",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "passwordsNoMatch": "Passwords do not match.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "passwordChanged": "Password changed successfully.",
+    "passwordChangeFailed": "Failed to change password.",
+    "allFieldsRequired": "All fields required.",
+    "usernameChanged": "Username changed successfully.",
+    "usernameChangeFailed": "Failed to change username.",
+    "accountSettings": "Account Settings",
+    "uploadFailed": "Upload failed. Try again.",
+    "serverError": "Server error. Try again.",
+    "networkError": "Network error. Check connection."
   }
 }

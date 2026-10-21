@@ -413,10 +413,10 @@ function DashboardContent() {
         if (res.ok && data.url) {
           uploaded.push(data.url);
         } else {
-          setSaveError(`Upload failed: ${data.error ?? res.status}. Try again.`);
+          setSaveError(tF("uploadFailed"));
         }
       } catch {
-        setSaveError("Upload error — check your connection and try again.");
+        setSaveError(tF("networkError"));
       }
     }
     if (uploaded.length > 0) setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, ...uploaded] }));
@@ -482,7 +482,7 @@ function DashboardContent() {
         setSaveError(d.error ?? `Server error (${res.status}). Try again.`);
       }
     } catch {
-      setSaveError("Network error — check your connection and try again.");
+      setSaveError(tF("networkError"));
     } finally {
       setSaving(false);
     }
@@ -688,7 +688,7 @@ function DashboardContent() {
               <label className="flex items-center gap-3 cursor-pointer">
                 <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })}
                   className="h-4 w-4 rounded accent-gold-500" />
-                <span className="text-sm font-medium text-primary-700 dark:text-white/80">Mark as Featured</span>
+                <span className="text-sm font-medium text-primary-800 dark:text-white/80">{tF("featuredLabel")}</span>
               </label>
 
               {/* Photo upload */}
@@ -747,7 +747,7 @@ function DashboardContent() {
                   if (f.status && l.status !== f.status) return false;
                   return true;
                 }).length;
-                return `${n} of ${dbListings.length}`;
+                return `${n} / ${dbListings.length}`;
               })()}
             </span>
           </div>

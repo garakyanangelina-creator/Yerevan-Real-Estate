@@ -13,7 +13,10 @@
     "contacts": "Контакты",
     "users": "Пользователи",
     "auditLog": "Журнал",
-    "superAdmin": "Супер Админ"
+    "superAdmin": "Супер Админ",
+    "signedInAs": "Вы вошли как",
+    "dashboardSuffix": "Панель",
+    "signOut": "Выйти"
   },
   "hero": {
     "title": "Найдите своё место в Ереване",
@@ -545,6 +548,17 @@
     "newUsernameLabel": "Новое имя пользователя",
     "confirmWithPasswordLabel": "Подтвердить паролем",
     "resetForm": "Сбросить форму",
-    "tryAgain": "Попробовать снова"
+    "tryAgain": "Попробовать снова",
+    "passwordsNoMatch": "Пароли не совпадают.",
+    "passwordTooShort": "Пароль минимум 6 символов.",
+    "passwordChanged": "Пароль успешно изменён.",
+    "passwordChangeFailed": "Не удалось изменить пароль.",
+    "allFieldsRequired": "Все поля обязательны.",
+    "usernameChanged": "Имя пользователя изменено.",
+    "usernameChangeFailed": "Не удалось изменить имя.",
+    "accountSettings": "Настройки аккаунта",
+    "uploadFailed": "Ошибка загрузки. Попробуйте снова.",
+    "serverError": "Ошибка сервера. Попробуйте снова.",
+    "networkError": "Ошибка сети. Проверьте соединение."
   }
 }

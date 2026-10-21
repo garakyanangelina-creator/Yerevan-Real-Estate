@@ -79,6 +79,9 @@ interface CardProps {
 
 function EmployeeListingCard(p: CardProps) {
   const [copied, setCopied] = useState(false);
+  const tStatus = useTranslations("status");
+  const tEPCard = useTranslations("employeePortal");
+  const tDistCard = useTranslations("districts");
 
   async function copyLink(e: React.MouseEvent) {
     e.stopPropagation();
@@ -112,7 +115,7 @@ function EmployeeListingCard(p: CardProps) {
             {p.status}
           </span>
           {!p.isPublished && (
-            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">Draft</span>
+            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">{tEPCard("draftBadge")}</span>
           )}
         </div>
         {p.displayCode && (
@@ -132,7 +135,7 @@ function EmployeeListingCard(p: CardProps) {
             </h3>
             <p className="mt-0.5 flex items-center gap-1 text-xs text-primary-500 dark:text-white/50">
               <span className="h-1.5 w-1.5 rounded-full bg-gold-500" />
-              {DISTRICT_SHORT[p.district] ?? p.district}
+              {tDistCard(p.district as Parameters<typeof tDistCard>[0])}
             </p>
           </div>
         </div>
@@ -162,7 +165,7 @@ function EmployeeListingCard(p: CardProps) {
             href={`/${p.locale}/employee/listing/${p.id}`}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary-900 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-800 dark:bg-white/10 dark:hover:bg-white/20"
           >
-            <Eye className="h-3.5 w-3.5" /> View Details
+            <Eye className="h-3.5 w-3.5" /> {tEPCard("viewDetails")}
           </a>
           {p.displayCode && (
             <button onClick={copyLink}
@@ -171,7 +174,7 @@ function EmployeeListingCard(p: CardProps) {
                   ? "border-green-400 bg-green-50 text-green-700 dark:border-green-600 dark:bg-green-900/20 dark:text-green-400"
                   : "border-gold-300 bg-gold-50 text-gold-700 hover:bg-gold-100 dark:border-gold-600/40 dark:bg-gold-900/10 dark:text-gold-400"
               }`}>
-              {copied ? <><Check className="h-3.5 w-3.5" /> Copied!</> : <><Link2 className="h-3.5 w-3.5" /> Copy link</>}
+              {copied ? <><Check className="h-3.5 w-3.5" /> {tEPCard("copiedLink")}</> : <><Link2 className="h-3.5 w-3.5" /> {tEPCard("copyLink")}</>}
             </button>
           )}
           <button onClick={p.onEdit} title="Edit"
@@ -465,7 +468,7 @@ export default function EmployeeDashboard() {
         await fetchListings();
       } else {
         const d = await res.json().catch(() => ({}));
-        setSubmitError(d.error ?? `Server error (${res.status}). Tap "Try Again" to retry.`);
+        setSubmitError(d.error ?? tF("serverError"));
       }
     } catch {
       setSubmitError("Network error — check your connection and tap \"Try Again\".");
@@ -485,8 +488,8 @@ export default function EmployeeDashboard() {
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
     setPwError(""); setPwSuccess("");
-    if (pwForm.next !== pwForm.confirm) { setPwError("Passwords do not match."); return; }
-    if (pwForm.next.length < 6) { setPwError("Password must be at least 6 characters."); return; }
+    if (pwForm.next !== pwForm.confirm) { setPwError(tF("passwordsNoMatch")); return; }
+    if (pwForm.next.length < 6) { setPwError(tF("passwordTooShort")); return; }
     setPwSaving(true);
     const res = await fetch("/api/auth/change-password", {
       method: "POST",
@@ -494,14 +497,14 @@ export default function EmployeeDashboard() {
       body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
     });
     setPwSaving(false);
-    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setPwSuccess("Password changed successfully."); }
-    else { const d = await res.json(); setPwError(d.error ?? "Failed to change password."); }
+    if (res.ok) { setPwForm({ current: "", next: "", confirm: "" }); setPwSuccess(tF("passwordChanged")); }
+    else { const d = await res.json(); setPwError(d.error ?? tF("passwordChangeFailed")); }
   }
 
   async function handleChangeUsername(e: React.FormEvent) {
     e.preventDefault();
     setPwError(""); setPwSuccess("");
-    if (!unForm.newUsername.trim() || !unForm.password) { setPwError("All fields required."); return; }
+    if (!unForm.newUsername.trim() || !unForm.password) { setPwError(tF("allFieldsRequired")); return; }
     setPwSaving(true);
     const res = await fetch("/api/auth/change-username", {
       method: "POST",
@@ -509,8 +512,8 @@ export default function EmployeeDashboard() {
       body: JSON.stringify({ newUsername: unForm.newUsername.trim(), password: unForm.password }),
     });
     setPwSaving(false);
-    if (res.ok) { setUnForm({ newUsername: "", password: "" }); setPwSuccess("Username changed successfully."); }
-    else { const d = await res.json(); setPwError(d.error ?? "Failed to change username."); }
+    if (res.ok) { setUnForm({ newUsername: "", password: "" }); setPwSuccess(tF("usernameChanged")); }
+    else { const d = await res.json(); setPwError(d.error ?? tF("usernameChangeFailed")); }
   }
 
   const toCode = (id: string) => id.slice(0, 6).toUpperCase();
@@ -523,13 +526,13 @@ export default function EmployeeDashboard() {
     return (
       <div className="container-page py-10">
         <div className="flex items-center justify-between border-b border-primary-100 pb-4 dark:border-white/10">
-          <span className="font-serif font-semibold text-primary-900 dark:text-white">Account Settings / Հաշվի կարգավորումներ</span>
+          <span className="font-serif font-semibold text-primary-900 dark:text-white">{tF("accountSettings")}</span>
           <button onClick={() => setMode("list")} className="btn-outline text-sm">{tEP("back")}</button>
         </div>
         <div className="mt-8 max-w-sm">
           <div className="mb-6 flex gap-2">
-            <button onClick={() => { setAccTab("password"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${accTab === "password" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>Password / Գաղտնաբառ</button>
-            <button onClick={() => { setAccTab("username"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${accTab === "username" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>Username / Մուտքանուն</button>
+            <button onClick={() => { setAccTab("password"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${accTab === "password" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>{tSettings("passwordTab")}</button>
+            <button onClick={() => { setAccTab("username"); setPwError(""); setPwSuccess(""); }} className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${accTab === "username" ? "bg-gold-500 text-primary-900" : "bg-primary-50 text-primary-600 dark:bg-white/10 dark:text-white/70"}`}>{tSettings("usernameTab")}</button>
           </div>
           {accTab === "password" && (
             <form onSubmit={handleChangePassword} className="space-y-4">
@@ -840,10 +843,10 @@ export default function EmployeeDashboard() {
               </button>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setMode("list")} className="btn-outline">
-                  Cancel / Չեղ.
+                  {tF("cancel")}
                 </button>
                 <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
-                  {saving ? "Saving…" : mode === "create" ? "Create Listing / Ստ. հայt" : "Save Changes / Պah. փ."}
+                  {saving ? tF("saving") : mode === "create" ? tF("createPublish") : tF("saveChanges")}
                 </button>
               </div>
             </div>

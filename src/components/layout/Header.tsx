@@ -18,15 +18,16 @@ function dashboardHref(role: AuthUser["role"], locale: string): string {
   return `/${locale}/admin/dashboard`;
 }
 
-function roleLabel(role: AuthUser["role"]): string {
-  if (role === "super_admin") return "Super Admin";
-  if (role === "admin") return "Admin";
-  return "Agent";
-}
+// roleLabel moved inline using translations
 
 export default function Header() {
   const t = useTranslations("nav");
   const locale = useLocale();
+  function roleLabel(role: AuthUser["role"]) {
+    if (role === "super_admin") return t("superAdmin");
+    if (role === "admin") return t("admin");
+    return "Agent";
+  }
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -159,7 +160,7 @@ export default function Header() {
               {accountOpen && (
                 <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-primary-100 bg-white shadow-soft dark:border-white/10 dark:bg-primary-800">
                   <div className="border-b border-primary-100 px-4 py-3 dark:border-white/10">
-                    <p className="text-xs font-semibold text-primary-400 dark:text-white/40 uppercase tracking-wide">Signed in as</p>
+                    <p className="text-xs font-semibold text-primary-400 dark:text-white/40 uppercase tracking-wide">{t("signedInAs")}</p>
                     <p className="mt-0.5 font-semibold text-primary-900 dark:text-white">{user.username}</p>
                   </div>
                   <a
@@ -168,14 +169,13 @@ export default function Header() {
                     className="flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-primary-800 transition hover:bg-primary-50 dark:text-white dark:hover:bg-white/10"
                   >
                     <LayoutDashboard className="h-4 w-4 text-gold-500" />
-                    {roleLabel(user.role)} Dashboard
+                    {roleLabel(user.role)} {t("dashboardSuffix")}
                   </a>
                   <button
                     onClick={signOut}
                     className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                   >
-                    <LogOut className="h-4 w-4" />
-                    Sign Out
+                    <LogOut className="h-4 w-4" /> {t("signOut")}
                   </button>
                 </div>
               )}
@@ -230,14 +230,13 @@ export default function Header() {
                   className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-700 transition hover:bg-primary-50 dark:text-white/80 dark:hover:bg-white/10"
                 >
                   <LayoutDashboard className="h-4 w-4 text-gold-500" />
-                  {roleLabel(user.role)} Dashboard
+                  {roleLabel(user.role)} {t("dashboardSuffix")}
                 </a>
                 <button
                   onClick={() => { setOpen(false); signOut(); }}
                   className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
+                  <LogOut className="h-4 w-4" /> {t("signOut")}
                 </button>
               </>
             ) : (
