@@ -2,64 +2,42 @@
 
 import { MapPin } from "lucide-react";
 
-// Convert lat/lng to OSM tile coordinates at given zoom
 function latLngToTile(lat: number, lng: number, zoom: number) {
   const n = Math.pow(2, zoom);
   const x = Math.floor(((lng + 180) / 360) * n);
   const latRad = (lat * Math.PI) / 180;
   const y = Math.floor(((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n);
-  return { x, y };
-}
-
-// Pixel offset of the exact lat/lng within the center tile (0–256)
-function latLngToPixelOffset(lat: number, lng: number, zoom: number) {
-  const n = Math.pow(2, zoom);
-  const xFloat = ((lng + 180) / 360) * n;
-  const latRad = (lat * Math.PI) / 180;
-  const yFloat = ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n;
-  return {
-    px: (xFloat - Math.floor(xFloat)) * 256,
-    py: (yFloat - Math.floor(yFloat)) * 256,
-  };
+  const px = (((lng + 180) / 360) * n - x) * 256;
+  const py = (((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n - y) * 256;
+  return { x, y, px, py };
 }
 
 export default function PropertyMap({ lat, lng, title }: { lat: number; lng: number; title: string }) {
   const zoom = 15;
-  const { x, y } = latLngToTile(lat, lng, zoom);
-  const { px, py } = latLngToPixelOffset(lat, lng, zoom);
+  const { x, y, px, py } = latLngToTile(lat, lng, zoom);
 
-  // Show a 3×2 grid of tiles (768×512 visible area, cropped to show the pin centered)
-  const cols = 3;
-  const rows = 2;
+  const cols = 5;
+  const rows = 3;
   const tileSize = 256;
-  const mapW = cols * tileSize;
-  const mapH = rows * tileSize;
 
-  // Center the pin at 50% width, 50% height of the visible area
-  const offsetX = Math.round(mapW / 2 - px);
-  const offsetY = Math.round(mapH / 2 - py);
+  // The pin sits at px,py within the center tile.
+  // Offset the grid so that exact point lands at 50%,50% of the container.
+  const centerCol = Math.floor(cols / 2);
+  const centerRow = Math.floor(rows / 2);
+  const shiftX = -(centerCol * tileSize + px);
+  const shiftY = -(centerRow * tileSize + py);
 
   const osmLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=${zoom}/${lat}/${lng}`;
 
-  const tiles: { key: string; src: string; left: number; top: number }[] = [];
+  const tiles = [];
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const tx = x - Math.floor(cols / 2) + col;
-      const ty = y - Math.floor(rows / 2) + row;
-      // Round-robin between OSM tile subdomains for better performance
+      const tx = x - centerCol + col;
+      const ty = y - centerRow + row;
       const sub = ["a", "b", "c"][(col + row) % 3];
-      tiles.push({
-        key: `${tx}-${ty}`,
-        src: `https://${sub}.tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`,
-        left: offsetX + col * tileSize,
-        top: offsetY + row * tileSize,
-      });
+      tiles.push({ key: `${tx}-${ty}`, src: `https://${sub}.tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`, col, row });
     }
   }
-
-  // Pin position relative to the container (always center)
-  const pinLeft = mapW / 2;
-  const pinTop = mapH / 2;
 
   return (
     <a
@@ -69,12 +47,18 @@ export default function PropertyMap({ lat, lng, title }: { lat: number; lng: num
       className="block overflow-hidden rounded-xl shadow-soft"
       title={`View ${title} on OpenStreetMap`}
     >
-      <div
-        className="relative bg-primary-100 dark:bg-primary-800"
-        style={{ width: "100%", height: 288, overflow: "hidden" }}
-      >
-        {/* Tile layer */}
-        <div className="absolute inset-0" style={{ width: mapW, height: mapH, overflow: "visible" }}>
+      <div className="relative bg-primary-100 dark:bg-primary-800" style={{ width: "100%", height: 288, overflow: "hidden" }}>
+        {/* Tile grid — shifted so the exact location is at container center */}
+        <div
+          className="absolute"
+          style={{
+            left: "50%",
+            top: "50%",
+            width: cols * tileSize,
+            height: rows * tileSize,
+            transform: `translate(${shiftX}px, ${shiftY}px)`,
+          }}
+        >
           {tiles.map((t) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -83,17 +67,14 @@ export default function PropertyMap({ lat, lng, title }: { lat: number; lng: num
               alt=""
               width={tileSize}
               height={tileSize}
-              style={{ position: "absolute", left: t.left, top: t.top, imageRendering: "auto" }}
+              style={{ position: "absolute", left: t.col * tileSize, top: t.row * tileSize }}
               draggable={false}
             />
           ))}
         </div>
 
-        {/* Pin marker */}
-        <div
-          className="absolute z-10 flex flex-col items-center"
-          style={{ left: pinLeft, top: pinTop, transform: "translate(-50%, -100%)" }}
-        >
+        {/* Pin always at exact center */}
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-full flex-col items-center">
           <div className="rounded-full bg-red-500 p-1 shadow-lg">
             <MapPin className="h-5 w-5 text-white" />
           </div>
@@ -102,7 +83,15 @@ export default function PropertyMap({ lat, lng, title }: { lat: number; lng: num
 
         {/* OSM attribution */}
         <div className="absolute bottom-1 right-1 z-10 rounded bg-white/80 px-1 text-[10px] text-gray-600 dark:bg-black/50 dark:text-gray-300">
-          © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>OpenStreetMap</a>
+          ©{" "}
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            OpenStreetMap
+          </a>
         </div>
       </div>
     </a>
