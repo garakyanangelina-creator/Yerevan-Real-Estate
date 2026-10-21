@@ -194,30 +194,30 @@ function EmployeeListingCard(p: CardProps) {
 type FormMode = "list" | "create" | "edit" | "password";
 
 const DISTRICTS = [
-  { value: "kentron",          label: "Kentron / Կենտրոն" },
-  { value: "arabkir",          label: "Arabkir / Արաբկիր" },
-  { value: "davtashen",        label: "Davtashen / Դավթաշեն" },
-  { value: "ajapnyak",         label: "Ajapnyak / Աջափնյակ" },
-  { value: "shengavit",        label: "Shengavit / Շենգավիթ" },
-  { value: "kanaker-zeytun",   label: "Kanaker-Zeytun / Քանաքեռ-Զեյթուն" },
-  { value: "nor-nork",         label: "Nor Nork / Նոր Նորք" },
-  { value: "malatia-sebastia", label: "Malatia-Sebastia / Մալաթիա-Սեբաստիա" },
-  { value: "avan",             label: "Avan / Ավան" },
-  { value: "erebuni",          label: "Erebuni / Էրեբունի" },
-  { value: "nork-marash",      label: "Nork-Marash / Նորք-Մարաշ" },
-  { value: "nubarashen",       label: "Nubarashen / Նուբարաշեն" },
-  { value: "other",            label: "Other / Այլ" },
+  { value: "kentron" },
+  { value: "arabkir" },
+  { value: "davtashen" },
+  { value: "ajapnyak" },
+  { value: "shengavit" },
+  { value: "kanaker-zeytun" },
+  { value: "nor-nork" },
+  { value: "malatia-sebastia" },
+  { value: "avan" },
+  { value: "erebuni" },
+  { value: "nork-marash" },
+  { value: "nubarashen" },
+  { value: "other" },
 ];
 
 const AMENITY_KEYS = [
-  { key: "parking",     label: "Parking / Կայանատեղի" },
-  { key: "balcony",     label: "Balcony / Պատշգամբ" },
-  { key: "furniture",   label: "Furnished / Կահավորված" },
-  { key: "petFriendly", label: "Pet Friendly / Ընտանի կենդ." },
-  { key: "newBuilding", label: "New Building / Նոր կառ." },
-  { key: "elevator",    label: "Elevator / Վերելակ" },
-  { key: "ac",          label: "AC / Կондեioner" },
-  { key: "heating",     label: "Heating / Ջեռուցում" },
+  { key: "parking" },
+  { key: "balcony" },
+  { key: "furniture" },
+  { key: "petFriendly" },
+  { key: "newBuilding" },
+  { key: "elevator" },
+  { key: "ac" },
+  { key: "heating" },
 ];
 
 type AmenityMap = Record<string, boolean | string | number>;

@@ -14,9 +14,9 @@
     "users": "Ոգտագորձներ",
     "auditLog": "Աուդիտի գրանցաղություն",
     "superAdmin": "Գլխավոր Admin",
-    "signedInAs": "Мутqagrvatsvek ortpess",
-    "dashboardSuffix": "Вahanaknk",
-    "signOut": "Дoorss gal"
+    "signedInAs": "Մուտք ե որպես",
+    "dashboardSuffix": "Վահանակ",
+    "signOut": "Դուռս գալ"
   },
   "hero": {
     "title": "Գտեք ձեր տեղը Երևանում",
@@ -277,7 +277,7 @@
     "viewMatchingClients": "Տեսնել համապատասխան հաճախորդներին",
     "markAllRead": "Նշել բոլորը որպես կարդացված",
     "empty": "Ծանուցումներ դեռ չկան։",
-    "matchingClients": "Համapataskhannerr"
+    "matchingClients": "Համապատասխան հաճախորդներ"
   },
   "footer": {
     "tagline": "Պրեմիում անշարժ գույք ողջ Երևանում",
@@ -408,7 +408,7 @@
     "twoFaDisable": "Անգամարգել 2FA"
   },
   "userForm": {
-    "createTitle": "Խմբել ոգտագորձ",
+    "createTitle": "Ավելացել Ոգտագորձ",
     "editTitle": "Ռադագրել ոգտագորձ",
     "nameLabel": "Անուն",
     "emailLabel": "Ելֆոստ",
@@ -416,8 +416,8 @@
     "roleLabel": "դեր",
     "roleAdmin": "Admin",
     "roleEmployee": "Աշխատակիծ",
-    "cancel": "Մեկնարկել",
-    "create": "Խմբել",
+    "cancel": "Չեղարկել",
+    "create": "Ավելացել",
     "save": "Պահել",
     "requiredError": "Պոլոր դաշտերն բարակալ ե",
     "emailError": "Ելֆոստի սխալ",
@@ -459,8 +459,8 @@
     "ownerPhoneLabel": "Սեփականատիռոդջի Հեռակխոսհամառ",
     "statusLabel": "Կարգավիչկ",
     "photosLabel": "Լուսանկարներ",
-    "cancel": "Մեկնարկել",
-    "createAndPublish": "Խմբել եվ հրապարակել",
+    "cancel": "Չեղարկել",
+    "createAndPublish": "Ավելացել եվ հրապարակել",
     "saveChanges": "Պահել պոփոխություններ",
     "newListing": "Նոր Հայտարարություն",
     "allListings": "Բոլոր Հայտարարությունները",

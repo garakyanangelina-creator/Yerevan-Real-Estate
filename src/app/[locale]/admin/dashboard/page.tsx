@@ -57,19 +57,19 @@ interface UserRow {
 }
 
 const DISTRICTS = [
-  { value: "kentron",         label: "Kentron / Կենտրոն" },
-  { value: "arabkir",         label: "Arabkir / Արաբկիր" },
-  { value: "davtashen",       label: "Davtashen / Դավթաշեն" },
-  { value: "ajapnyak",        label: "Ajapnyak / Աջափնյակ" },
-  { value: "shengavit",       label: "Shengavit / Շենգավիթ" },
-  { value: "kanaker-zeytun",   label: "Kanaker-Zeytun / Քանաքեռ-Զեյթուն" },
-  { value: "nor-nork",         label: "Nor Nork / Նոր Նորք" },
-  { value: "malatia-sebastia", label: "Malatia-Sebastia / Մալաթիա-Սեբաստիա" },
-  { value: "avan",            label: "Avan / Ավան" },
-  { value: "erebuni",         label: "Erebuni / Էրեբունի" },
-  { value: "nork-marash",      label: "Nork-Marash / Նորք-Մարաշ" },
-  { value: "nubarashen",      label: "Nubarashen / Նուբարաշեն" },
-  { value: "other",           label: "Other / Այլ" },
+  { value: "kentron" },
+  { value: "arabkir" },
+  { value: "davtashen" },
+  { value: "ajapnyak" },
+  { value: "shengavit" },
+  { value: "kanaker-zeytun" },
+  { value: "nor-nork" },
+  { value: "malatia-sebastia" },
+  { value: "avan" },
+  { value: "erebuni" },
+  { value: "nork-marash" },
+  { value: "nubarashen" },
+  { value: "other" },
 ];
 
 function emptyForm() {
@@ -587,7 +587,7 @@ function DashboardContent() {
                 <label className={labelCls}>{tF("districtLabel")}</label>
                 <select className={inputCls} value={form.district}
                   onChange={(e) => { setForm({ ...form, district: e.target.value, street: "" }); setStreetQuery(""); }}>
-                  {DISTRICTS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+                  {DISTRICTS.map((d) => <option key={d.value} value={d.value}>{tDistricts(d.value as Parameters<typeof tDistricts>[0])}</option>)}
                 </select>
               </div>
 
