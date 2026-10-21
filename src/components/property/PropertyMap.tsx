@@ -34,8 +34,8 @@ export default function PropertyMap({ lat, lng, title }: { lat: number; lng: num
     for (let col = 0; col < cols; col++) {
       const tx = x - centerCol + col;
       const ty = y - centerRow + row;
-      const sub = ["a", "b", "c"][(col + row) % 3];
-      tiles.push({ key: `${tx}-${ty}`, src: `https://${sub}.tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`, col, row });
+      const sub = ["a", "b", "c", "d"][(col + row) % 4];
+      tiles.push({ key: `${tx}-${ty}`, src: `https://${sub}.basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tx}/${ty}.png`, col, row });
     }
   }
 
