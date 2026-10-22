@@ -43,11 +43,9 @@ export default function SubmitForm() {
     if (!streetQuery || streetQuery.length < 1) { setStreetSuggestions([]); return; }
     const streets = streetsByDistrict[form.district] ?? [];
     const q = transliterateQuery(streetQuery);
-    // For short queries use startsWith so typing "A" shows A-streets, not every street containing "a"
     const filtered = q.length <= 2
       ? streets.filter((s) => s.toLowerCase().startsWith(q))
       : streets.filter((s) => s.toLowerCase().includes(q));
-    // Deduplicate by lowercased name before showing
     const seen = new Set<string>();
     const unique = filtered.filter((s) => {
       const key = s.toLowerCase();
@@ -97,9 +95,9 @@ export default function SubmitForm() {
         body: JSON.stringify({ ...form, photos: uploadedUrls }),
       });
       if (res.ok) { setSent(true); }
-      else { setError("Something went wrong. Please try again."); }
+      else { setError(t("errorGeneral")); }
     } catch {
-      setError("Connection error. Please try again.");
+      setError(t("errorConnection"));
     } finally {
       setSubmitting(false);
     }
@@ -114,14 +112,14 @@ export default function SubmitForm() {
 
       {/* Name */}
       <div>
-        <label className={labelCls}>Full Name / Անուն Ազգանուն *</label>
+        <label className={labelCls}>{t("nameLabel")} *</label>
         <input required placeholder={t("name")} value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
       </div>
 
       {/* Phone */}
       <div>
-        <label className={labelCls}>Phone / Հեռ. *</label>
+        <label className={labelCls}>{t("phoneLabel")} *</label>
         <input required type="tel" placeholder={t("phone")} value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} />
         <p className="mt-1.5 flex items-center gap-1.5 text-xs text-primary-500 dark:text-white/50">
@@ -131,7 +129,7 @@ export default function SubmitForm() {
 
       {/* Email */}
       <div>
-        <label className={labelCls}>Email</label>
+        <label className={labelCls}>{t("emailLabel")}</label>
         <input type="email" placeholder={t("email")} value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} />
       </div>
@@ -139,7 +137,7 @@ export default function SubmitForm() {
       {/* Type & Purpose */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Property Type / Տ. տեսակ *</label>
+          <label className={labelCls}>{t("propertyTypeLabel")} *</label>
           <select required value={form.propertyType}
             onChange={(e) => setForm({ ...form, propertyType: e.target.value })} className={inputCls}>
             <option value="">{t("propertyType")}</option>
@@ -149,7 +147,7 @@ export default function SubmitForm() {
           </select>
         </div>
         <div>
-          <label className={labelCls}>Purpose / Նպ. *</label>
+          <label className={labelCls}>{t("purposeLabel")} *</label>
           <select required value={form.purpose}
             onChange={(e) => setForm({ ...form, purpose: e.target.value })} className={inputCls}>
             <option value="">{t("purpose")}</option>
@@ -161,7 +159,7 @@ export default function SubmitForm() {
 
       {/* District */}
       <div>
-        <label className={labelCls}>District / Թաղ. *</label>
+        <label className={labelCls}>{t("districtLabel")} *</label>
         <select required value={form.district}
           onChange={(e) => { setForm({ ...form, district: e.target.value, street: "" }); setStreetQuery(""); }} className={inputCls}>
           <option value="">{t("district")}</option>
@@ -173,10 +171,10 @@ export default function SubmitForm() {
 
       {/* Street autocomplete */}
       <div ref={streetRef} className="relative">
-        <label className={labelCls}>Street / Փողոց</label>
+        <label className={labelCls}>{t("streetLabel")}</label>
         <div className="relative">
           <input
-            placeholder="Type street name… / Մուտq. փողոց..."
+            placeholder={t("streetPlaceholder")}
             value={streetQuery}
             onChange={(e) => { setStreetQuery(e.target.value); setForm({ ...form, street: e.target.value }); }}
             className={inputCls}
@@ -214,11 +212,11 @@ export default function SubmitForm() {
         )}
         {streetQuery.length >= 2 && streetSuggestions.length === 0 && (
           <div className="mt-1 flex items-center gap-2">
-            <p className="text-xs text-primary-400 dark:text-white/40">No streets found — type manually or</p>
+            <p className="text-xs text-primary-400 dark:text-white/40">{t("noStreetsFound")}</p>
             <button type="button"
               onClick={() => { const q = streetQuery; setStreetQuery(""); setTimeout(() => setStreetQuery(q), 50); }}
               className="flex items-center gap-1 text-xs font-medium text-gold-600 hover:underline dark:text-gold-400">
-              <RefreshCw className="h-3 w-3" /> Retry
+              <RefreshCw className="h-3 w-3" /> {t("retry")}
             </button>
           </div>
         )}
@@ -226,14 +224,14 @@ export default function SubmitForm() {
 
       {/* Building number */}
       <div>
-        <label className={labelCls}>Building Number / Շ. համ.</label>
-        <input placeholder="e.g. 12, 7a…" value={form.buildingNumber}
+        <label className={labelCls}>{t("buildingNumberLabel")}</label>
+        <input placeholder={t("buildingNumberPlaceholder")} value={form.buildingNumber}
           onChange={(e) => setForm({ ...form, buildingNumber: e.target.value })} className={inputCls} />
       </div>
 
       {/* Price & Currency */}
       <div>
-        <label className={labelCls}>Price / Գ. *</label>
+        <label className={labelCls}>{t("priceLabel")} *</label>
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
             <input required type="number" min="0" placeholder={t("price")} value={form.price}
@@ -251,15 +249,17 @@ export default function SubmitForm() {
       {/* Rooms & Area */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Rooms / Սենy.</label>
+          <label className={labelCls}>{t("roomsLabel")}</label>
           <select value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} className={inputCls}>
-            <option value="">— Select —</option>
-            {["1","2","3","4","5","6","6+"].map(v => <option key={v} value={v}>{v} room{v !== "1" ? "s" : ""}</option>)}
+            <option value="">{t("selectDefault")}</option>
+            {["1","2","3","4","5","6","6+"].map(v => (
+              <option key={v} value={v}>{v} {t("roomUnit")}</option>
+            ))}
           </select>
         </div>
         <div>
-          <label className={labelCls}>Area m² / Մ²</label>
-          <input type="number" min="0" placeholder="e.g. 75" value={form.area}
+          <label className={labelCls}>{t("areaLabel")}</label>
+          <input type="number" min="0" placeholder={t("areaPlaceholder")} value={form.area}
             onChange={(e) => setForm({ ...form, area: e.target.value })} className={inputCls} />
         </div>
       </div>
@@ -267,13 +267,13 @@ export default function SubmitForm() {
       {/* Floor / Total floors */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Floor / Հ.</label>
-          <input type="number" min="0" placeholder="e.g. 3" value={form.floor}
+          <label className={labelCls}>{t("floorLabel")}</label>
+          <input type="number" min="0" placeholder={t("floorPlaceholder")} value={form.floor}
             onChange={(e) => setForm({ ...form, floor: e.target.value })} className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Total Floors / Ընդ. հ.</label>
-          <input type="number" min="0" placeholder="e.g. 9" value={form.totalFloors}
+          <label className={labelCls}>{t("totalFloorsLabel")}</label>
+          <input type="number" min="0" placeholder={t("totalFloorsPlaceholder")} value={form.totalFloors}
             onChange={(e) => setForm({ ...form, totalFloors: e.target.value })} className={inputCls} />
         </div>
       </div>
@@ -281,42 +281,42 @@ export default function SubmitForm() {
       {/* Bedrooms / Bathrooms */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Bedrooms / Ննj.</label>
-          <input type="number" min="0" placeholder="e.g. 2" value={form.bedrooms}
+          <label className={labelCls}>{t("bedroomsLabel")}</label>
+          <input type="number" min="0" placeholder={t("bedroomsPlaceholder")} value={form.bedrooms}
             onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Bathrooms / Լ/Ս</label>
-          <input type="number" min="0" placeholder="e.g. 1" value={form.bathrooms}
+          <label className={labelCls}>{t("bathroomsLabel")}</label>
+          <input type="number" min="0" placeholder={t("bathroomsPlaceholder")} value={form.bathrooms}
             onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} className={inputCls} />
         </div>
       </div>
 
       {/* Building type */}
       <div>
-        <label className={labelCls}>Building Type / Կ. տ.</label>
+        <label className={labelCls}>{t("buildingTypeLabel")}</label>
         <select value={form.buildingType} onChange={(e) => setForm({ ...form, buildingType: e.target.value })} className={inputCls}>
-          <option value="">— Select / Ընt. —</option>
-          <option value="panel">Panel / Պ.</option>
-          <option value="newBuilding">New Building / Ն. կ.</option>
-          <option value="stone">Stone / Ք.</option>
+          <option value="">{t("selectDefault")}</option>
+          <option value="panel">{t("buildingTypePanel")}</option>
+          <option value="newBuilding">{t("buildingTypeNew")}</option>
+          <option value="stone">{t("buildingTypeStone")}</option>
         </select>
       </div>
 
       {/* Balconies */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Open Balcony / Բ. պ.</label>
+          <label className={labelCls}>{t("openBalconyLabel")}</label>
           <select value={form.openBalcony} onChange={(e) => setForm({ ...form, openBalcony: e.target.value })} className={inputCls}>
-            <option value="0">None / Չ.</option>
+            <option value="0">{t("balconyNone")}</option>
             <option value="1">1</option>
             <option value="2">2</option>
           </select>
         </div>
         <div>
-          <label className={labelCls}>Closed Balcony / Փ. պ.</label>
+          <label className={labelCls}>{t("closedBalconyLabel")}</label>
           <select value={form.closedBalcony} onChange={(e) => setForm({ ...form, closedBalcony: e.target.value })} className={inputCls}>
-            <option value="0">None / Չ.</option>
+            <option value="0">{t("balconyNone")}</option>
             <option value="1">1</option>
             <option value="2">2</option>
           </select>
@@ -326,9 +326,9 @@ export default function SubmitForm() {
       {/* Ceiling height / View */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Ceiling Height / Բ. բ.</label>
+          <label className={labelCls}>{t("ceilingHeightLabel")}</label>
           <select value={form.ceilingHeight} onChange={(e) => setForm({ ...form, ceilingHeight: e.target.value })} className={inputCls}>
-            <option value="">— Select —</option>
+            <option value="">{t("selectDefault")}</option>
             <option value="2.6">2.6 m</option>
             <option value="2.8">2.8 m</option>
             <option value="3.0">3.0 m</option>
@@ -337,30 +337,30 @@ export default function SubmitForm() {
           </select>
         </div>
         <div>
-          <label className={labelCls}>View / Տ.</label>
+          <label className={labelCls}>{t("viewLabel")}</label>
           <select value={form.view} onChange={(e) => setForm({ ...form, view: e.target.value })} className={inputCls}>
-            <option value="">— Select —</option>
-            <option value="ararat">Ararat / Ա.</option>
-            <option value="city">City / Ք.</option>
-            <option value="garden">Garden / Այ.</option>
-            <option value="street">Street / Փ.</option>
+            <option value="">{t("selectDefault")}</option>
+            <option value="ararat">{t("viewArarat")}</option>
+            <option value="city">{t("viewCity")}</option>
+            <option value="garden">{t("viewGarden")}</option>
+            <option value="street">{t("viewStreet")}</option>
           </select>
         </div>
       </div>
 
       {/* Description */}
       <div>
-        <label className={labelCls}>Description / Ն. *</label>
+        <label className={labelCls}>{t("descriptionLabel")} *</label>
         <textarea required rows={4} placeholder={t("description")} value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} />
       </div>
 
       {/* Photos */}
       <div>
-        <label className={labelCls}>Photos / Լ.</label>
+        <label className={labelCls}>{t("photosLabel")}</label>
         <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-primary-200 p-6 text-sm text-primary-500 dark:border-white/15">
           <UploadCloud className="h-6 w-6" />
-          {uploadingPhotos ? "Uploading…" : t("photos")}
+          {uploadingPhotos ? t("uploading") : t("photos")}
           <input type="file" accept="image/*" multiple className="hidden"
             onChange={(e) => handlePhotoChange(e.target.files)} />
         </label>
@@ -384,13 +384,13 @@ export default function SubmitForm() {
           <p className="flex-1 text-sm text-red-700 dark:text-red-400">{error}</p>
           <button type="submit"
             className="shrink-0 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">
-            Try again
+            {t("tryAgain")}
           </button>
         </div>
       )}
 
       <button type="submit" disabled={submitting || uploadingPhotos} className="btn-gold w-full disabled:opacity-60">
-        {submitting ? "Submitting…" : t("submitBtn")}
+        {submitting ? t("submitting") : t("submitBtn")}
       </button>
     </form>
   );
