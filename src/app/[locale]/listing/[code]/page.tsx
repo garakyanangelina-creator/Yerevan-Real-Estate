@@ -13,6 +13,8 @@ import { BedDouble, Bath, Ruler, Building2, MapPin } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const SITE_URL = "https://www.yerevanreal.com";
+
 export async function generateMetadata({
   params,
 }: {
@@ -21,9 +23,19 @@ export async function generateMetadata({
   const { code, locale } = await params;
   const { property } = await getPublicPropertyByCode(code, locale);
   if (!property) return {};
+  const path = `/listing/${code}`;
   return {
     title: property.title,
     description: property.description,
+    alternates: {
+      canonical: `${SITE_URL}/${locale}${path}`,
+      languages: {
+        en: `${SITE_URL}/en${path}`,
+        ru: `${SITE_URL}/ru${path}`,
+        hy: `${SITE_URL}/hy${path}`,
+        "x-default": `${SITE_URL}/en${path}`,
+      },
+    },
     openGraph: {
       title: property.title,
       description: property.description,

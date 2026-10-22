@@ -125,9 +125,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ru: `Квартиры, дома и коммерческая недвижимость на продажу и в аренду в районе ${name}, Ереван. Найдите идеальный объект с Yerevan Real Estate.`,
     hy: `Բնակարաններ, տներ և առևտրային անշարժ գույք ${name} թաղամասում՝ վաճառքի և վարձակալության։`,
   };
+  const SITE_URL = "https://www.yerevanreal.com";
+  const path = `/district/${params.slug}`;
   return {
     title: titles[params.locale] ?? titles.en,
     description: descs[params.locale] ?? descs.en,
+    alternates: {
+      canonical: `${SITE_URL}/${params.locale}${path}`,
+      languages: {
+        en: `${SITE_URL}/en${path}`,
+        ru: `${SITE_URL}/ru${path}`,
+        hy: `${SITE_URL}/hy${path}`,
+        "x-default": `${SITE_URL}/en${path}`,
+      },
+    },
   };
 }
 
