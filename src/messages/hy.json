@@ -113,7 +113,7 @@
     "areaLabel": "Մակերես",
     "floorLabel": "Հարկ",
     "districtLabel": "Թաղամաս",
-    "copyLink": "Պատչենել կապակն",
+    "copyLink": "Պատճենել հղումը",
     "copiedLink": "Կոպիացվան!"
   },
   "home": {
@@ -500,7 +500,7 @@
     "forPurpose": "Նապատակի",
     "shareWithClient": "Կիսարել Հաղախորդին",
     "linkCopied": "Կրկված է!",
-    "copyLink": "Պատչենել կապակն",
+    "copyLink": "Պատճենել հղումը",
     "clientSeesPublic": "Հաղախորդը տեսնում հանրային տարբերակը",
     "noListingCode": "Հգագիրի կոդը դեյս անլխկալ",
     "ownerContact": "Սեփականատիրոջի կապը",
@@ -512,7 +512,7 @@
     "createListing": "Նոր Հայտարարություն",
     "editListing": "Ռադագրել Հգագիր",
     "viewDetails": "Տեսնել մանրամասներն",
-    "copyLink": "Պատչենել կապակն",
+    "copyLink": "Պատճենել հղումը",
     "copied": "կոպիացված",
     "draftBadge": "Նախնագիր",
     "noListings": "Հայտարարություններ չկան",
