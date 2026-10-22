@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${BASE_URL}/${locale}/listing/${code}`,
         changeFrequency: "weekly",
         priority: 0.9,
-        lastModified: property.updatedAt ? new Date(property.updatedAt) : undefined,
+        lastModified: new Date(),
       });
     }
   }
