@@ -116,9 +116,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lang = LOCALE_NAMES[params.locale] ?? "en";
   const name = district[lang as "en" | "ru" | "hy"];
   const titles: Record<string, string> = {
-    en: `Real Estate in ${name}, Yerevan — Apartments & Properties | Yerevan Real Estate`,
-    ru: `Недвижимость в районе ${name}, Ереван — Квартиры и объекты | Yerevan Real Estate`,
-    hy: `Անշարժ գույք ${name} թաղամասում, Երևան | Yerevan Real Estate`,
+    en: `Real Estate in ${name}, Yerevan — Apartments & Properties`,
+    ru: `Недвижимость в районе ${name}, Ереван — Квартиры и объекты`,
+    hy: `Անշարժ գույք ${name} թաղամասում, Երևան`,
   };
   const descs: Record<string, string> = {
     en: `Browse apartments, houses and commercial properties for sale and rent in ${name}, Yerevan. Find your ideal property with Yerevan Real Estate.`,

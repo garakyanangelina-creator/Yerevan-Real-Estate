@@ -90,7 +90,20 @@ export default async function ListingPage({
     "@type": "RealEstateListing",
     name: property.title,
     description: property.description,
+    url: `${SITE_URL}/${locale}/listing/${displayCode}`,
     image: property.images,
+    numberOfRooms: property.bedrooms > 0 ? property.bedrooms : undefined,
+    floorSize: {
+      "@type": "QuantitativeValue",
+      value: property.area,
+      unitCode: "MTK",
+    },
+    offers: {
+      "@type": "Offer",
+      price: property.price,
+      priceCurrency: property.currency,
+      availability: "https://schema.org/InStock",
+    },
     address: {
       "@type": "PostalAddress",
       // streetAddress intentionally omitted — building number is private
