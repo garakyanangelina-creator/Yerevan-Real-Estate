@@ -9,7 +9,9 @@ import EmptyState from "@/components/common/EmptyState";
 import { getPublicPropertyByCode, getSimilarPublicProperties } from "@/services/propertyService";
 import { formatPrice } from "@/lib/utils";
 import CopyLinkButton from "@/components/property/CopyLinkButton";
+import { Link } from "@/i18n/routing";
 import { BedDouble, Bath, Ruler, Building2, MapPin } from "lucide-react";
+import { districts } from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
 
@@ -120,7 +122,17 @@ export default async function ListingPage({
                 {property.title}
               </h1>
               <p className="mt-1 flex items-center gap-1 text-primary-500 dark:text-white/60">
-                <MapPin className="h-4 w-4" /> {tDistricts(property.district)}, Yerevan
+                <MapPin className="h-4 w-4" />
+                {(districts as readonly string[]).includes(property.district) ? (
+                  <Link
+                    href={`/district/${property.district}`}
+                    className="hover:text-gold-600 transition-colors"
+                  >
+                    {tDistricts(property.district)}, Yerevan
+                  </Link>
+                ) : (
+                  <>{tDistricts(property.district)}, Yerevan</>
+                )}
               </p>
             </div>
             <p className="text-2xl font-semibold text-gold-600">

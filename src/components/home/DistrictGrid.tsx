@@ -36,7 +36,7 @@ export default function DistrictGrid() {
         {districts.map((d) => (
           <Link
             key={d}
-            href={`/search?district=${d}`}
+            href={`/district/${d}`}
             className="group relative overflow-hidden rounded-xl shadow-soft ring-1 ring-primary-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-gold-400/30 sm:rounded-2xl"
             style={{ height: "clamp(120px, 25vw, 192px)" }}
           >
