@@ -92,7 +92,7 @@ export default async function ListingPage({
     description: property.description,
     url: `${SITE_URL}/${locale}/listing/${displayCode}`,
     image: property.images,
-    numberOfRooms: property.bedrooms > 0 ? property.bedrooms : undefined,
+    numberOfBedrooms: property.bedrooms > 0 ? property.bedrooms : undefined,
     floorSize: {
       "@type": "QuantitativeValue",
       value: property.area,
