@@ -1,6 +1,28 @@
 export const revalidate = 60;
 
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+
+const SITE_URL = "https://www.yerevanreal.com";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    alternates: {
+      canonical: `${SITE_URL}/${locale}`,
+      languages: {
+        en: `${SITE_URL}/en`,
+        ru: `${SITE_URL}/ru`,
+        hy: `${SITE_URL}/hy`,
+        "x-default": `${SITE_URL}/en`,
+      },
+    },
+  };
+}
 import Image from "next/image";
 import Hero from "@/components/home/Hero";
 import DistrictGrid from "@/components/home/DistrictGrid";

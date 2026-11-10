@@ -20,7 +20,7 @@ export async function generateMetadata({
   const { id, locale } = await params;
   const { property } = await getPublicPropertyById(id);
   if (!property) return {};
-  const base = "https://yerevanreal.com";
+  const base = "https://www.yerevanreal.com";
   return {
     title: property.title,
     description: property.description,

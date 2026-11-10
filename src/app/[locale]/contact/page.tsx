@@ -1,10 +1,29 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Phone, Mail, MapPin } from "lucide-react";
 import ContactForm from "@/components/contact/ContactForm";
 
-export async function generateMetadata() {
+const SITE_URL = "https://www.yerevanreal.com";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations("contact");
-  return { title: t("title") };
+  return {
+    title: t("title"),
+    alternates: {
+      canonical: `${SITE_URL}/${locale}/contact`,
+      languages: {
+        en: `${SITE_URL}/en/contact`,
+        ru: `${SITE_URL}/ru/contact`,
+        hy: `${SITE_URL}/hy/contact`,
+        "x-default": `${SITE_URL}/en/contact`,
+      },
+    },
+  };
 }
 
 export default async function ContactPage() {

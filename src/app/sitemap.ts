@@ -11,7 +11,7 @@ const DISTRICTS = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPaths = ["", "/search", "/submit", "/contact"];
+  const staticPaths = ["", "/search", "/contact"];
   const entries: MetadataRoute.Sitemap = [];
 
   const { properties } = await getPublicProperties().catch(() => ({ properties: [] }));
@@ -38,7 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${BASE_URL}/${locale}/listing/${code}`,
         changeFrequency: "weekly",
         priority: 0.9,
-        lastModified: new Date(),
       });
     }
   }
