@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import Gallery from "@/components/property/Gallery";
@@ -17,22 +17,16 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string; locale: string }>;
 }): Promise<Metadata> {
-  const { id, locale } = await params;
+  const { id } = await params;
   const { property } = await getPublicPropertyById(id);
   if (!property) return {};
-  const base = "https://www.yerevanreal.com";
+  // /property/[id] is never the canonical URL — suppress indexing in all cases.
+  // Properties with a listingCode redirect to /listing/[code] in the page component.
+  // Properties without a listingCode are not in the sitemap.
   return {
     title: property.title,
     description: property.description,
-    alternates: {
-      canonical: `${base}/${locale}/property/${id}`,
-      languages: {
-        "en": `${base}/en/property/${id}`,
-        "ru": `${base}/ru/property/${id}`,
-        "hy": `${base}/hy/property/${id}`,
-        "x-default": `${base}/en/property/${id}`,
-      },
-    },
+    robots: { index: false, follow: false },
     openGraph: {
       title: property.title,
       description: property.description,
@@ -48,6 +42,12 @@ export default async function PropertyPage({
 }) {
   const { id, locale } = await params;
   const { property, error } = await getPublicPropertyById(id, locale);
+
+  // Redirect to the canonical /listing/[code] URL when a listing code exists.
+  if (property?.listingCode) {
+    const code = String(property.listingCode).padStart(4, "0");
+    redirect(`/${locale}/listing/${code}`);
+  }
 
   const tCommon = await getTranslations("common");
 
