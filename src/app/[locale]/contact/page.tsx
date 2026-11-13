@@ -12,8 +12,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations("contact");
+  const title = t("title");
+  const description = locale !== "hy" ? t("metaDescription") : undefined;
   return {
-    title: t("title"),
+    title,
+    ...(description !== undefined && { description }),
+    ...(description !== undefined && {
+      openGraph: {
+        title,
+        description,
+      },
+    }),
     alternates: {
       canonical: `${SITE_URL}/${locale}/contact`,
       languages: {

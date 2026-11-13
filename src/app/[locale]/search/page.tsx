@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { getPublicProperties } from "@/services/propertyService";
 import SearchClient from "./SearchClient";
 
@@ -13,7 +14,18 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations("search");
+  const title = t("title");
+  const description = locale !== "hy" ? t("metaDescription") : undefined;
   return {
+    title,
+    ...(description !== undefined && { description }),
+    ...(description !== undefined && {
+      openGraph: {
+        title,
+        description,
+      },
+    }),
     alternates: {
       canonical: `${SITE_URL}/${locale}/search`,
       languages: {

@@ -24,7 +24,8 @@
     "cta": "Search Properties"
   },
   "search": {
-    "title": "Property Search",
+    "title": "Search Properties in Yerevan",
+    "metaDescription": "Browse apartments, houses and commercial spaces for sale and rent in Yerevan. Filter by district, type, price and size to find your ideal property.",
     "placeholder": "Search by district, title or address",
     "type": "Property Type",
     "purpose": "Purpose",
@@ -201,6 +202,7 @@
   },
   "contact": {
     "title": "Contact Us",
+    "metaDescription": "Get in touch with Yerevan Real Estate. Our agency helps you buy, sell or rent apartments, houses and commercial property across Yerevan. We respond quickly.",
     "subtitle": "Have a question? Send us a message and our team will respond shortly.",
     "name": "Name",
     "phone": "Phone",
